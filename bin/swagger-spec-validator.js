@@ -1,16 +1,45 @@
 #!/usr/bin/env node
 /**
- * An executable command which will be added to $PATH.
+ * swagger-spec-validator executable command.
  *
- * @copyright Copyright 2016 Kevin Locke <kevin@kevinlocke.name>
+ * @copyright Copyright 2017 Kevin Locke <kevin@kevinlocke.name>
  * @license MIT
  */
 
 'use strict';
 
 var Command = require('commander').Command;
-var modulename = require('..');
+var arrayUniq = require('array-uniq');
+var assign = require('object-assign');
 var packageJson = require('../package.json');
+var swaggerSpecValidator = require('..');
+var url = require('url');
+
+function addHeader(line, headers) {
+  var match = /^\s*(\S+)\s*:\s*(.*?)\s*$/.exec(line);
+  if (!match) {
+    throw new Error('Unable to parse header line "' + line + '"');
+  }
+
+  var name = match[1];
+  var value = match[2];
+  headers[name] = value;
+  return headers;
+}
+
+/** Gets validation messages from a validation response object. */
+function getMessages(result) {
+  var messages = [];
+  if (result.messages) {
+    messages = messages.concat(result.messages);
+  }
+  if (result.schemaValidationMessages) {
+    messages = messages.concat(result.schemaValidationMessages.map(function(m) {
+      return m.level + ': ' + m.message;
+    }));
+  }
+  return messages;
+}
 
 /** Options for command entry points.
  *
@@ -39,7 +68,7 @@ var packageJson = require('../package.json');
  * and <code>global.Promise</code> is defined, a <code>Promise</code> with the
  * exit code or <code>Error</code>.
  */
-function modulenameCmd(args, options, callback) {
+function swaggerSpecValidatorCmd(args, options, callback) {
   if (!callback && typeof options === 'function') {
     callback = options;
     options = null;
@@ -48,7 +77,7 @@ function modulenameCmd(args, options, callback) {
   if (!callback && typeof Promise === 'function') {
     // eslint-disable-next-line no-undef
     return new Promise(function(resolve, reject) {
-      modulenameCmd(args, function(err, result) {
+      swaggerSpecValidatorCmd(args, function(err, result) {
         if (err) { reject(err); } else { resolve(result); }
       });
     });
@@ -63,7 +92,7 @@ function modulenameCmd(args, options, callback) {
       throw new TypeError('options must be an object');
     }
 
-    options = Object.assign(
+    options = assign(
       {
         in: process.stdin,
         out: process.stdout,
@@ -89,12 +118,24 @@ function modulenameCmd(args, options, callback) {
   }
 
   var command = new Command()
-    .description('Does the thing with the thing and stuff.')
-    // .arguments() splits on white space.  Call .parseExpectedArgs directly.
-    .parseExpectedArgs(['<arg name>'])
+    .description('Validate OpenAPI/Swagger API specifications.')
+    .arguments('[swagger.yaml...]')
+    .option(
+      '-H, --header <header-line>',
+      'additional HTTP header to send',
+      addHeader,
+      {}
+    )
     .option('-q, --quiet', 'print less output')
+    .on('quiet', function() { this.verbosity -= 1; })
+    .option(
+      '-u, --url <url>',
+      'validator URL (default: ' + swaggerSpecValidator.DEFAULT_URL + ')'
+    )
     .option('-v, --verbose', 'print more output')
+    .on('verbose', function() { this.verbosity += 1; })
     .version(packageJson.version);
+  command.verbosity = 0;
 
   // Patch stdout, stderr, and exit for Commander
   // See: https://github.com/tj/commander.js/pull/444
@@ -138,18 +179,64 @@ function modulenameCmd(args, options, callback) {
     Object.defineProperty(process, 'stderr', stderrDesc);
   }
 
-  if (command.args.length !== 1) {
-    callback(new Error('Exactly one argument is required.\n' +
-          command.helpInformation()));
-    return undefined;
+  var reqOpts = command.url ? url.parse(command.url) : {};
+  reqOpts.headers = command.headers;
+
+  var specPaths = command.args;
+  if (specPaths.length === 0) {
+    // Default to validating stdin
+    specPaths.push('-');
+    if (command.verbosity > 1) {
+      options.out.write('Reading spec from stdin...\n');
+    }
+  } else if (specPaths.length > 1) {
+    specPaths = arrayUniq(specPaths);
   }
 
-  // Parse arguments then call API function with parsed options
-  modulename(command, callback);
+  var hadError = false;
+  var hadInvalid = false;
+  var numValidated = 0;
+  specPaths.forEach(function(specPath) {
+    function onResult(err, result) {
+      if (err) {
+        hadError = true;
+        if (command.verbosity >= -1) {
+          options.err.write(specPath + ': ' + err + '\n');
+          // DEBUG
+          options.err.write(err.stack);
+        }
+      } else {
+        var messages = getMessages(result);
+        if (messages.length > 0) {
+          hadInvalid = true;
+          if (command.verbosity >= 0) {
+            options.out.write(messages.join('\n') + '\n');
+          }
+        }
+      }
+
+      numValidated += 1;
+      if (numValidated === specPaths.length) {
+        if (!hadError && !hadInvalid && command.verbosity >= 0) {
+          options.err.write('All OpenAPI/Swagger specs are valid.\n');
+        }
+
+        callback(null, hadError ? 2 : hadInvalid ? 1 : 0);
+      }
+    }
+
+    if (specPath === '-') {
+      swaggerSpecValidator.validate(options.in, reqOpts, onResult);
+    } else {
+      swaggerSpecValidator.validateFile(specPath, reqOpts, onResult);
+    }
+  });
+
   return undefined;
 }
 
-module.exports = modulenameCmd;
+swaggerSpecValidatorCmd.default = swaggerSpecValidatorCmd;
+module.exports = swaggerSpecValidatorCmd;
 
 if (require.main === module) {
   // This file was invoked directly.
@@ -159,7 +246,7 @@ if (require.main === module) {
     out: process.stdout,
     err: process.stderr
   };
-  modulenameCmd(process.argv, mainOptions, function(err, code) {
+  swaggerSpecValidatorCmd(process.argv, mainOptions, function(err, code) {
     if (err) {
       if (err.stdout) { process.stdout.write(err.stdout); }
       if (err.stderr) { process.stderr.write(err.stderr); }

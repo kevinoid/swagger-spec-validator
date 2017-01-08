@@ -1,22 +1,24 @@
 {
-  "name": "@kevinoid/project-template",
-  "version": "0.0.1",
-  "description": "A Node.js/npm project template with codecov, coveralls, ESLint, github_changelog_generator, istanbul, JSDoc, and mocha.",
+  "name": "swagger-spec-validator",
+  "version": "0.1.0",
+  "description": "Validate an OpenAPI/Swagger API specification using the swagger.io online validator.",
   "keywords": [
-    "project-template",
-    "template"
+    "cli",
+    "openapi",
+    "swagger",
+    "validator"
   ],
   "license": "MIT",
-  "homepage": "https://github.com/kevinoid/node-project-template",
-  "bugs": "https://github.com/kevinoid/node-project-template/issues",
+  "homepage": "https://github.com/kevinoid/swagger-spec-validator",
+  "bugs": "https://github.com/kevinoid/swagger-spec-validator/issues",
   "author": "Kevin Locke <kevin@kevinlocke.name>",
   "repository": {
     "type": "git",
-    "url": "https://github.com/kevinoid/node-project-template.git"
+    "url": "https://github.com/kevinoid/swagger-spec-validator.git"
   },
   "main": "index.js",
   "bin": {
-    "index": "bin/index.js"
+    "swagger-spec-validator": "bin/swagger-spec-validator.js"
   },
   "//": "All scripts should run in POSIX sh and Windows cmd.exe",
   "scripts": {
@@ -30,7 +32,6 @@
     "postpublish": "git -C doc push && git push --follow-tags origin master gh-pages && echo Remember to update GitHub Releases from CHANGELOG.md && echo until skywinder/github-changelog-generator#56 is fixed.",
     "postversion": "rimraf doc && git clone -b gh-pages -l -q . doc && npm run doc && git -C doc add . && git -C doc commit -n -m \"Docs for v$npm_package_version\"",
     "preversion": "depcheck --ignores eslint-plugin-import && david && git-branch-is master && travis-status -b -c -qwx && istanbul check-coverage --statements 95 coverage/coverage.json",
-    "start": "supervisor --quiet --no-restart-on exit --extensions js,json --ignore test --poll-interval 2000 server.js",
     "test": "npm run lint && npm run test-unit",
     "test-cov": "npm run lint && npm run test-unit-cov",
     "test-unit": "mocha --recursive test",
@@ -39,7 +40,12 @@
     "version": "github_changelog_generator -t \"$npm_config_gcg_github_token\" --future-release \"$npm_package_version\" && echo && echo === Please edit CHANGELOG.md as desired, then exit === && echo && $npm_config_shell && git commit -m \"Update CHANGELOG.md for $npm_package_version\" CHANGELOG.md",
     "version-deps": "npm install david depcheck git-branch-is travis-status"
   },
-  "dependencies": {},
+  "dependencies": {
+    "caseless": "^0.11.0",
+    "commander": "^2.9.0",
+    "object-assign": "^4.1.0",
+    "ssl-root-cas": "^1.2.3"
+  },
   "devDependencies": {
     "codecov": "^1.0.1",
     "coveralls": "^2.11.6",

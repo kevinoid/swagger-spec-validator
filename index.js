@@ -90,10 +90,9 @@ function requestJson(options, callback) {
  * specification content.
  * @param {Object=} options Options for <code>http.request</code>.
  * @param {?function(Error, Object=)=} callback Callback for the validation
- * results object.  Required if <code>global.Promise</code> is not defined.
- * @return {Promise<Object>|undefined} If <code>callback</code> is not given
- * and <code>global.Promise</code> is defined, a <code>Promise</code> with the
- * validation results or <code>Error</code>.
+ * results object.
+ * @return {Promise<Object>|undefined} If <code>callback</code> is not given,
+ * a <code>Promise</code> with the validation results or <code>Error</code>.
  */
 function validate(spec, options, callback) {
   if (!callback && typeof options === 'function') {
@@ -101,8 +100,7 @@ function validate(spec, options, callback) {
     options = null;
   }
 
-  if (!callback && typeof Promise === 'function') {
-    // eslint-disable-next-line no-undef
+  if (!callback) {
     return new Promise(function(resolve, reject) {
       validate(spec, options, function(err, result) {
         if (err) { reject(err); } else { resolve(result); }
@@ -139,10 +137,9 @@ function validate(spec, options, callback) {
  * @param {string} specPath Path of OpenAPI/Swagger API specification file.
  * @param {Object=} options Options for <code>http.request</code>.
  * @param {?function(Error, Object=)=} callback Callback for the validation
- * results object.  Required if <code>global.Promise</code> is not defined.
- * @return {Promise<Object>|undefined} If <code>callback</code> is not given
- * and <code>global.Promise</code> is defined, a <code>Promise</code> with the
- * validation results or <code>Error</code>.
+ * results object.
+ * @return {Promise<Object>|undefined} If <code>callback</code> is not given,
+ * a <code>Promise</code> with the validation results or <code>Error</code>.
  */
 function validateFile(specPath, options, callback) {
   if (!callback && typeof options === 'function') {

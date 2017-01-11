@@ -11,7 +11,13 @@ var fs = require('fs');
 var http = require('http');
 var https = require('https');
 var packageJson = require('./package.json');
+var path = require('path');
+var pify = require('pify');
+var tls = require('tls');
 var url = require('url');
+
+var readFileP = pify(fs.readFile);
+var readdirP = pify(fs.readdir);
 
 /** Default URL to which validation requests are sent.
  * @const
@@ -27,7 +33,48 @@ var DEFAULT_HEADERS = Object.freeze({
     ' Node.js/' + process.version.slice(1)
 });
 
-/** Makes an HTTP(S) request and parses the JSON response. */
+/** HTTPS Agent for online.swagger.io which can valididate the HTTPS
+ * certificate lacking an intermediate.
+ * See https://github.com/swagger-api/validator-badge/issues/98
+ */
+var swaggerIoHttpsAgent;
+
+/** Adds our default HTTP Agent to the request options.
+ * @private
+ */
+function getSwaggerIoAgent() {
+  if (!swaggerIoHttpsAgent) {
+    var certsPath = path.join(__dirname, 'certs');
+    swaggerIoHttpsAgent = readdirP(certsPath)
+      .then(function(certNames) {
+        return Promise.all(
+          certNames.map(function(certName) {
+            var certPath = path.join(certsPath, certName);
+            return readFileP(certPath, {encoding: 'utf8'});
+          })
+        );
+      })
+      .then(function(certs) {
+        // Note: Using undocumented API to use both root and loaded certs.
+        //       Specifying options.ca skips root certs, which could cause cert
+        //       verification to fail if online.swagger.io changed certs.
+        var secureContext = tls.createSecureContext();
+        certs.forEach(function(cert) {
+          secureContext.context.addCACert(cert);
+        });
+        return new https.Agent({
+          keepAlive: true,
+          secureContext: secureContext
+        });
+      });
+  }
+
+  return swaggerIoHttpsAgent;
+}
+
+/** Makes an HTTP(S) request and parses the JSON response.
+ * @private
+ */
 function requestJson(options, callback) {
   var proto = options.protocol === 'https:' ? https :
     options.protocol === 'http:' ? http :
@@ -124,7 +171,18 @@ function validate(spec, options, callback) {
   assign(reqOpts, options);
   reqOpts.headers = assign({}, DEFAULT_HEADERS, options && options.headers);
   reqOpts.body = spec;
-  requestJson(reqOpts, callback);
+
+  if (reqOpts.hostname === 'online.swagger.io' &&
+      !hasOwnProperty.call(reqOpts, 'agent')) {
+    getSwaggerIoAgent()
+      .then(function(agent) {
+        reqOpts.agent = agent;
+        requestJson(reqOpts, callback);
+      })
+      .catch(callback);
+  } else {
+    requestJson(reqOpts, callback);
+  }
 
   return undefined;
 }

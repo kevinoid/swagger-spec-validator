@@ -44,6 +44,8 @@
     "caseless": "^0.11.0",
     "object-assign": "^4.1.0",
     "pify": "^2.3.0",
+    "proxyquire": "^1.7.10",
+    "sinon": "^1.17.7",
     "yargs": "^6.6.0"
   },
   "devDependencies": {
@@ -57,6 +59,7 @@
     "mocha": "^3.2.0",
     "node-version-check": "^2.1.1",
     "nodecat": "^0.1.0",
+    "regexp.escape": "^1.0.2",
     "rimraf": "^2.2.0"
   },
   "engines": {

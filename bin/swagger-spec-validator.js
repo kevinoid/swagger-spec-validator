@@ -201,6 +201,8 @@ function swaggerSpecValidatorCmd(args, options, callback) {
       coerce: parseHeaders
     })
     .help()
+    .alias('help', 'h')
+    .alias('help', '?')
     .option('quiet', {
       alias: 'q',
       describe: 'Print less output',
@@ -217,6 +219,7 @@ function swaggerSpecValidatorCmd(args, options, callback) {
       count: true
     })
     .version()
+    .alias('version', 'V')
     .strict();
   parseYargs(yargs, args, function(err, argOpts, output) {
     if (err) {

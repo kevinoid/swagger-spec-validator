@@ -16,7 +16,10 @@ var swaggerSpecValidator = require('..');
 var url = require('url');
 
 function addHeader(line, headers) {
-  var match = /^\s*(\S+)\s*:\s*(.*?)\s*$/.exec(line);
+  // Note: curl uses the header line literally.  We can't due to Node API.
+  //       Node enforces name is a valid RFC 7230 token, so remove whitespace
+  //       as a convenience for users.
+  var match = /^\s*(\S+)\s*: ?(.*)$/.exec(line);
   if (!match) {
     throw new Error('Unable to parse header line "' + line + '"');
   }

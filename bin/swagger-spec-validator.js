@@ -205,8 +205,9 @@ function swaggerSpecValidatorCmd(args, options, callback) {
         hadError = true;
         if (command.verbosity >= -1) {
           options.err.write(specPath + ': ' + err + '\n');
-          // DEBUG
-          options.err.write(err.stack);
+          if (command.verbosity >= 1) {
+            options.err.write(err.stack);
+          }
         }
       } else {
         var messages = getMessages(result);

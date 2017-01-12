@@ -226,7 +226,7 @@ function swaggerSpecValidatorCmd(args, options, callback) {
       options.err.write(output ?
                           output + '\n' :
                           err.name + ': ' + err.message + '\n');
-      callback(null, 1);
+      callback(null, 3);
       return;
     }
 

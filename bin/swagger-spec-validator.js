@@ -11,6 +11,7 @@
 var Yargs = require('yargs/yargs');
 var arrayUniq = require('array-uniq');
 var assign = require('object-assign');
+var packageJson = require('../package.json');
 var swaggerSpecValidator = require('..');
 var url = require('url');
 
@@ -218,7 +219,7 @@ function swaggerSpecValidatorCmd(args, options, callback) {
       describe: 'Print more output',
       count: true
     })
-    .version()
+    .version(packageJson.name + ' ' + packageJson.version)
     .alias('version', 'V')
     .strict();
   parseYargs(yargs, args, function(err, argOpts, output) {

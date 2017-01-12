@@ -131,11 +131,26 @@ function requestJson(options, callback) {
   }
 }
 
+/** Validation options
+ *
+ * @typedef {{
+ *   err: (stream.Writable|undefined),
+ *   request: (Object|undefined),
+ *   verbosity: (number|undefined)
+ * }} ValidateOptions
+ * @property {stream.Writable=} err Stream to which errors (and non-output
+ * status messages) are written. (default: <code>process.stderr</code>)
+ * @property {Object=} request Options passed to <code>http.request()</code>.
+ * @property {number=} verbosity Amount of output to produce.  Larger numbers
+ * produce more output.
+ */
+// var ValidateOptions;
+
 /** Validates an OpenAPI/Swagger API specification.
  *
  * @param {string|!Buffer|!stream.Readable} spec OpenAPI/Swagger API
  * specification content.
- * @param {Object=} options Options for <code>http.request</code>.
+ * @param {ValidateOptions=} options Validation options.
  * @param {?function(Error, Object=)=} callback Callback for the validation
  * results object.
  * @return {Promise<Object>|undefined} If <code>callback</code> is not given,
@@ -168,8 +183,8 @@ function validate(spec, options, callback) {
 
   var reqOpts = url.parse(DEFAULT_URL);
   reqOpts.method = 'POST';
-  assign(reqOpts, options);
-  reqOpts.headers = assign({}, DEFAULT_HEADERS, options && options.headers);
+  assign(reqOpts, options && options.request);
+  reqOpts.headers = assign({}, DEFAULT_HEADERS, reqOpts.headers);
   reqOpts.body = spec;
 
   if (reqOpts.hostname === 'online.swagger.io' &&
@@ -193,7 +208,7 @@ function validate(spec, options, callback) {
  * and <code>.yaml</code>/<code>.yml</code> files.
  *
  * @param {string} specPath Path of OpenAPI/Swagger API specification file.
- * @param {Object=} options Options for <code>http.request</code>.
+ * @param {ValidateOptions=} options Validation options.
  * @param {?function(Error, Object=)=} callback Callback for the validation
  * results object.
  * @return {Promise<Object>|undefined} If <code>callback</code> is not given,
@@ -205,7 +220,7 @@ function validateFile(specPath, options, callback) {
     options = null;
   }
 
-  var headers = options && options.headers;
+  var headers = options && options.request && options.request.headers;
   if (!headers || !caseless(headers).has('Content-Type')) {
     // Server ignores Content-Type, so not worth depending on a Media Type db.
     var contentType = /\.json$/i.test(specPath) ? 'application/json' :
@@ -213,8 +228,9 @@ function validateFile(specPath, options, callback) {
       null;
     if (contentType) {
       options = assign({}, options);
-      options.headers = assign({}, options.headers);
-      options.headers['Content-Type'] = contentType;
+      options.request = assign({}, options.request);
+      options.request.headers = assign({}, options.request.headers);
+      options.request.headers['Content-Type'] = contentType;
     }
   }
 

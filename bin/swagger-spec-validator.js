@@ -8,14 +8,13 @@
 
 'use strict';
 
-var Command = require('commander').Command;
+var Yargs = require('yargs/yargs');
 var arrayUniq = require('array-uniq');
 var assign = require('object-assign');
-var packageJson = require('../package.json');
 var swaggerSpecValidator = require('..');
 var url = require('url');
 
-function addHeader(line, headers) {
+function parseHeader(line) {
   // Note: curl uses the header line literally.  We can't due to Node API.
   //       Node enforces name is a valid RFC 7230 token, so remove whitespace
   //       as a convenience for users.
@@ -26,8 +25,27 @@ function addHeader(line, headers) {
 
   var name = match[1];
   var value = match[2];
-  headers[name] = value;
-  return headers;
+  return [name, value];
+}
+
+function parseHeaders(lines) {
+  return lines.map(parseHeader)
+    .reduce(function(headerObj, header) {
+      headerObj[header[0]] = header[1];
+      return headerObj;
+    }, {});
+}
+
+/** Calls <code>yargs.parse</code> and passes any thrown errors to the callback.
+ * Workaround for https://github.com/yargs/yargs/issues/755
+ */
+function parseYargs(yargs, args, callback) {
+  try {
+    yargs.parse(args, callback);
+  } catch (err) {
+    // Since yargs doesn't nextTick its callback, don't here either
+    callback(err);
+  }
 }
 
 /** Gets validation messages from a validation response object. */
@@ -42,6 +60,48 @@ function getMessages(result) {
     }));
   }
   return messages;
+}
+
+function validateAll(specPaths, options, callback) {
+  var hadError = false;
+  var hadInvalid = false;
+  var numValidated = 0;
+  specPaths.forEach(function(specPath) {
+    function onResult(err, result) {
+      if (err) {
+        hadError = true;
+        if (options.verbosity >= -1) {
+          options.err.write(specPath + ': ' + err + '\n');
+          if (options.verbosity >= 1) {
+            options.err.write(err.stack);
+          }
+        }
+      } else {
+        var messages = getMessages(result);
+        if (messages.length > 0) {
+          hadInvalid = true;
+          if (options.verbosity >= 0) {
+            options.out.write(messages.join('\n') + '\n');
+          }
+        }
+      }
+
+      numValidated += 1;
+      if (numValidated === specPaths.length) {
+        if (!hadError && !hadInvalid && options.verbosity >= 0) {
+          options.err.write('All OpenAPI/Swagger specs are valid.\n');
+        }
+
+        callback(null, hadError ? 2 : hadInvalid ? 1 : 0);
+      }
+    }
+
+    if (specPath === '-') {
+      swaggerSpecValidator.validate(options.in, options, onResult);
+    } else {
+      swaggerSpecValidator.validateFile(specPath, options, onResult);
+    }
+  });
 }
 
 /** Options for command entry points.
@@ -129,123 +189,72 @@ function swaggerSpecValidatorCmd(args, options, callback) {
     return undefined;
   }
 
-  var command = new Command()
-    .description('Validate OpenAPI/Swagger API specifications.')
-    .arguments('[swagger.yaml...]')
-    .option(
-      '-H, --header <header-line>',
-      'additional HTTP header to send',
-      addHeader,
-      {}
-    )
-    .option('-q, --quiet', 'print less output')
-    .on('quiet', function() { this.verbosity -= 1; })
-    .option(
-      '-u, --url <url>',
-      'validator URL (default: ' + swaggerSpecValidator.DEFAULT_URL + ')'
-    )
-    .option('-v, --verbose', 'print more output')
-    .on('verbose', function() { this.verbosity += 1; })
-    .version(packageJson.version);
-  command.verbosity = 0;
-
-  // Patch stdout, stderr, and exit for Commander
-  // See: https://github.com/tj/commander.js/pull/444
-  var exitDesc = Object.getOwnPropertyDescriptor(process, 'exit');
-  var stdoutDesc = Object.getOwnPropertyDescriptor(process, 'stdout');
-  var stderrDesc = Object.getOwnPropertyDescriptor(process, 'stderr');
-  var errExit = new Error('process.exit() called');
-  process.exit = function throwOnExit(exitCode) {
-    errExit.exitCode = Number(exitCode) || 0;
-    throw errExit;
-  };
-  if (options.out) {
-    Object.defineProperty(
-        process,
-        'stdout',
-        {configurable: true, enumerable: true, value: options.out}
-    );
-  }
-  if (options.err) {
-    Object.defineProperty(
-        process,
-        'stderr',
-        {configurable: true, enumerable: true, value: options.err}
-    );
-  }
-  try {
-    command.parse(args);
-  } catch (errParse) {
-    process.nextTick(function() {
-      if (errParse !== errExit) {
-        // Match commander formatting for consistency
-        options.err.write('\n  error: ' + errParse.message + '\n\n');
-      }
-      callback(
-        null,
-        typeof errParse.exitCode === 'number' ? errParse.exitCode : 1
-      );
-    });
-    return undefined;
-  } finally {
-    Object.defineProperty(process, 'exit', exitDesc);
-    Object.defineProperty(process, 'stdout', stdoutDesc);
-    Object.defineProperty(process, 'stderr', stderrDesc);
-  }
-
-  var reqOpts = command.url ? url.parse(command.url) : {};
-  reqOpts.headers = command.header;
-  reqOpts.verbosity = command.verbosity;
-
-  var specPaths = command.args;
-  if (specPaths.length === 0) {
-    // Default to validating stdin
-    specPaths.push('-');
-    if (command.verbosity > 1) {
-      options.out.write('Reading spec from stdin...\n');
-    }
-  } else if (specPaths.length > 1) {
-    specPaths = arrayUniq(specPaths);
-  }
-
-  var hadError = false;
-  var hadInvalid = false;
-  var numValidated = 0;
-  specPaths.forEach(function(specPath) {
-    function onResult(err, result) {
-      if (err) {
-        hadError = true;
-        if (command.verbosity >= -1) {
-          options.err.write(specPath + ': ' + err + '\n');
-          if (command.verbosity >= 1) {
-            options.err.write(err.stack);
-          }
-        }
-      } else {
-        var messages = getMessages(result);
-        if (messages.length > 0) {
-          hadInvalid = true;
-          if (command.verbosity >= 0) {
-            options.out.write(messages.join('\n') + '\n');
-          }
-        }
-      }
-
-      numValidated += 1;
-      if (numValidated === specPaths.length) {
-        if (!hadError && !hadInvalid && command.verbosity >= 0) {
-          options.err.write('All OpenAPI/Swagger specs are valid.\n');
-        }
-
-        callback(null, hadError ? 2 : hadInvalid ? 1 : 0);
-      }
+  var yargs = new Yargs()
+    .usage('Usage: $0 [options] [swagger.yaml...]')
+    .option('header', {
+      alias: 'H',
+      describe: 'Additional HTTP header to send',
+      requiresArg: true,
+      array: true,
+      // Prevent array from eating non-option arguments
+      nargs: 1,
+      coerce: parseHeaders
+    })
+    .help()
+    .option('quiet', {
+      alias: 'q',
+      describe: 'Print less output',
+      count: true
+    })
+    .option('url', {
+      alias: 'u',
+      describe: 'Validator URL',
+      defaultDescription: swaggerSpecValidator.DEFAULT_URL
+    })
+    .option('verbose', {
+      alias: 'v',
+      describe: 'Print more output',
+      count: true
+    })
+    .version()
+    .strict();
+  parseYargs(yargs, args, function(err, argOpts, output) {
+    if (err) {
+      options.err.write(output ?
+                          output + '\n' :
+                          err.name + ': ' + err.message + '\n');
+      callback(null, 1);
+      return;
     }
 
-    if (specPath === '-') {
-      swaggerSpecValidator.validate(options.in, reqOpts, onResult);
-    } else {
-      swaggerSpecValidator.validateFile(specPath, reqOpts, onResult);
+    if (output) {
+      options.out.write(output + '\n');
     }
+
+    if (argOpts.help || argOpts.version) {
+      callback(null, 0);
+      return;
+    }
+
+    var verbosity = argOpts.verbose - argOpts.quiet;
+
+    var specPaths = argOpts._;
+    if (specPaths.length === 0) {
+      // Default to validating stdin
+      specPaths.push('-');
+      if (verbosity > 1) {
+        options.out.write('Reading spec from stdin...\n');
+      }
+    } else if (specPaths.length > 1) {
+      specPaths = arrayUniq(specPaths);
+    }
+
+    var validateOpts = assign({}, options);
+    validateOpts.request = argOpts.url ? url.parse(argOpts.url) : {};
+    validateOpts.request.headers = argOpts.header;
+    validateOpts.verbosity = verbosity;
+
+    validateAll(specPaths, validateOpts, callback);
   });
 
   return undefined;

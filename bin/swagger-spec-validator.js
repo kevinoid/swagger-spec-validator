@@ -77,7 +77,7 @@ function swaggerSpecValidatorCmd(args, options, callback) {
 
   if (!callback) {
     return new Promise(function(resolve, reject) {
-      swaggerSpecValidatorCmd(args, function(err, result) {
+      swaggerSpecValidatorCmd(args, options, function(err, result) {
         if (err) { reject(err); } else { resolve(result); }
       });
     });

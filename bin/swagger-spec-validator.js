@@ -182,7 +182,7 @@ function swaggerSpecValidatorCmd(args, options, callback) {
   }
 
   var reqOpts = command.url ? url.parse(command.url) : {};
-  reqOpts.headers = command.headers;
+  reqOpts.headers = command.header;
 
   var specPaths = command.args;
   if (specPaths.length === 0) {

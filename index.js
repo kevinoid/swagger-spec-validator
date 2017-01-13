@@ -71,6 +71,29 @@ function getSwaggerIoAgent() {
   return swaggerIoHttpsAgent;
 }
 
+/** Combines HTTP headers objects.
+ * With the capitalization and value of the last occurrence.
+ * @private
+ */
+function combineHeaders() {
+  var combinedLower = {};
+  var combined = {};
+  var args = Array.prototype.slice.call(arguments);
+  args.reverse();
+  args.forEach(function(headers) {
+    if (headers) {
+      Object.keys(headers).forEach(function(name) {
+        var nameLower = name.toLowerCase();
+        if (!hasOwnProperty.call(combinedLower, nameLower)) {
+          combinedLower[nameLower] = true;
+          combined[name] = headers[name];
+        }
+      });
+    }
+  });
+  return combined;
+}
+
 /** Makes an HTTP(S) request and parses the JSON response.
  * @private
  */
@@ -195,7 +218,7 @@ function validate(spec, options, callback) {
   var reqOpts = url.parse(DEFAULT_URL);
   reqOpts.method = 'POST';
   assign(reqOpts, options && options.request);
-  reqOpts.headers = assign({}, DEFAULT_HEADERS, reqOpts.headers);
+  reqOpts.headers = combineHeaders(DEFAULT_HEADERS, reqOpts.headers);
   reqOpts.body = spec;
 
   if (reqOpts.hostname === 'online.swagger.io' &&

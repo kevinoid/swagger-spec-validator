@@ -384,6 +384,27 @@ describe('swagger-spec-validator command', function() {
     validate.yield(new Error('testerr'), {});
   });
 
+  it('-v prints error messages with stack to stderr', function(done) {
+    swaggerSpecValidatorMock.expects('validateFile').never();
+    var validate = swaggerSpecValidatorMock.expects('validate').once()
+      .withArgs(
+        options.in,
+        match.object,
+        match.func
+      );
+    var allArgs = RUNTIME_ARGS.concat('-v');
+    swaggerSpecValidatorCmd(allArgs, options, function(err, code) {
+      assert.ifError(err);
+      assert.strictEqual(code, 2);
+      assert.strictEqual(options.out.read(), null);
+      var errStr = String(options.err.read());
+      assertMatch(errStr, /testerr/i);
+      assertMatch(errStr, new RegExp(regexpEscape(__filename)));
+      done();
+    });
+    validate.yield(new Error('testerr'), {});
+  });
+
   it('normally prints validation messages to stdout', function(done) {
     swaggerSpecValidatorMock.expects('validateFile').never();
     var validate = swaggerSpecValidatorMock.expects('validate').once()

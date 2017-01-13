@@ -221,6 +221,17 @@ describe('swaggerSpecValidator', function() {
         );
     });
 
+    it('returns Error for unsupported protocol', function() {
+      var options = {request: url.parse('ftp://example.com')};
+      return swaggerSpecValidator.validateFile(swaggerJsonPath, options)
+        .then(
+          neverCalled,
+          function(err) {
+            assert.ok(/ftp/.test(err.message));
+          }
+        );
+    });
+
     it('returns validator JSON with errors', function() {
       var testBody = 'swagger';
       var response = {messages: ['test1', 'test2']};
@@ -232,6 +243,67 @@ describe('swaggerSpecValidator', function() {
           assert.deepEqual(result, response);
           ne.done();
         });
+    });
+
+    it('can be called with callback without options', function(done) {
+      var testBody = 'swagger';
+      var testResponse = {};
+      var ne = nock(defaultProtoHost)
+        .post(defaultUrl.path, testBody)
+        .reply(200, testResponse);
+      swaggerSpecValidator.validate(testBody, function(err, result) {
+        assert.ifError(err);
+        assert.deepEqual(result, testResponse);
+        ne.done();
+        done();
+      });
+    });
+
+    it('throws for non-function callback', function() {
+      var testBody = 'swagger';
+      assert.throws(
+        function() {
+          swaggerSpecValidator.validate(testBody, {}, true);
+        },
+        TypeError,
+        /\bcallback\b/
+      );
+    });
+
+    it('accepts spec as Buffer', function() {
+      var testBody = 'swagger';
+      var response = {};
+      var ne = nock(defaultProtoHost)
+        .post(defaultUrl.path, testBody)
+        .reply(200, response);
+      return swaggerSpecValidator.validate(new Buffer(testBody))
+        .then(function(result) {
+          assert.deepEqual(result, response);
+          ne.done();
+        });
+    });
+
+    it('Error for non-string, non-Buffer, non-Readable spec', function() {
+      return swaggerSpecValidator.validate(true)
+        .then(
+          neverCalled,
+          function(err) {
+            assert.ok(err instanceof TypeError);
+            assert.ok(/\bspec\b/.test(err.message));
+          }
+        );
+    });
+
+    it('Error for non-object options', function() {
+      var testBody = 'swagger';
+      return swaggerSpecValidator.validate(testBody, true)
+        .then(
+          neverCalled,
+          function(err) {
+            assert.ok(err instanceof TypeError);
+            assert.ok(/\boptions\b/.test(err.message));
+          }
+        );
     });
   });
 
@@ -287,6 +359,19 @@ describe('swaggerSpecValidator', function() {
           assert.deepEqual(result, response);
           ne.done();
         });
+    });
+
+    it('can be called with callback without options', function(done) {
+      var response = {};
+      var ne = nock(defaultProtoHost)
+        .post(defaultUrl.path)
+        .reply(200, response);
+      swaggerSpecValidator.validateFile(swaggerYamlPath, function(err, result) {
+        assert.ifError(err);
+        assert.deepEqual(result, response);
+        ne.done();
+        done();
+      });
     });
   });
 });

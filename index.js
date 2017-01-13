@@ -174,9 +174,21 @@ function validate(spec, options, callback) {
     throw new TypeError('callback must be a function');
   }
 
-  if (options !== undefined && typeof options !== 'object') {
+  try {
+    if (spec === undefined ||
+        spec === null ||
+        (typeof spec !== 'string' &&
+         !Buffer.isBuffer(spec) &&
+         typeof spec.pipe !== 'function')) {
+      throw new TypeError('spec must be a string, Buffer, or Readable');
+    }
+
+    if (options !== undefined && typeof options !== 'object') {
+      throw new TypeError('options must be an object');
+    }
+  } catch (err) {
     process.nextTick(function() {
-      callback(new TypeError('options must be an object'));
+      callback(err);
     });
     return undefined;
   }

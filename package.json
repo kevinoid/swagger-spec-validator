@@ -41,6 +41,7 @@
     "version-deps": "npm install david depcheck git-branch-is travis-status"
   },
   "dependencies": {
+    "array-uniq": "^1.0.3",
     "object-assign": "^4.1.0",
     "pify": "^2.3.0",
     "proxyquire": "^1.7.10",

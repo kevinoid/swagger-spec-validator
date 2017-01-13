@@ -29,7 +29,7 @@ var DEFAULT_URL = 'https://online.swagger.io/validator/debug';
  */
 var DEFAULT_HEADERS = Object.freeze({
   Accept: 'application/json',
-  'User-Agent': 'swagger-spec-validator/' + packageJson.version +
+  'User-Agent': packageJson.name + '/' + packageJson.version +
     ' Node.js/' + process.version.slice(1)
 });
 

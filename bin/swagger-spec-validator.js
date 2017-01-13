@@ -39,6 +39,7 @@ function parseHeaders(lines) {
 
 /** Calls <code>yargs.parse</code> and passes any thrown errors to the callback.
  * Workaround for https://github.com/yargs/yargs/issues/755
+ * @private
  */
 function parseYargs(yargs, args, callback) {
   try {
@@ -49,7 +50,9 @@ function parseYargs(yargs, args, callback) {
   }
 }
 
-/** Gets validation messages from a validation response object. */
+/** Gets validation messages from a validation response object.
+ * @private
+ */
 function getMessages(result) {
   var messages = [];
   if (result.messages) {
@@ -129,6 +132,7 @@ function validateAll(specPaths, options, callback) {
  * callback Callback for the exit code or an <code>Error</code>.
  * @return {Promise<number>|undefined} If <code>callback</code> is not given, a
  * <code>Promise</code> with the exit code or <code>Error</code>.
+ * @exports swagger-spec-validator/bin/swagger-spec-validator
  */
 function swaggerSpecValidatorCmd(args, options, callback) {
   if (!callback && typeof options === 'function') {

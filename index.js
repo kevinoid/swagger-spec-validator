@@ -18,6 +18,7 @@ var url = require('url');
 var readFileP = pify(fs.readFile);
 var readdirP = pify(fs.readdir);
 
+/** @exports swagger-spec-validator */
 var swaggerSpecValidator = {};
 
 /** Default URL to which validation requests are sent.
@@ -39,6 +40,7 @@ swaggerSpecValidator.DEFAULT_HEADERS = DEFAULT_HEADERS;
 /** HTTPS Agent for online.swagger.io which can valididate the HTTPS
  * certificate lacking an intermediate.
  * See https://github.com/swagger-api/validator-badge/issues/98
+ * @private
  */
 var swaggerIoHttpsAgent;
 

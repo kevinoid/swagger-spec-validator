@@ -438,5 +438,32 @@ describe('swaggerSpecValidator', function() {
       /* eslint-enable no-underscore-dangle */
       return result;
     });
+
+    it('returns one Error for unreadable file and Agent', function(done) {
+      var testStatusCode = 200;
+      var testResponse = {};
+      var ne = nock(defaultProtoHost)
+        .post(defaultUrl.path)
+        .optionally()
+        .reply(testStatusCode, testResponse);
+
+      var errTest = new Error('test error');
+      function getTestError() {
+        return Promise.reject(errTest);
+      }
+      /* eslint-disable no-underscore-dangle */
+      var getSwaggerIoAgent = swaggerSpecValidator._getSwaggerIoAgent;
+      try {
+        swaggerSpecValidator._getSwaggerIoAgent = getTestError;
+        swaggerSpecValidator.validateFile('nonexistent.yaml', function(err) {
+          assert(err === errTest || err.code === 'ENOENT');
+          ne.done();
+          done();
+        });
+      } finally {
+        swaggerSpecValidator._getSwaggerIoAgent = getSwaggerIoAgent;
+      }
+      /* eslint-enable no-underscore-dangle */
+    });
   });
 });

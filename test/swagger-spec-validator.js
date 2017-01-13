@@ -146,6 +146,38 @@ describe('swaggerSpecValidator', function() {
         });
     });
 
+    it('returns Error loading Agent', function() {
+      var testStatusCode = 200;
+      var testResponse = {};
+      var ne = nock(defaultProtoHost)
+        .post(defaultUrl.path)
+        .optionally()
+        .reply(testStatusCode, testResponse);
+
+      var errTest = new Error('test error');
+      function getTestError() {
+        return Promise.reject(errTest);
+      }
+      /* eslint-disable no-underscore-dangle */
+      var getSwaggerIoAgent = swaggerSpecValidator._getSwaggerIoAgent;
+      var result;
+      try {
+        swaggerSpecValidator._getSwaggerIoAgent = getTestError;
+        result = swaggerSpecValidator.validate('swagger')
+          .then(
+            neverCalled,
+            function(err) {
+              assert.strictEqual(err, errTest);
+              ne.done();
+            }
+          );
+      } finally {
+        swaggerSpecValidator._getSwaggerIoAgent = getSwaggerIoAgent;
+      }
+      /* eslint-enable no-underscore-dangle */
+      return result;
+    });
+
     it('returns Error for invalid JSON body', function() {
       var testStatusCode = 200;
       var testResponse = '{"bad": "json"';

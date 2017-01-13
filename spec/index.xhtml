@@ -37,6 +37,7 @@ swaggerSpecValidatorCmd(allArgs, options, function(err, code) {
   assert.strictEqual(code, 0);
   assert.strictEqual(options.out.read(), null);
   assert.ok(/\bvalid/i.test(options.err.read()));
+  done();
 });</code></pre></dd>
         <dt>validates from stdin</dt>
         <dd><pre><code>var options = {
@@ -49,6 +50,7 @@ swaggerSpecValidatorCmd(RUNTIME_ARGS, options, function(err, code) {
   assert.strictEqual(code, 0);
   assert.strictEqual(options.out.read(), null);
   assert.ok(/\bvalid/i.test(options.err.read()));
+  done();
 });</code></pre></dd>
         <dt>handles validation failures</dt>
         <dd><pre><code>var options = {
@@ -63,6 +65,7 @@ swaggerSpecValidatorCmd(allArgs, options, function(err, code) {
   var outStr = String(options.out.read());
   assert.strictEqual(outStr.indexOf(invalidYamlPath + ':'), 0);
   assert.strictEqual(options.err.read(), null);
+  done();
 });</code></pre></dd>
         <dt>handles unreadable file errors</dt>
         <dd><pre><code>var options = {
@@ -79,6 +82,7 @@ swaggerSpecValidatorCmd(allArgs, options, function(err, code) {
   var errStr = String(options.err.read());
   assert.strictEqual(errStr.indexOf(nonexistentPath + ':'), 0);
   assert.ok(errStr.indexOf('ENOENT') &gt;= 0);
+  done();
 });</code></pre></dd>
       </dl>
     </section>
@@ -1009,43 +1013,27 @@ return swaggerSpecValidator.validate('swagger', options)
     assert.deepEqual(result, response);
     ne.done();
   });</code></pre></dd>
-            <dt>returns Error for unreadable file</dt>
+            <dt>returns Error loading Agent</dt>
             <dd><pre><code>var testStatusCode = 200;
 var testResponse = {};
-var testType = 'application/json';
 var ne = nock(defaultProtoHost)
   .post(defaultUrl.path)
   .optionally()
-  .reply(testStatusCode, testResponse, {'Content-Type': testType});
-return swaggerSpecValidator.validateFile('nonexistent.yaml')
-  .then(
-    neverCalled,
-    function(err) {
-      assert.strictEqual(err.code, 'ENOENT');
-      ne.done();
-    }
-  );</code></pre></dd>
-            <dt>returns Error for unreadable file while loading Agent</dt>
-            <dd><pre><code>var testStatusCode = 200;
-var testResponse = {};
-var testType = 'application/json';
-var ne = nock(defaultProtoHost)
-  .post(defaultUrl.path)
-  .optionally()
-  .reply(testStatusCode, testResponse, {'Content-Type': testType});
-function waitForever() {
-  return new Promise(function() {});
+  .reply(testStatusCode, testResponse);
+var errTest = new Error('test error');
+function getTestError() {
+  return Promise.reject(errTest);
 }
 /* eslint-disable no-underscore-dangle */
 var getSwaggerIoAgent = swaggerSpecValidator._getSwaggerIoAgent;
 var result;
 try {
-  swaggerSpecValidator._getSwaggerIoAgent = waitForever;
-  result = swaggerSpecValidator.validateFile('nonexistent.yaml')
+  swaggerSpecValidator._getSwaggerIoAgent = getTestError;
+  result = swaggerSpecValidator.validate('swagger')
     .then(
       neverCalled,
       function(err) {
-        assert.strictEqual(err.code, 'ENOENT');
+        assert.strictEqual(err, errTest);
         ne.done();
       }
     );
@@ -1213,6 +1201,17 @@ return swaggerSpecValidator.validateFile(swaggerYamlPath)
     assert.deepEqual(result, response);
     ne.done();
   });</code></pre></dd>
+            <dt>doesn't add Content-Type for other extensions</dt>
+            <dd><pre><code>var response = {};
+var ne = nock(defaultProtoHost)
+  .matchHeader('Content-Type', undefined)
+  .post(defaultUrl.path)
+  .reply(200, response);
+return swaggerSpecValidator.validateFile(emptyPath)
+  .then(function(result) {
+    assert.deepEqual(result, response);
+    ne.done();
+  });</code></pre></dd>
             <dt>does not change caller-provided Content-Type</dt>
             <dd><pre><code>var response = {};
 var testType = 'text/plain';
@@ -1237,6 +1236,73 @@ swaggerSpecValidator.validateFile(swaggerYamlPath, function(err, result) {
   ne.done();
   done();
 });</code></pre></dd>
+            <dt>returns Error for unreadable file</dt>
+            <dd><pre><code>var testStatusCode = 200;
+var testResponse = {};
+var ne = nock(defaultProtoHost)
+  .post(defaultUrl.path)
+  .optionally()
+  .reply(testStatusCode, testResponse);
+return swaggerSpecValidator.validateFile('nonexistent.yaml')
+  .then(
+    neverCalled,
+    function(err) {
+      assert.strictEqual(err.code, 'ENOENT');
+      ne.done();
+    }
+  );</code></pre></dd>
+            <dt>returns Error for unreadable file while loading Agent</dt>
+            <dd><pre><code>var testStatusCode = 200;
+var testResponse = {};
+var ne = nock(defaultProtoHost)
+  .post(defaultUrl.path)
+  .optionally()
+  .reply(testStatusCode, testResponse);
+function waitForever() {
+  return new Promise(function() {});
+}
+/* eslint-disable no-underscore-dangle */
+var getSwaggerIoAgent = swaggerSpecValidator._getSwaggerIoAgent;
+var result;
+try {
+  swaggerSpecValidator._getSwaggerIoAgent = waitForever;
+  result = swaggerSpecValidator.validateFile('nonexistent.yaml')
+    .then(
+      neverCalled,
+      function(err) {
+        assert.strictEqual(err.code, 'ENOENT');
+        ne.done();
+      }
+    );
+} finally {
+  swaggerSpecValidator._getSwaggerIoAgent = getSwaggerIoAgent;
+}
+/* eslint-enable no-underscore-dangle */
+return result;</code></pre></dd>
+            <dt>returns one Error for unreadable file and Agent</dt>
+            <dd><pre><code>var testStatusCode = 200;
+var testResponse = {};
+var ne = nock(defaultProtoHost)
+  .post(defaultUrl.path)
+  .optionally()
+  .reply(testStatusCode, testResponse);
+var errTest = new Error('test error');
+function getTestError() {
+  return Promise.reject(errTest);
+}
+/* eslint-disable no-underscore-dangle */
+var getSwaggerIoAgent = swaggerSpecValidator._getSwaggerIoAgent;
+try {
+  swaggerSpecValidator._getSwaggerIoAgent = getTestError;
+  swaggerSpecValidator.validateFile('nonexistent.yaml', function(err) {
+    assert(err === errTest || err.code === 'ENOENT');
+    ne.done();
+    done();
+  });
+} finally {
+  swaggerSpecValidator._getSwaggerIoAgent = getSwaggerIoAgent;
+}
+/* eslint-enable no-underscore-dangle */</code></pre></dd>
           </dl>
         </section>
       </dl>

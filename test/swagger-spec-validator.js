@@ -146,6 +146,24 @@ describe('swaggerSpecValidator', function() {
         });
     });
 
+    it('returns Error for unreadable file', function() {
+      var testStatusCode = 200;
+      var testResponse = {};
+      var testType = 'application/json';
+      var ne = nock(defaultProtoHost)
+        .post(defaultUrl.path)
+        .optionally()
+        .reply(testStatusCode, testResponse, {'Content-Type': testType});
+      return swaggerSpecValidator.validateFile('nonexistent.yaml')
+        .then(
+          neverCalled,
+          function(err) {
+            assert.strictEqual(err.code, 'ENOENT');
+            ne.done();
+          }
+        );
+    });
+
     it('returns Error for invalid JSON body', function() {
       var testStatusCode = 200;
       var testResponse = '{"bad": "json"';

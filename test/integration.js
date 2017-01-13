@@ -66,4 +66,22 @@ describe('swagger-spec-validator', function() {
       assert.strictEqual(options.err.read(), null);
     });
   });
+
+  it('handles unreadable file errors', function() {
+    var options = {
+      in: new stream.PassThrough(),
+      out: new stream.PassThrough(),
+      err: new stream.PassThrough()
+    };
+    var nonexistentPath = 'nonexistent.yaml';
+    var allArgs = RUNTIME_ARGS.concat([nonexistentPath]);
+    swaggerSpecValidatorCmd(allArgs, options, function(err, code) {
+      assert.ifError(err);
+      assert.strictEqual(code, 2);
+      assert.strictEqual(options.out.read(), null);
+      var errStr = String(options.err.read());
+      assert.strictEqual(errStr.indexOf(nonexistentPath + ':'), 0);
+      assert.ok(errStr.indexOf('ENOENT') >= 0);
+    });
+  });
 });

@@ -235,40 +235,30 @@ function validate(spec, options, callback) {
   reqOpts.headers = combineHeaders(DEFAULT_HEADERS, reqOpts.headers);
   reqOpts.body = spec;
 
-  var errStream;
-  function onStreamError(err) {
-    errStream = err;
-    callback(err);
+  var calledBack = false;
+  function callbackOnce(err) {
+    if (!calledBack) {
+      calledBack = true;
+      callback.apply(this, arguments);
+    }
   }
 
   if (reqOpts.hostname === 'online.swagger.io' &&
       !hasOwnProperty.call(reqOpts, 'agent')) {
     if (typeof spec.pipe === 'function') {
       // Stream can emit an error before Agent is loaded.  Handle this.
-      spec.once('error', onStreamError);
+      spec.on('error', callbackOnce);
     }
 
     // eslint-disable-next-line no-underscore-dangle
     swaggerSpecValidator._getSwaggerIoAgent()
       .then(function(agent) {
-        if (!errStream) {
-          if (typeof spec.pipe === 'function') {
-            spec.removeListener('error', onStreamError);
-          }
-
+        if (!calledBack) {
           reqOpts.agent = agent;
-          requestJson(reqOpts, callback);
+          requestJson(reqOpts, callbackOnce);
         }
       })
-      .catch(function(err) {
-        if (!errStream) {
-          if (typeof spec.pipe === 'function') {
-            spec.removeListener('error', onStreamError);
-          }
-
-          callback(err);
-        }
-      });
+      .catch(callbackOnce);
   } else {
     requestJson(reqOpts, callback);
   }

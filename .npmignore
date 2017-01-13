@@ -8,6 +8,7 @@
 /doc/
 /scripts
 /test
+/test-data
 TODO.*
 appveyor.yml
 jsdoc*.conf.json

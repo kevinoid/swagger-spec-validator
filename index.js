@@ -115,12 +115,12 @@ function requestJson(options, callback) {
       res.on('data', function(data) { bodyData.push(data); });
       res.on('end', function() {
         var resBody = Buffer.concat(bodyData);
-        var errBody, resBodyObj;
+        var err, resBodyObj;
         try {
           resBodyObj = JSON.parse(resBody.toString());
         } catch (errJson) {
-          errBody = new SyntaxError('Error parsing server response as JSON: ' +
-                                    errJson.message);
+          err = new SyntaxError('Error parsing server response as JSON: ' +
+                                errJson.message);
         }
 
         if (res.statusCode >= 300) {
@@ -128,7 +128,10 @@ function requestJson(options, callback) {
           if (res.statusMessage) {
             errMessage += ': ' + res.statusMessage;
           }
-          var err = new Error(errMessage);
+          err = new Error(errMessage);
+        }
+
+        if (err) {
           err.statusCode = res.statusCode;
           err.statusMessage = res.statusMessage;
           err.headers = res.headers;
@@ -136,7 +139,7 @@ function requestJson(options, callback) {
           err.body = resBodyObj !== undefined ? resBodyObj : resBody;
           callback(err);
         } else {
-          callback(errBody, resBodyObj);
+          callback(null, resBodyObj);
         }
       });
     });

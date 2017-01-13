@@ -61,7 +61,7 @@ npm install swagger-spec-validator
 ## Recipes
 
 More examples can be found in the [test
-specifications](https://kevinoid.github.io/swagger-spec-validator/specs).
+specifications](https://kevinoid.github.io/swagger-spec-validator/spec).
 
 ## API Docs
 

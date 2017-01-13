@@ -146,59 +146,6 @@ describe('swaggerSpecValidator', function() {
         });
     });
 
-    it('returns Error for unreadable file', function() {
-      var testStatusCode = 200;
-      var testResponse = {};
-      var testType = 'application/json';
-      var ne = nock(defaultProtoHost)
-        .post(defaultUrl.path)
-        .optionally()
-        .reply(testStatusCode, testResponse, {'Content-Type': testType});
-      return swaggerSpecValidator.validateFile('nonexistent.yaml')
-        .then(
-          neverCalled,
-          function(err) {
-            assert.strictEqual(err.code, 'ENOENT');
-            ne.done();
-          }
-        );
-    });
-
-    // The error event can be emitted from a file stream before reading begins.
-    // If this happens before a listener is attached, it will cause an unhandled
-    // exception.  This test covers a case where that could occur.
-    it('returns Error for unreadable file while loading Agent', function() {
-      var testStatusCode = 200;
-      var testResponse = {};
-      var testType = 'application/json';
-      var ne = nock(defaultProtoHost)
-        .post(defaultUrl.path)
-        .optionally()
-        .reply(testStatusCode, testResponse, {'Content-Type': testType});
-
-      function waitForever() {
-        return new Promise(function() {});
-      }
-      /* eslint-disable no-underscore-dangle */
-      var getSwaggerIoAgent = swaggerSpecValidator._getSwaggerIoAgent;
-      var result;
-      try {
-        swaggerSpecValidator._getSwaggerIoAgent = waitForever;
-        result = swaggerSpecValidator.validateFile('nonexistent.yaml')
-          .then(
-            neverCalled,
-            function(err) {
-              assert.strictEqual(err.code, 'ENOENT');
-              ne.done();
-            }
-          );
-      } finally {
-        swaggerSpecValidator._getSwaggerIoAgent = getSwaggerIoAgent;
-      }
-      /* eslint-enable no-underscore-dangle */
-      return result;
-    });
-
     it('returns Error for invalid JSON body', function() {
       var testStatusCode = 200;
       var testResponse = '{"bad": "json"';
@@ -407,6 +354,57 @@ describe('swaggerSpecValidator', function() {
         ne.done();
         done();
       });
+    });
+
+    it('returns Error for unreadable file', function() {
+      var testStatusCode = 200;
+      var testResponse = {};
+      var ne = nock(defaultProtoHost)
+        .post(defaultUrl.path)
+        .optionally()
+        .reply(testStatusCode, testResponse);
+      return swaggerSpecValidator.validateFile('nonexistent.yaml')
+        .then(
+          neverCalled,
+          function(err) {
+            assert.strictEqual(err.code, 'ENOENT');
+            ne.done();
+          }
+        );
+    });
+
+    // The error event can be emitted from a file stream before reading begins.
+    // If this happens before a listener is attached, it will cause an unhandled
+    // exception.  This test covers a case where that could occur.
+    it('returns Error for unreadable file while loading Agent', function() {
+      var testStatusCode = 200;
+      var testResponse = {};
+      var ne = nock(defaultProtoHost)
+        .post(defaultUrl.path)
+        .optionally()
+        .reply(testStatusCode, testResponse);
+
+      function waitForever() {
+        return new Promise(function() {});
+      }
+      /* eslint-disable no-underscore-dangle */
+      var getSwaggerIoAgent = swaggerSpecValidator._getSwaggerIoAgent;
+      var result;
+      try {
+        swaggerSpecValidator._getSwaggerIoAgent = waitForever;
+        result = swaggerSpecValidator.validateFile('nonexistent.yaml')
+          .then(
+            neverCalled,
+            function(err) {
+              assert.strictEqual(err.code, 'ENOENT');
+              ne.done();
+            }
+          );
+      } finally {
+        swaggerSpecValidator._getSwaggerIoAgent = getSwaggerIoAgent;
+      }
+      /* eslint-enable no-underscore-dangle */
+      return result;
     });
   });
 });

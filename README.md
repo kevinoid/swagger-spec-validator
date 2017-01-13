@@ -24,15 +24,28 @@ a result.
 
 ## Introductory Example
 
-```js
-const swaggerSpecValidator = require('swagger-spec-validator');
-swaggerSpecValidator('swagger.yaml')
-  .then(() => console.log('Valid!'))
-  .catch(err => console.error('Invalid: ' + err));
-```
+To use `swagger-spec-validator` from the command line, simply invoke it with
+the specification files to validate as arguments:
 
 ```sh
 $ swagger-spec-validator swagger.yaml
+```
+
+If no arguments are given, the specification will be read from `stdin`.
+
+`swagger-spec-validator` can be used as a library as follows:
+
+```js
+const swaggerSpecValidator = require('swagger-spec-validator');
+swaggerSpecValidator.validateFile('swagger.yaml')
+  .then((result) => {
+    if (Object.keys(result).length > 0) {
+      console.log('Invalid.');
+    } else {
+      console.log('Valid!');
+    }
+  })
+  .catch(err => console.error('Unable to validate: ' + err));
 ```
 
 ## Installation

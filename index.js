@@ -6,7 +6,6 @@
 'use strict';
 
 var assign = require('object-assign');
-var caseless = require('caseless');
 var fs = require('fs');
 var http = require('http');
 var https = require('https');
@@ -233,7 +232,10 @@ function validateFile(specPath, options, callback) {
   }
 
   var headers = options && options.request && options.request.headers;
-  if (!headers || !caseless(headers).has('Content-Type')) {
+  var hasContentType = headers && Object.keys(headers).some(function(name) {
+    return name.toLowerCase() === 'content-type';
+  });
+  if (!hasContentType) {
     // Server ignores Content-Type, so not worth depending on a Media Type db.
     var contentType = /\.json$/i.test(specPath) ? 'application/json' :
       /\.ya?ml$/i.test(specPath) ? 'text/x-yaml' :

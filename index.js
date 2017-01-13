@@ -18,10 +18,13 @@ var url = require('url');
 var readFileP = pify(fs.readFile);
 var readdirP = pify(fs.readdir);
 
+var swaggerSpecValidator = {};
+
 /** Default URL to which validation requests are sent.
  * @const
  */
 var DEFAULT_URL = 'https://online.swagger.io/validator/debug';
+swaggerSpecValidator.DEFAULT_URL = DEFAULT_URL;
 
 /** Default headers sent with API requests.
  * @const
@@ -31,6 +34,7 @@ var DEFAULT_HEADERS = Object.freeze({
   'User-Agent': packageJson.name + '/' + packageJson.version +
     ' Node.js/' + process.version.slice(1)
 });
+swaggerSpecValidator.DEFAULT_HEADERS = DEFAULT_HEADERS;
 
 /** HTTPS Agent for online.swagger.io which can valididate the HTTPS
  * certificate lacking an intermediate.
@@ -39,8 +43,12 @@ var DEFAULT_HEADERS = Object.freeze({
 var swaggerIoHttpsAgent;
 
 /** Adds our default HTTP Agent to the request options.
+ *
+ * This private function is exported to allow it to be overridden for testing.
  * @private
  */
+// eslint-disable-next-line no-underscore-dangle
+swaggerSpecValidator._getSwaggerIoAgent =
 function getSwaggerIoAgent() {
   if (!swaggerIoHttpsAgent) {
     var certsPath = path.join(__dirname, 'certs');
@@ -69,7 +77,7 @@ function getSwaggerIoAgent() {
   }
 
   return swaggerIoHttpsAgent;
-}
+};
 
 /** Combines HTTP headers objects.
  * With the capitalization and value of the last occurrence.
@@ -181,6 +189,7 @@ function requestJson(options, callback) {
  * @return {Promise<Object>|undefined} If <code>callback</code> is not given,
  * a <code>Promise</code> with the validation results or <code>Error</code>.
  */
+swaggerSpecValidator.validate =
 function validate(spec, options, callback) {
   if (!callback && typeof options === 'function') {
     callback = options;
@@ -226,7 +235,8 @@ function validate(spec, options, callback) {
 
   if (reqOpts.hostname === 'online.swagger.io' &&
       !hasOwnProperty.call(reqOpts, 'agent')) {
-    getSwaggerIoAgent()
+    // eslint-disable-next-line no-underscore-dangle
+    swaggerSpecValidator._getSwaggerIoAgent()
       .then(function(agent) {
         reqOpts.agent = agent;
         requestJson(reqOpts, callback);
@@ -237,7 +247,7 @@ function validate(spec, options, callback) {
   }
 
   return undefined;
-}
+};
 
 /** Validates an OpenAPI/Swagger API specification file.
  *
@@ -251,6 +261,7 @@ function validate(spec, options, callback) {
  * @return {Promise<Object>|undefined} If <code>callback</code> is not given,
  * a <code>Promise</code> with the validation results or <code>Error</code>.
  */
+swaggerSpecValidator.validateFile =
 function validateFile(specPath, options, callback) {
   if (!callback && typeof options === 'function') {
     callback = options;
@@ -275,12 +286,7 @@ function validateFile(specPath, options, callback) {
   }
 
   var specStream = fs.createReadStream(specPath);
-  return validate(specStream, options, callback);
-}
-
-module.exports = {
-  DEFAULT_HEADERS: DEFAULT_HEADERS,
-  DEFAULT_URL: DEFAULT_URL,
-  validate: validate,
-  validateFile: validateFile
+  return swaggerSpecValidator.validate(specStream, options, callback);
 };
+
+module.exports = swaggerSpecValidator;

@@ -85,7 +85,10 @@ function validateAll(specPaths, options, callback) {
         if (messages.length > 0) {
           hadInvalid = true;
           if (options.verbosity >= 0) {
-            options.out.write(messages.join('\n') + '\n');
+            var messagesWithPath = messages.map(function(message) {
+              return specPath + ': ' + message;
+            });
+            options.out.write(messagesWithPath.join('\n') + '\n');
           }
         }
       }

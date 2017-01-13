@@ -20,6 +20,8 @@ var swaggerJsonPath =
   path.join(__dirname, '..', 'test-data', 'petstore-minimal.json');
 var swaggerYamlPath =
   path.join(__dirname, '..', 'test-data', 'petstore-minimal.yaml');
+var emptyPath =
+  path.join(__dirname, '..', 'test-data', 'empty.txt');
 
 function neverCalled() {
   throw new Error('should not be called');
@@ -354,6 +356,20 @@ describe('swaggerSpecValidator', function() {
         .post(defaultUrl.path)
         .reply(200, response);
       return swaggerSpecValidator.validateFile(swaggerYamlPath)
+        .then(function(result) {
+          assert.deepEqual(result, response);
+          ne.done();
+        });
+    });
+
+    // This may change in the future.  Test to ensure header is reasonable.
+    it('doesn\'t add Content-Type for other extensions', function() {
+      var response = {};
+      var ne = nock(defaultProtoHost)
+        .matchHeader('Content-Type', undefined)
+        .post(defaultUrl.path)
+        .reply(200, response);
+      return swaggerSpecValidator.validateFile(emptyPath)
         .then(function(result) {
           assert.deepEqual(result, response);
           ne.done();

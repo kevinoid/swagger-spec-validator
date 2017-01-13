@@ -22,7 +22,7 @@ var invalidYamlPath =
   path.join(__dirname, '..', 'test-data', 'petstore-invalid.yaml');
 
 describe('swagger-spec-validator', function() {
-  it('validates JSON and YAML files', function() {
+  it('validates JSON and YAML files', function(done) {
     var options = {
       in: new stream.PassThrough(),
       out: new stream.PassThrough(),
@@ -34,10 +34,11 @@ describe('swagger-spec-validator', function() {
       assert.strictEqual(code, 0);
       assert.strictEqual(options.out.read(), null);
       assert.ok(/\bvalid/i.test(options.err.read()));
+      done();
     });
   });
 
-  it('validates from stdin', function() {
+  it('validates from stdin', function(done) {
     var options = {
       in: fs.createReadStream(swaggerYamlPath),
       out: new stream.PassThrough(),
@@ -48,10 +49,11 @@ describe('swagger-spec-validator', function() {
       assert.strictEqual(code, 0);
       assert.strictEqual(options.out.read(), null);
       assert.ok(/\bvalid/i.test(options.err.read()));
+      done();
     });
   });
 
-  it('handles validation failures', function() {
+  it('handles validation failures', function(done) {
     var options = {
       in: new stream.PassThrough(),
       out: new stream.PassThrough(),
@@ -64,10 +66,11 @@ describe('swagger-spec-validator', function() {
       var outStr = String(options.out.read());
       assert.strictEqual(outStr.indexOf(invalidYamlPath + ':'), 0);
       assert.strictEqual(options.err.read(), null);
+      done();
     });
   });
 
-  it('handles unreadable file errors', function() {
+  it('handles unreadable file errors', function(done) {
     var options = {
       in: new stream.PassThrough(),
       out: new stream.PassThrough(),
@@ -82,6 +85,7 @@ describe('swagger-spec-validator', function() {
       var errStr = String(options.err.read());
       assert.strictEqual(errStr.indexOf(nonexistentPath + ':'), 0);
       assert.ok(errStr.indexOf('ENOENT') >= 0);
+      done();
     });
   });
 });

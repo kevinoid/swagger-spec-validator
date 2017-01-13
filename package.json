@@ -1,6 +1,6 @@
 {
   "name": "swagger-spec-validator",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Validate an OpenAPI/Swagger API specification using the swagger.io online validator.",
   "keywords": [
     "cli",

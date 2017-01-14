@@ -30,7 +30,10 @@ function parseHeader(line) {
 }
 
 function parseHeaders(lines) {
-  return lines.map(parseHeader)
+  return lines
+    // yargs passes [undefined] when insufficient arguments are given
+    .filter(function(line) { return line !== null && line !== undefined; })
+    .map(parseHeader)
     .reduce(function(headerObj, header) {
       headerObj[header[0]] = header[1];
       return headerObj;
@@ -219,7 +222,8 @@ function swaggerSpecValidatorCmd(args, options, callback) {
     .option('url', {
       alias: 'u',
       describe: 'Validator URL',
-      defaultDescription: swaggerSpecValidator.DEFAULT_URL
+      defaultDescription: swaggerSpecValidator.DEFAULT_URL,
+      nargs: 1
     })
     .option('verbose', {
       alias: 'v',

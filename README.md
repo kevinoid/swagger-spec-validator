@@ -1,6 +1,8 @@
 OpenAPI/Swagger Specification Validator
 =======================================
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/kevinoid/swagger-spec-validator.svg)](https://greenkeeper.io/)
+
 [![Build Status: Linux](https://img.shields.io/travis/kevinoid/swagger-spec-validator/master.svg?style=flat&label=build+on+linux)](https://travis-ci.org/kevinoid/swagger-spec-validator)
 [![Build Status: Windows](https://img.shields.io/appveyor/ci/kevinoid/swagger-spec-validator/master.svg?style=flat&label=build+on+windows)](https://ci.appveyor.com/project/kevinoid/swagger-spec-validator)
 [![Coverage](https://img.shields.io/codecov/c/github/kevinoid/swagger-spec-validator.svg?style=flat)](https://codecov.io/github/kevinoid/swagger-spec-validator?branch=master)

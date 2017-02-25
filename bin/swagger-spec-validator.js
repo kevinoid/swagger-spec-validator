@@ -45,11 +45,22 @@ function parseHeaders(lines) {
  * @private
  */
 function parseYargs(yargs, args, callback) {
+  // Since yargs doesn't nextTick its callback, this function must be careful
+  // that exceptions thrown from callback (which propagate through yargs.parse)
+  // are not caught and passed to a second invocation of callback.
+  var called = false;
   try {
-    yargs.parse(args, callback);
+    yargs.parse(args, function() {
+      called = true;
+      return callback.apply(this, arguments);
+    });
   } catch (err) {
-    // Since yargs doesn't nextTick its callback, don't here either
-    callback(err);
+    if (called) {
+      // err was thrown after or by callback.  Let it propagate.
+      throw err;
+    } else {
+      callback(err);
+    }
   }
 }
 
@@ -159,14 +170,13 @@ function swaggerSpecValidatorCmd(args, options, callback) {
   }
 
   try {
-    if (args === undefined ||
-        args === null ||
-        (typeof args === 'object' && args.length === 0)) {
+    if (args === undefined || args === null) {
       args = [];
     } else if (typeof args !== 'object' ||
-               Math.floor(args.length) !== args.length ||
-               args.length < 2) {
-      throw new TypeError('args must be Array-like with at least 2 elements');
+               Math.floor(args.length) !== args.length) {
+      throw new TypeError('args must be Array-like');
+    } else if (args.length < 2) {
+      throw new RangeError('args must have at least 2 elements');
     } else {
       args = Array.prototype.slice.call(args, 2).map(String);
     }
@@ -200,7 +210,9 @@ function swaggerSpecValidatorCmd(args, options, callback) {
     return undefined;
   }
 
-  var yargs = new Yargs()
+  // Workaround for https://github.com/yargs/yargs/issues/783
+  require.main = module;
+  var yargs = new Yargs(null, null, require)
     .usage('Usage: $0 [options] [swagger.yaml...]')
     .option('header', {
       alias: 'H',

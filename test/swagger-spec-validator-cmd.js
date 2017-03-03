@@ -313,10 +313,10 @@ describe('swagger-spec-validator command', function() {
   expectArgsResult(['-u'], 3, null, /missing|not enough/i);
   expectArgsResult(['--url'], 3, null, /missing|not enough/i);
   expectArgsResult(
-    ['--unknown'],
+    ['--badtestopt'],
     3,
     null,
-    /\b(unknown|recognized|unsupported)\b.+--unknown\b/i
+    /\bbadtestopt\b/i
   );
 
   expectArgsResult(['--help'], 0, /usage/i, null);

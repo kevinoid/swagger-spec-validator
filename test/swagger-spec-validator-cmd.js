@@ -544,11 +544,11 @@ describe('swagger-spec-validator command', function() {
     });
   });
 
-  it('returns Error for args.length < 2', function(done) {
+  it('yields RangeError for args.length < 2', function(done) {
     swaggerSpecValidatorMock.expects('validate').never();
     swaggerSpecValidatorMock.expects('validateFile').never();
     swaggerSpecValidatorCmd(['ha'], {}, function(err) {
-      assert.ok(err instanceof TypeError);
+      assert.ok(err instanceof RangeError);
       assertMatch(err.message, /\bargs\b/);
       swaggerSpecValidatorMock.verify();
       done();

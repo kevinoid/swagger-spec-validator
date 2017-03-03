@@ -402,6 +402,46 @@ swaggerSpecValidatorMock.expects('validate').once()
 var allArgs = RUNTIME_ARGS.concat(args);
 swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
 swaggerSpecValidatorMock.verify();</code></pre></dd>
+        <dt>prints error and exits for -H</dt>
+        <dd><pre><code>swaggerSpecValidatorMock.expects('validate').never();
+swaggerSpecValidatorMock.expects('validateFile').never();
+var allArgs = RUNTIME_ARGS.concat(args);
+swaggerSpecValidatorCmd(allArgs, options, function(err, code) {
+  assert.ifError(err);
+  assert.strictEqual(code, expectCode);
+  if (expectOutMsg instanceof RegExp) {
+    assertMatch(options.out.read(), expectOutMsg);
+  } else {
+    assert.strictEqual(options.out.read(), expectOutMsg);
+  }
+  if (expectErrMsg instanceof RegExp) {
+    assertMatch(options.err.read(), expectErrMsg);
+  } else {
+    assert.strictEqual(options.err.read(), expectErrMsg);
+  }
+  swaggerSpecValidatorMock.verify();
+  done();
+});</code></pre></dd>
+        <dt>prints error and exits for --header</dt>
+        <dd><pre><code>swaggerSpecValidatorMock.expects('validate').never();
+swaggerSpecValidatorMock.expects('validateFile').never();
+var allArgs = RUNTIME_ARGS.concat(args);
+swaggerSpecValidatorCmd(allArgs, options, function(err, code) {
+  assert.ifError(err);
+  assert.strictEqual(code, expectCode);
+  if (expectOutMsg instanceof RegExp) {
+    assertMatch(options.out.read(), expectOutMsg);
+  } else {
+    assert.strictEqual(options.out.read(), expectOutMsg);
+  }
+  if (expectErrMsg instanceof RegExp) {
+    assertMatch(options.err.read(), expectErrMsg);
+  } else {
+    assert.strictEqual(options.err.read(), expectErrMsg);
+  }
+  swaggerSpecValidatorMock.verify();
+  done();
+});</code></pre></dd>
         <dt>prints error and exits for -H :badarg</dt>
         <dd><pre><code>swaggerSpecValidatorMock.expects('validate').never();
 swaggerSpecValidatorMock.expects('validateFile').never();
@@ -442,7 +482,47 @@ swaggerSpecValidatorCmd(allArgs, options, function(err, code) {
   swaggerSpecValidatorMock.verify();
   done();
 });</code></pre></dd>
-        <dt>prints error and exits for --unknown</dt>
+        <dt>prints error and exits for -u</dt>
+        <dd><pre><code>swaggerSpecValidatorMock.expects('validate').never();
+swaggerSpecValidatorMock.expects('validateFile').never();
+var allArgs = RUNTIME_ARGS.concat(args);
+swaggerSpecValidatorCmd(allArgs, options, function(err, code) {
+  assert.ifError(err);
+  assert.strictEqual(code, expectCode);
+  if (expectOutMsg instanceof RegExp) {
+    assertMatch(options.out.read(), expectOutMsg);
+  } else {
+    assert.strictEqual(options.out.read(), expectOutMsg);
+  }
+  if (expectErrMsg instanceof RegExp) {
+    assertMatch(options.err.read(), expectErrMsg);
+  } else {
+    assert.strictEqual(options.err.read(), expectErrMsg);
+  }
+  swaggerSpecValidatorMock.verify();
+  done();
+});</code></pre></dd>
+        <dt>prints error and exits for --url</dt>
+        <dd><pre><code>swaggerSpecValidatorMock.expects('validate').never();
+swaggerSpecValidatorMock.expects('validateFile').never();
+var allArgs = RUNTIME_ARGS.concat(args);
+swaggerSpecValidatorCmd(allArgs, options, function(err, code) {
+  assert.ifError(err);
+  assert.strictEqual(code, expectCode);
+  if (expectOutMsg instanceof RegExp) {
+    assertMatch(options.out.read(), expectOutMsg);
+  } else {
+    assert.strictEqual(options.out.read(), expectOutMsg);
+  }
+  if (expectErrMsg instanceof RegExp) {
+    assertMatch(options.err.read(), expectErrMsg);
+  } else {
+    assert.strictEqual(options.err.read(), expectErrMsg);
+  }
+  swaggerSpecValidatorMock.verify();
+  done();
+});</code></pre></dd>
+        <dt>prints error and exits for --badtestopt</dt>
         <dd><pre><code>swaggerSpecValidatorMock.expects('validate').never();
 swaggerSpecValidatorMock.expects('validateFile').never();
 var allArgs = RUNTIME_ARGS.concat(args);
@@ -803,11 +883,11 @@ swaggerSpecValidatorCmd(true, {}, function(err) {
   swaggerSpecValidatorMock.verify();
   done();
 });</code></pre></dd>
-        <dt>returns Error for args.length &lt; 2</dt>
+        <dt>yields RangeError for args.length &lt; 2</dt>
         <dd><pre><code>swaggerSpecValidatorMock.expects('validate').never();
 swaggerSpecValidatorMock.expects('validateFile').never();
 swaggerSpecValidatorCmd(['ha'], {}, function(err) {
-  assert.ok(err instanceof TypeError);
+  assert.ok(err instanceof RangeError);
   assertMatch(err.message, /\bargs\b/);
   swaggerSpecValidatorMock.verify();
   done();

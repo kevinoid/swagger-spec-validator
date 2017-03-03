@@ -175,7 +175,7 @@ function swaggerSpecValidatorCmd(args, options, callback) {
     } else if (typeof args !== 'object' ||
                Math.floor(args.length) !== args.length) {
       throw new TypeError('args must be Array-like');
-    } else if (args.length < 2) {
+    } else if (args.length < 2 && args.length !== 0) {
       throw new RangeError('args must have at least 2 elements');
     } else {
       args = Array.prototype.slice.call(args, 2).map(String);

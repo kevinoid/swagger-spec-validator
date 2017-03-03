@@ -1,10 +1,12 @@
 # Change Log
 
-## [v0.1.1](https://github.com/kevinoid/swagger-spec-validator/tree/v0.1.1) (2017-01-13)
+## [0.1.2](https://github.com/kevinoid/swagger-spec-validator/tree/0.1.2) (2017-03-03)
+[Full Changelog](https://github.com/kevinoid/swagger-spec-validator/compare/v0.1.1...0.1.2)
 
-- Removed unnecessary dependencies.
-- Improved error message formatting.
-- Improved tests.
+- Update dependency versions.
+
+## [v0.1.1](https://github.com/kevinoid/swagger-spec-validator/tree/v0.1.1) (2017-01-13)
+[Full Changelog](https://github.com/kevinoid/swagger-spec-validator/compare/v0.1.0...v0.1.1)
 
 ## [v0.1.0](https://github.com/kevinoid/swagger-spec-validator/tree/v0.1.0) (2017-01-13)
 

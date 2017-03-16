@@ -1,9 +1,20 @@
 # Change Log
 
-## [0.1.2](https://github.com/kevinoid/swagger-spec-validator/tree/0.1.2) (2017-03-03)
-[Full Changelog](https://github.com/kevinoid/swagger-spec-validator/compare/v0.1.1...0.1.2)
+## [1.0.0](https://github.com/kevinoid/swagger-spec-validator/tree/1.0.0) (2017-03-16)
+[Full Changelog](https://github.com/kevinoid/swagger-spec-validator/compare/0.1.2...1.0.0)
 
-- Update dependency versions.
+- **No API Changes** Change to v1.0.0 is only a declaration of stability.
+- Dev dependency version updates.
+
+## [0.1.2](https://github.com/kevinoid/swagger-spec-validator/tree/0.1.2) (2017-03-03)
+[Full Changelog](https://github.com/kevinoid/swagger-spec-validator/compare/v0.1.2...0.1.2)
+
+## [v0.1.2](https://github.com/kevinoid/swagger-spec-validator/tree/v0.1.2) (2017-03-03)
+[Full Changelog](https://github.com/kevinoid/swagger-spec-validator/compare/v0.1.1...v0.1.2)
+
+**Merged pull requests:**
+
+- Update dependencies to enable Greenkeeper 🌴 [\#1](https://github.com/kevinoid/swagger-spec-validator/pull/1) ([greenkeeper[bot]](https://github.com/integration/greenkeeper))
 
 ## [v0.1.1](https://github.com/kevinoid/swagger-spec-validator/tree/v0.1.1) (2017-01-13)
 [Full Changelog](https://github.com/kevinoid/swagger-spec-validator/compare/v0.1.0...v0.1.1)

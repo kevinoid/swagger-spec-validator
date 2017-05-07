@@ -67,6 +67,9 @@ function getSwaggerIoAgent() {
         // Note: Using undocumented API to use both root and loaded certs.
         //       Specifying options.ca skips root certs, which could cause cert
         //       verification to fail if online.swagger.io changed certs.
+        // Note: First call to addCACert reloads root certs without
+        //       NODE_EXTRA_CA_CERTS. On Debian this includes all root CAs.
+        //       This is why the DigiCert Root CA file is in the package.
         var secureContext = tls.createSecureContext();
         certs.forEach(function(cert) {
           secureContext.context.addCACert(cert);

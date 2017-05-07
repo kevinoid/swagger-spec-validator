@@ -1,5 +1,10 @@
 # Change Log
 
+## [1.0.1](https://github.com/kevinoid/swagger-spec-validator/tree/1.0.1) (2017-05-07)
+[Full Changelog](https://github.com/kevinoid/swagger-spec-validator/compare/1.0.0...1.0.1)
+
+- Include DigiCert Global Root CA in package to fix SSL validation on Debian.
+
 ## [1.0.0](https://github.com/kevinoid/swagger-spec-validator/tree/1.0.0) (2017-03-16)
 [Full Changelog](https://github.com/kevinoid/swagger-spec-validator/compare/0.1.2...1.0.0)
 

@@ -43,7 +43,7 @@
   "dependencies": {
     "array-uniq": "^1.0.3",
     "object-assign": "^4.1.0",
-    "pify": "^2.3.0",
+    "pify": "^3.0.0",
     "yargs": "^7.0.1"
   },
   "devDependencies": {

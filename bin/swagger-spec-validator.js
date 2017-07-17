@@ -48,7 +48,7 @@ function parseYargs(yargs, args, callback) {
   // Since yargs doesn't nextTick its callback, this function must be careful
   // that exceptions thrown from callback (which propagate through yargs.parse)
   // are not caught and passed to a second invocation of callback.
-  var called = false;
+  let called = false;
   try {
     yargs.parse(args, function() {
       called = true;
@@ -139,7 +139,7 @@ function validateAll(specPaths, options, callback) {
  * @property {stream.Writable=} err Stream to which errors (and non-output
  * status messages) are written. (default: <code>process.stderr</code>)
  */
-// var CommandOptions;
+// const CommandOptions;
 
 /** Entry point for this command.
  *
@@ -204,7 +204,7 @@ function swaggerSpecValidatorCmd(args, options, callback) {
       throw new TypeError('options.err must be a stream.Writable');
     }
   } catch (err) {
-    process.nextTick(function() {
+    process.nextTick(() => {
       callback(err);
     });
     return undefined;
@@ -242,20 +242,20 @@ function swaggerSpecValidatorCmd(args, options, callback) {
       describe: 'Print more output',
       count: true
     })
-    .version(packageJson.name + ' ' + packageJson.version)
+    .version(`${packageJson.name} ${packageJson.version}`)
     .alias('version', 'V')
     .strict();
-  parseYargs(yargs, args, function(err, argOpts, output) {
+  parseYargs(yargs, args, (err, argOpts, output) => {
     if (err) {
       options.err.write(output ?
-                          output + '\n' :
-                          err.name + ': ' + err.message + '\n');
+                          `${output}\n` :
+                          `${err.name}: ${err.message}\n`);
       callback(null, 3);
       return;
     }
 
     if (output) {
-      options.out.write(output + '\n');
+      options.out.write(`${output}\n`);
     }
 
     if (argOpts.help || argOpts.version) {
@@ -293,7 +293,7 @@ module.exports = swaggerSpecValidatorCmd;
 if (require.main === module) {
   // This file was invoked directly.
   /* eslint-disable no-process-exit */
-  var mainOptions = {
+  const mainOptions = {
     in: process.stdin,
     out: process.stdout,
     err: process.stderr
@@ -302,7 +302,7 @@ if (require.main === module) {
     if (err) {
       if (err.stdout) { process.stdout.write(err.stdout); }
       if (err.stderr) { process.stderr.write(err.stderr); }
-      process.stderr.write(err.name + ': ' + err.message + '\n');
+      process.stderr.write(`${err.name}: ${err.message}\n`);
 
       exitCode = typeof err.exitCode === 'number' ? err.exitCode : 1;
     }

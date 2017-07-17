@@ -5,31 +5,31 @@
 
 'use strict';
 
-var assert = require('assert');
-var fs = require('fs');
-var path = require('path');
-var stream = require('stream');
-var swaggerSpecValidatorCmd = require('../bin/swagger-spec-validator');
+const assert = require('assert');
+const fs = require('fs');
+const path = require('path');
+const stream = require('stream');
+const swaggerSpecValidatorCmd = require('../bin/swagger-spec-validator');
 
 // Simulate arguments passed by the node runtime
-var RUNTIME_ARGS = ['node', 'swagger-spec-validator'];
+const RUNTIME_ARGS = ['node', 'swagger-spec-validator'];
 
-var swaggerJsonPath =
+const swaggerJsonPath =
   path.join(__dirname, '..', 'test-data', 'petstore-minimal.json');
-var swaggerYamlPath =
+const swaggerYamlPath =
   path.join(__dirname, '..', 'test-data', 'petstore-minimal.yaml');
-var invalidYamlPath =
+const invalidYamlPath =
   path.join(__dirname, '..', 'test-data', 'petstore-invalid.yaml');
 
-describe('swagger-spec-validator', function() {
-  it('validates JSON and YAML files', function(done) {
-    var options = {
+describe('swagger-spec-validator', () => {
+  it('validates JSON and YAML files', (done) => {
+    const options = {
       in: new stream.PassThrough(),
       out: new stream.PassThrough(),
       err: new stream.PassThrough()
     };
-    var allArgs = RUNTIME_ARGS.concat([swaggerJsonPath, swaggerYamlPath]);
-    swaggerSpecValidatorCmd(allArgs, options, function(err, code) {
+    const allArgs = RUNTIME_ARGS.concat([swaggerJsonPath, swaggerYamlPath]);
+    swaggerSpecValidatorCmd(allArgs, options, (err, code) => {
       assert.ifError(err);
       assert.strictEqual(code, 0);
       assert.strictEqual(options.out.read(), null);
@@ -38,13 +38,13 @@ describe('swagger-spec-validator', function() {
     });
   });
 
-  it('validates from stdin', function(done) {
-    var options = {
+  it('validates from stdin', (done) => {
+    const options = {
       in: fs.createReadStream(swaggerYamlPath),
       out: new stream.PassThrough(),
       err: new stream.PassThrough()
     };
-    swaggerSpecValidatorCmd(RUNTIME_ARGS, options, function(err, code) {
+    swaggerSpecValidatorCmd(RUNTIME_ARGS, options, (err, code) => {
       assert.ifError(err);
       assert.strictEqual(code, 0);
       assert.strictEqual(options.out.read(), null);
@@ -53,37 +53,37 @@ describe('swagger-spec-validator', function() {
     });
   });
 
-  it('handles validation failures', function(done) {
-    var options = {
+  it('handles validation failures', (done) => {
+    const options = {
       in: new stream.PassThrough(),
       out: new stream.PassThrough(),
       err: new stream.PassThrough()
     };
-    var allArgs = RUNTIME_ARGS.concat([invalidYamlPath]);
-    swaggerSpecValidatorCmd(allArgs, options, function(err, code) {
+    const allArgs = RUNTIME_ARGS.concat([invalidYamlPath]);
+    swaggerSpecValidatorCmd(allArgs, options, (err, code) => {
       assert.ifError(err);
       assert.strictEqual(code, 1);
-      var outStr = String(options.out.read());
-      assert.strictEqual(outStr.indexOf(invalidYamlPath + ':'), 0);
+      const outStr = String(options.out.read());
+      assert.strictEqual(outStr.indexOf(`${invalidYamlPath}:`), 0);
       assert.strictEqual(options.err.read(), null);
       done();
     });
   });
 
-  it('handles unreadable file errors', function(done) {
-    var options = {
+  it('handles unreadable file errors', (done) => {
+    const options = {
       in: new stream.PassThrough(),
       out: new stream.PassThrough(),
       err: new stream.PassThrough()
     };
-    var nonexistentPath = 'nonexistent.yaml';
-    var allArgs = RUNTIME_ARGS.concat([nonexistentPath]);
-    swaggerSpecValidatorCmd(allArgs, options, function(err, code) {
+    const nonexistentPath = 'nonexistent.yaml';
+    const allArgs = RUNTIME_ARGS.concat([nonexistentPath]);
+    swaggerSpecValidatorCmd(allArgs, options, (err, code) => {
       assert.ifError(err);
       assert.strictEqual(code, 2);
       assert.strictEqual(options.out.read(), null);
-      var errStr = String(options.err.read());
-      assert.strictEqual(errStr.indexOf(nonexistentPath + ':'), 0);
+      const errStr = String(options.err.read());
+      assert.strictEqual(errStr.indexOf(`${nonexistentPath}:`), 0);
       assert.ok(errStr.indexOf('ENOENT') >= 0);
       done();
     });

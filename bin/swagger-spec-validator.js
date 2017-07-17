@@ -8,33 +8,33 @@
 
 'use strict';
 
-var Yargs = require('yargs/yargs');
-var arrayUniq = require('array-uniq');
-var assign = require('object-assign');
-var packageJson = require('../package.json');
-var swaggerSpecValidator = require('..');
-var url = require('url');
+const Yargs = require('yargs/yargs');
+const arrayUniq = require('array-uniq');
+const assign = require('object-assign');
+const packageJson = require('../package.json');
+const swaggerSpecValidator = require('..');
+const url = require('url');
 
 function parseHeader(line) {
   // Note: curl uses the header line literally.  We can't due to Node API.
   //       Node enforces name is a valid RFC 7230 token, so remove whitespace
   //       as a convenience for users.
-  var match = /^\s*(\S+)\s*: ?(.*)$/.exec(line);
+  const match = /^\s*(\S+)\s*: ?(.*)$/.exec(line);
   if (!match) {
-    throw new Error('Unable to parse header line "' + line + '"');
+    throw new Error(`Unable to parse header line "${line}"`);
   }
 
-  var name = match[1];
-  var value = match[2];
+  const name = match[1];
+  const value = match[2];
   return [name, value];
 }
 
 function parseHeaders(lines) {
   return lines
     // yargs passes [undefined] when insufficient arguments are given
-    .filter(function(line) { return line !== null && line !== undefined; })
+    .filter((line) => line !== null && line !== undefined)
     .map(parseHeader)
-    .reduce(function(headerObj, header) {
+    .reduce((headerObj, header) => {
       headerObj[header[0]] = header[1];
       return headerObj;
     }, {});
@@ -68,41 +68,40 @@ function parseYargs(yargs, args, callback) {
  * @private
  */
 function getMessages(result) {
-  var messages = [];
+  let messages = [];
   if (result.messages) {
     messages = messages.concat(result.messages);
   }
   if (result.schemaValidationMessages) {
-    messages = messages.concat(result.schemaValidationMessages.map(function(m) {
-      return m.level + ': ' + m.message;
-    }));
+    messages = messages.concat(
+      result.schemaValidationMessages.map((m) => `${m.level}: ${m.message}`)
+    );
   }
   return messages;
 }
 
 function validateAll(specPaths, options, callback) {
-  var hadError = false;
-  var hadInvalid = false;
-  var numValidated = 0;
-  specPaths.forEach(function(specPath) {
+  let hadError = false;
+  let hadInvalid = false;
+  let numValidated = 0;
+  specPaths.forEach((specPath) => {
     function onResult(err, result) {
       if (err) {
         hadError = true;
         if (options.verbosity >= -1) {
-          options.err.write(specPath + ': ' + err + '\n');
+          options.err.write(`${specPath}: ${err}\n`);
           if (options.verbosity >= 1) {
             options.err.write(err.stack);
           }
         }
       } else {
-        var messages = getMessages(result);
+        const messages = getMessages(result);
         if (messages.length > 0) {
           hadInvalid = true;
           if (options.verbosity >= 0) {
-            var messagesWithPath = messages.map(function(message) {
-              return specPath + ': ' + message;
-            });
-            options.out.write(messagesWithPath.join('\n') + '\n');
+            const messagesWithPath =
+              messages.map((message) => `${specPath}: ${message}`);
+            options.out.write(`${messagesWithPath.join('\n')}\n`);
           }
         }
       }
@@ -158,8 +157,8 @@ function swaggerSpecValidatorCmd(args, options, callback) {
   }
 
   if (!callback) {
-    return new Promise(function(resolve, reject) {
-      swaggerSpecValidatorCmd(args, options, function(err, result) {
+    return new Promise((resolve, reject) => {
+      swaggerSpecValidatorCmd(args, options, (err, result) => {
         if (err) { reject(err); } else { resolve(result); }
       });
     });
@@ -212,7 +211,7 @@ function swaggerSpecValidatorCmd(args, options, callback) {
 
   // Workaround for https://github.com/yargs/yargs/issues/783
   require.main = module;
-  var yargs = new Yargs(null, null, require)
+  const yargs = new Yargs(null, null, require)
     .usage('Usage: $0 [options] [swagger.yaml...]')
     .option('header', {
       alias: 'H',
@@ -263,9 +262,9 @@ function swaggerSpecValidatorCmd(args, options, callback) {
       return;
     }
 
-    var verbosity = argOpts.verbose - argOpts.quiet;
+    const verbosity = argOpts.verbose - argOpts.quiet;
 
-    var specPaths = argOpts._;
+    let specPaths = argOpts._;
     if (specPaths.length === 0) {
       // Default to validating stdin
       specPaths.push('-');
@@ -276,7 +275,7 @@ function swaggerSpecValidatorCmd(args, options, callback) {
       specPaths = arrayUniq(specPaths);
     }
 
-    var validateOpts = assign({}, options);
+    const validateOpts = assign({}, options);
     validateOpts.request = argOpts.url ? url.parse(argOpts.url) : {};
     validateOpts.request.headers = argOpts.header;
     validateOpts.verbosity = verbosity;
@@ -298,7 +297,7 @@ if (require.main === module) {
     out: process.stdout,
     err: process.stderr
   };
-  swaggerSpecValidatorCmd(process.argv, mainOptions, function(err, exitCode) {
+  swaggerSpecValidatorCmd(process.argv, mainOptions, (err, exitCode) => {
     if (err) {
       if (err.stdout) { process.stdout.write(err.stdout); }
       if (err.stderr) { process.stderr.write(err.stderr); }

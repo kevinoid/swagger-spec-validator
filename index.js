@@ -5,35 +5,35 @@
 
 'use strict';
 
-var assign = require('object-assign');
-var fs = require('fs');
-var http = require('http');
-var https = require('https');
-var packageJson = require('./package.json');
-var path = require('path');
-var pify = require('pify');
-var tls = require('tls');
-var url = require('url');
+const assign = require('object-assign');
+const fs = require('fs');
+const http = require('http');
+const https = require('https');
+const packageJson = require('./package.json');
+const path = require('path');
+const pify = require('pify');
+const tls = require('tls');
+const url = require('url');
 
-var readFileP = pify(fs.readFile);
-var readdirP = pify(fs.readdir);
+const readFileP = pify(fs.readFile);
+const readdirP = pify(fs.readdir);
 
 /** @exports swagger-spec-validator */
-var swaggerSpecValidator = {};
+const swaggerSpecValidator = {};
 
 /** Default URL to which validation requests are sent.
  * @const
  */
-var DEFAULT_URL = 'https://online.swagger.io/validator/debug';
+const DEFAULT_URL = 'https://online.swagger.io/validator/debug';
 swaggerSpecValidator.DEFAULT_URL = DEFAULT_URL;
 
 /** Default headers sent with API requests.
  * @const
  */
-var DEFAULT_HEADERS = Object.freeze({
+const DEFAULT_HEADERS = Object.freeze({
   Accept: 'application/json',
-  'User-Agent': packageJson.name + '/' + packageJson.version +
-    ' Node.js/' + process.version.slice(1)
+  'User-Agent': `${packageJson.name}/${packageJson.version
+    } Node.js/${process.version.slice(1)}`
 });
 swaggerSpecValidator.DEFAULT_HEADERS = DEFAULT_HEADERS;
 
@@ -42,7 +42,7 @@ swaggerSpecValidator.DEFAULT_HEADERS = DEFAULT_HEADERS;
  * See https://github.com/swagger-api/validator-badge/issues/98
  * @private
  */
-var swaggerIoHttpsAgent;
+let swaggerIoHttpsAgent;
 
 /** Adds our default HTTP Agent to the request options.
  *
@@ -53,30 +53,28 @@ var swaggerIoHttpsAgent;
 swaggerSpecValidator._getSwaggerIoAgent =
 function getSwaggerIoAgent() {
   if (!swaggerIoHttpsAgent) {
-    var certsPath = path.join(__dirname, 'certs');
+    const certsPath = path.join(__dirname, 'certs');
     swaggerIoHttpsAgent = readdirP(certsPath)
-      .then(function(certNames) {
-        return Promise.all(
-          certNames.map(function(certName) {
-            var certPath = path.join(certsPath, certName);
+      .then((certNames) => Promise.all(
+          certNames.map((certName) => {
+            const certPath = path.join(certsPath, certName);
             return readFileP(certPath, {encoding: 'utf8'});
           })
-        );
-      })
-      .then(function(certs) {
+        ))
+      .then((certs) => {
         // Note: Using undocumented API to use both root and loaded certs.
         //       Specifying options.ca skips root certs, which could cause cert
         //       verification to fail if online.swagger.io changed certs.
         // Note: First call to addCACert reloads root certs without
         //       NODE_EXTRA_CA_CERTS. On Debian this includes all root CAs.
         //       This is why the DigiCert Root CA file is in the package.
-        var secureContext = tls.createSecureContext();
-        certs.forEach(function(cert) {
+        const secureContext = tls.createSecureContext();
+        certs.forEach((cert) => {
           secureContext.context.addCACert(cert);
         });
         return new https.Agent({
           keepAlive: true,
-          secureContext: secureContext
+          secureContext
         });
       });
   }
@@ -89,14 +87,14 @@ function getSwaggerIoAgent() {
  * @private
  */
 function combineHeaders() {
-  var combinedLower = {};
-  var combined = {};
-  var args = Array.prototype.slice.call(arguments);
+  const combinedLower = {};
+  const combined = {};
+  const args = Array.prototype.slice.call(arguments);
   args.reverse();
-  args.forEach(function(headers) {
+  args.forEach((headers) => {
     if (headers) {
-      Object.keys(headers).forEach(function(name) {
-        var nameLower = name.toLowerCase();
+      Object.keys(headers).forEach((name) => {
+        const nameLower = name.toLowerCase();
         if (!hasOwnProperty.call(combinedLower, nameLower)) {
           combinedLower[nameLower] = true;
           combined[name] = headers[name];
@@ -111,35 +109,35 @@ function combineHeaders() {
  * @private
  */
 function requestJson(options, callback) {
-  var proto = options.protocol === 'https:' ? https :
+  const proto = options.protocol === 'https:' ? https :
     options.protocol === 'http:' ? http :
     null;
   if (!proto) {
-    callback(new Error('Unsupported protocol "' + options.protocol +
-                       '" for validator URL'));
+    callback(new Error(`Unsupported protocol "${options.protocol
+                       }" for validator URL`));
     return;
   }
 
-  var req = proto.request(options)
+  const req = proto.request(options)
     .once('error', callback)
-    .once('response', function(res) {
+    .once('response', (res) => {
       res.on('error', callback);
-      var bodyData = [];
-      res.on('data', function(data) { bodyData.push(data); });
-      res.on('end', function() {
-        var resBody = Buffer.concat(bodyData);
-        var err, resBodyObj;
+      const bodyData = [];
+      res.on('data', (data) => { bodyData.push(data); });
+      res.on('end', () => {
+        const resBody = Buffer.concat(bodyData);
+        let err, resBodyObj;
         try {
           resBodyObj = JSON.parse(resBody.toString());
         } catch (errJson) {
-          err = new SyntaxError('Error parsing server response as JSON: ' +
-                                errJson.message);
+          err = new SyntaxError(`Error parsing server response as JSON: ${
+                                errJson.message}`);
         }
 
         if (res.statusCode >= 300) {
-          var errMessage = 'HTTP ' + res.statusCode;
+          let errMessage = `HTTP ${res.statusCode}`;
           if (res.statusMessage) {
-            errMessage += ': ' + res.statusMessage;
+            errMessage += `: ${res.statusMessage}`;
           }
           err = new Error(errMessage);
         }
@@ -157,11 +155,11 @@ function requestJson(options, callback) {
       });
     });
 
-  var body = options.body;
+  const body = options.body;
   if (typeof body === 'string' || Buffer.isBuffer(body)) {
     req.end(body);
   } else {
-    body.on('error', function(err) {
+    body.on('error', (err) => {
       req.abort();
       callback(err);
     });
@@ -202,8 +200,8 @@ function validate(spec, options, callback) {
   }
 
   if (!callback) {
-    return new Promise(function(resolve, reject) {
-      validate(spec, options, function(err, result) {
+    return new Promise((resolve, reject) => {
+      validate(spec, options, (err, result) => {
         if (err) { reject(err); } else { resolve(result); }
       });
     });
@@ -226,19 +224,19 @@ function validate(spec, options, callback) {
       throw new TypeError('options must be an object');
     }
   } catch (err) {
-    process.nextTick(function() {
+    process.nextTick(() => {
       callback(err);
     });
     return undefined;
   }
 
-  var reqOpts = url.parse(DEFAULT_URL);
+  const reqOpts = url.parse(DEFAULT_URL);
   reqOpts.method = 'POST';
   assign(reqOpts, options && options.request);
   reqOpts.headers = combineHeaders(DEFAULT_HEADERS, reqOpts.headers);
   reqOpts.body = spec;
 
-  var calledBack = false;
+  let calledBack = false;
   function callbackOnce(err) {
     if (!calledBack) {
       calledBack = true;
@@ -255,7 +253,7 @@ function validate(spec, options, callback) {
 
     // eslint-disable-next-line no-underscore-dangle
     swaggerSpecValidator._getSwaggerIoAgent()
-      .then(function(agent) {
+      .then((agent) => {
         if (!calledBack) {
           reqOpts.agent = agent;
           requestJson(reqOpts, callbackOnce);
@@ -288,13 +286,12 @@ function validateFile(specPath, options, callback) {
     options = null;
   }
 
-  var headers = options && options.request && options.request.headers;
-  var hasContentType = headers && Object.keys(headers).some(function(name) {
-    return name.toLowerCase() === 'content-type';
-  });
+  const headers = options && options.request && options.request.headers;
+  const hasContentType = headers &&
+    Object.keys(headers).some((name) => name.toLowerCase() === 'content-type');
   if (!hasContentType) {
     // Server ignores Content-Type, so not worth depending on a Media Type db.
-    var contentType = /\.json$/i.test(specPath) ? 'application/json' :
+    const contentType = /\.json$/i.test(specPath) ? 'application/json' :
       /\.ya?ml$/i.test(specPath) ? 'text/x-yaml' :
       null;
     if (contentType) {
@@ -305,7 +302,7 @@ function validateFile(specPath, options, callback) {
     }
   }
 
-  var specStream = fs.createReadStream(specPath);
+  const specStream = fs.createReadStream(specPath);
   return swaggerSpecValidator.validate(specStream, options, callback);
 };
 

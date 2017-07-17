@@ -27,12 +27,7 @@ function neverCalled() {
   throw new Error('should not be called');
 }
 
-// nock doesn't support Node v8 yet:
-// https://github.com/node-nock/nock/issues/922
-// https://github.com/node-nock/nock/issues/925
-var describeThis =
-  Number(process.version.slice(1).split('.', 1)[0]) >= 8 ? xdescribe : describe;
-describeThis('swaggerSpecValidator', function() {
+describe('swaggerSpecValidator', function() {
   afterEach(function() {
     nock.cleanAll();
   });

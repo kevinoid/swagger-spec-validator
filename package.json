@@ -49,7 +49,7 @@
   "devDependencies": {
     "codecov": "^2.0.1",
     "coveralls": "^2.11.6",
-    "eslint": "^3.0.0",
+    "eslint": "^4.1.0",
     "eslint-config-airbnb-base": "^11.0.0",
     "eslint-plugin-import": "^2.2.0",
     "istanbul": "^0.4.1",

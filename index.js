@@ -32,8 +32,8 @@ swaggerSpecValidator.DEFAULT_URL = DEFAULT_URL;
  */
 const DEFAULT_HEADERS = Object.freeze({
   Accept: 'application/json',
-  'User-Agent': `${packageJson.name}/${packageJson.version
-    } Node.js/${process.version.slice(1)}`
+  'User-Agent': `${packageJson.name}/${packageJson.version} ` +
+    `Node.js/${process.version.slice(1)}`
 });
 swaggerSpecValidator.DEFAULT_HEADERS = DEFAULT_HEADERS;
 
@@ -56,11 +56,11 @@ function getSwaggerIoAgent() {
     const certsPath = path.join(__dirname, 'certs');
     swaggerIoHttpsAgent = readdirP(certsPath)
       .then((certNames) => Promise.all(
-          certNames.map((certName) => {
-            const certPath = path.join(certsPath, certName);
-            return readFileP(certPath, {encoding: 'utf8'});
-          })
-        ))
+        certNames.map((certName) => {
+          const certPath = path.join(certsPath, certName);
+          return readFileP(certPath, {encoding: 'utf8'});
+        })
+      ))
       .then((certs) => {
         // Note: Using undocumented API to use both root and loaded certs.
         //       Specifying options.ca skips root certs, which could cause cert
@@ -111,10 +111,11 @@ function combineHeaders() {
 function requestJson(options, callback) {
   const proto = options.protocol === 'https:' ? https :
     options.protocol === 'http:' ? http :
-    null;
+      null;
   if (!proto) {
-    callback(new Error(`Unsupported protocol "${options.protocol
-                       }" for validator URL`));
+    callback(
+      new Error(`Unsupported protocol "${options.protocol}" for validator URL`)
+    );
     return;
   }
 
@@ -130,8 +131,9 @@ function requestJson(options, callback) {
         try {
           resBodyObj = JSON.parse(resBody.toString());
         } catch (errJson) {
-          err = new SyntaxError(`Error parsing server response as JSON: ${
-                                errJson.message}`);
+          err = new SyntaxError(
+            `Error parsing server response as JSON: ${errJson.message}`
+          );
         }
 
         if (res.statusCode >= 300) {
@@ -293,7 +295,7 @@ function validateFile(specPath, options, callback) {
     // Server ignores Content-Type, so not worth depending on a Media Type db.
     const contentType = /\.json$/i.test(specPath) ? 'application/json' :
       /\.ya?ml$/i.test(specPath) ? 'text/x-yaml' :
-      null;
+        null;
     if (contentType) {
       options = assign({}, options);
       options.request = assign({}, options.request);

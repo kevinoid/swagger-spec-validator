@@ -184,7 +184,7 @@ function swaggerSpecValidatorCmd(args, options, callback) {
       throw new TypeError('options must be an object');
     }
 
-    options = assign(
+    options = Object.assign(
       {
         in: process.stdin,
         out: process.stdout,
@@ -246,9 +246,9 @@ function swaggerSpecValidatorCmd(args, options, callback) {
     .strict();
   parseYargs(yargs, args, (err, argOpts, output) => {
     if (err) {
-      options.err.write(output ?
-                          `${output}\n` :
-                          `${err.name}: ${err.message}\n`);
+      options.err.write(
+        output ? `${output}\n` : `${err.name}: ${err.message}\n`
+      );
       callback(null, 3);
       return;
     }

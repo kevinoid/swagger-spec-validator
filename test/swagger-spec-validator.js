@@ -292,7 +292,7 @@ describe('swaggerSpecValidator', () => {
       const ne = nock(defaultProtoHost)
         .post(defaultUrl.path, testBody)
         .reply(200, response);
-      return swaggerSpecValidator.validate(new Buffer(testBody))
+      return swaggerSpecValidator.validate(Buffer.from(testBody))
         .then((result) => {
           assert.deepEqual(result, response);
           ne.done();

@@ -288,7 +288,8 @@ describe('swagger-spec-validator command', () => {
         match({request: match({headers: {'Content-Type': 'text/plain'}})}),
         match.func
       );
-    const allArgs = RUNTIME_ARGS.concat('-H', 'Content-Type: text/plain', 'file');
+    const allArgs =
+      RUNTIME_ARGS.concat('-H', 'Content-Type: text/plain', 'file');
     const result =
       swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
     swaggerSpecValidatorMock.verify();

@@ -57,13 +57,16 @@ rules:
   block-spacing: [2, "always"]
   ## allow unnamed functions
   func-names: 0
-  ## max 80 length (other options match airbnb-base/legacy)
+  ## enforce a maximum line length
+  # reduce from 100 to 80 chars (conventional terminal width)
+  # ignore lines which consist of a single string, URL, or RegExp literal,
+  # possibly prefixed with comment opener or suffixed with ";".
+  # (Not ESLint ignore props which ignores any lines which contain these.)
+  #
+  # Note: Change // to /[/] to avoid getting mangled as a JS comment.
+  #       https://github.com/eslint/eslint/pull/9226
   max-len: [2, 80, 2, {
-    ignoreUrls: true,
-    ignoreComments: false,
-    ignoreRegExpLiterals: true,
-    ignoreStrings: true,
-    ignoreTemplateLiterals: true,
+    ignorePattern: '^\s*((/?\*|/[/])\s*)?(''[^''\\]*(\\.[^''\\]*)*''|"[^"\\]*(\\.[^"\\]*)*"|/[^/\\]*(\\.[^/\\]*)*/|[^:/?#\s]+:/[/]\S+);?$'
   }]
   ## require parens for Constructor
   new-parens: 2
@@ -89,7 +92,15 @@ rules:
   # list: https://github.com/eslint/eslint/tree/master/docs/rules#ecmascript-6
   ## require parentheses around arrow function arguments (as Node core does)
   arrow-parens: [2, "always"]
-  ## Suggest using the rest parameters instead of arguments (for Node 4)
+  ## enforce consistent line breaks inside function parentheses
+  # Would prefer multiline if it allowed line breaks for single argument
+  # Since it doesn't, use consistent
+  function-paren-newline: [2, "consistent"]
+  ## Prefer destructuring from arrays and objects
+  # Disabled since unsupported on Node < 6
+  prefer-destructuring: 0
+  ## Suggest using the rest parameters instead of arguments
+  # Disabled since unsupported on Node < 6
   prefer-rest-params: 0
 
 # vi: set sts=2 sw=2 et ft=yaml:

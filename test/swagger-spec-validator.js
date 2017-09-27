@@ -365,7 +365,7 @@ describe('swaggerSpecValidator', () => {
     it('doesn\'t add Content-Type for other extensions', () => {
       const response = {};
       const ne = nock(defaultProtoHost)
-        .matchHeader('Content-Type', undefined)
+        .matchHeader('Content-Type', (val) => val === undefined)
         .post(defaultUrl.path)
         .reply(200, response);
       return swaggerSpecValidator.validateFile(emptyPath)

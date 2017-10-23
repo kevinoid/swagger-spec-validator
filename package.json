@@ -44,7 +44,7 @@
     "array-uniq": "^1.0.3",
     "object-assign": "^4.1.0",
     "pify": "^3.0.0",
-    "yargs": "^9.0.1"
+    "yargs": "^10.0.3"
   },
   "devDependencies": {
     "codecov": "^3.0.0",

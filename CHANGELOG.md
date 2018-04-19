@@ -1,5 +1,14 @@
 # Change Log
 
+## [2.0.0](https://github.com/kevinoid/swagger-spec-validator/tree/2.0.0) (2018-04-19)
+[Full Changelog](https://github.com/kevinoid/swagger-spec-validator/compare/v1.0.1...2.0.0)
+
+- **Major:** Drop support for Node v0.12.  Require Node v4 or later.
+- Replace DigiCert intermediate+root certificates with GoDaddy, which is now
+  the CA for https://online.swagger.io/
+  ([\#38](https://github.com/kevinoid/swagger-spec-validator/issues/38))
+- Update dependency versions.  Drop unnecessary dependencies.
+
 ## [1.0.1](https://github.com/kevinoid/swagger-spec-validator/tree/1.0.1) (2017-05-07)
 [Full Changelog](https://github.com/kevinoid/swagger-spec-validator/compare/1.0.0...1.0.1)
 

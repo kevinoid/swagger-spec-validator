@@ -92,6 +92,9 @@ rules:
   one-var: 0
   ## require initialized variables to be declared on separate lines
   one-var-declaration-per-line: [2, "initializations"]
+  ## Requires operator at the beginning of the line in multiline statements
+  # Airbnb prevents breaks around =, suggesting ().  I don't see the advantage.
+  operator-linebreak: [2, "before"]
   ## allow use of spread operator, which is not supported in Node v4
   prefer-spread: 0
   ## no space before function, eg. 'function()'
@@ -107,5 +110,9 @@ rules:
   ## Suggest using the rest parameters instead of arguments
   # Disabled since unsupported on Node < 6
   prefer-rest-params: 0
+
+  # eslint-plugin-import
+  ## Allow requiring devDependencies in test, test-bin, and test-lib
+  import/no-extraneous-dependencies: [2, {"devDependencies": ["test/**", "test-bin/**", "test-lib/**"]}]
 
 # vi: set sts=2 sw=2 et ft=yaml:

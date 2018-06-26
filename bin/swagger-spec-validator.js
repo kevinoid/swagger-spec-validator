@@ -11,9 +11,10 @@
 const Yargs = require('yargs/yargs');
 const arrayUniq = require('array-uniq');
 const assign = require('object-assign');
+const url = require('url');
+
 const packageJson = require('../package.json');
 const swaggerSpecValidator = require('..');
-const url = require('url');
 
 function parseHeader(line) {
   // Note: curl uses the header line literally.  We can't due to Node API.
@@ -99,8 +100,8 @@ function validateAll(specPaths, options, callback) {
         if (messages.length > 0) {
           hadInvalid = true;
           if (options.verbosity >= 0) {
-            const messagesWithPath =
-              messages.map((message) => `${specPath}: ${message}`);
+            const messagesWithPath
+              = messages.map((message) => `${specPath}: ${message}`);
             options.out.write(`${messagesWithPath.join('\n')}\n`);
           }
         }
@@ -171,8 +172,8 @@ function swaggerSpecValidatorCmd(args, options, callback) {
   try {
     if (args === undefined || args === null) {
       args = [];
-    } else if (typeof args !== 'object' ||
-               Math.floor(args.length) !== args.length) {
+    } else if (typeof args !== 'object'
+               || Math.floor(args.length) !== args.length) {
       throw new TypeError('args must be Array-like');
     } else if (args.length < 2 && args.length !== 0) {
       throw new RangeError('args must have at least 2 elements');

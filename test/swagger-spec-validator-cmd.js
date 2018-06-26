@@ -7,13 +7,14 @@
 
 const assert = require('assert');
 const assign = require('object-assign');
-const packageJson = require('../package.json');
 const proxyquire = require('proxyquire');
 const regexpEscape = require('regexp.escape');
 const sinon = require('sinon');
 const stream = require('stream');
-let swaggerSpecValidator = require('..');
 const url = require('url');
+
+let swaggerSpecValidator = require('..');
+const packageJson = require('../package.json');
 
 // Avoid modifying the shared module during mocking
 swaggerSpecValidator = assign({}, swaggerSpecValidator);
@@ -64,8 +65,8 @@ describe('swagger-spec-validator command', () => {
         match.object,
         match.func
       );
-    const result =
-      swaggerSpecValidatorCmd(RUNTIME_ARGS, options, sinon.mock().never());
+    const result
+      = swaggerSpecValidatorCmd(RUNTIME_ARGS, options, sinon.mock().never());
     swaggerSpecValidatorMock.verify();
     assert.strictEqual(result, undefined);
   });
@@ -79,8 +80,8 @@ describe('swagger-spec-validator command', () => {
         match.func
       );
     const allArgs = RUNTIME_ARGS.concat('-');
-    const result =
-      swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
+    const result
+      = swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
     swaggerSpecValidatorMock.verify();
     assert.strictEqual(result, undefined);
   });
@@ -94,8 +95,8 @@ describe('swagger-spec-validator command', () => {
         match.func
       );
     const allArgs = RUNTIME_ARGS.concat('./-');
-    const result =
-      swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
+    const result
+      = swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
     swaggerSpecValidatorMock.verify();
     assert.strictEqual(result, undefined);
   });
@@ -115,8 +116,8 @@ describe('swagger-spec-validator command', () => {
         match.func
       );
     const allArgs = RUNTIME_ARGS.concat('file1', 'file2');
-    const result =
-      swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
+    const result
+      = swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
     swaggerSpecValidatorMock.verify();
     assert.strictEqual(result, undefined);
   });
@@ -131,8 +132,8 @@ describe('swagger-spec-validator command', () => {
         match.func
       );
     const allArgs = RUNTIME_ARGS.concat('file1', 'file1');
-    const result =
-      swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
+    const result
+      = swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
     swaggerSpecValidatorMock.verify();
     assert.strictEqual(result, undefined);
   });
@@ -153,8 +154,8 @@ describe('swagger-spec-validator command', () => {
         match.func
       );
     const allArgs = RUNTIME_ARGS.concat('file1', './file1');
-    const result =
-      swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
+    const result
+      = swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
     swaggerSpecValidatorMock.verify();
     assert.strictEqual(result, undefined);
   });
@@ -179,8 +180,8 @@ describe('swagger-spec-validator command', () => {
         match.func
       );
     const allArgs = RUNTIME_ARGS.concat('file1', '-', 'file2');
-    const result =
-      swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
+    const result
+      = swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
     swaggerSpecValidatorMock.verify();
     assert.strictEqual(result, undefined);
   });
@@ -288,10 +289,10 @@ describe('swagger-spec-validator command', () => {
         match({request: match({headers: {'Content-Type': 'text/plain'}})}),
         match.func
       );
-    const allArgs =
-      RUNTIME_ARGS.concat('-H', 'Content-Type: text/plain', 'file');
-    const result =
-      swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
+    const allArgs
+      = RUNTIME_ARGS.concat('-H', 'Content-Type: text/plain', 'file');
+    const result
+      = swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
     swaggerSpecValidatorMock.verify();
     assert.strictEqual(result, undefined);
   });

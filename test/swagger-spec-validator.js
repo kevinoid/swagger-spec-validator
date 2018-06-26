@@ -7,21 +7,22 @@
 
 const assert = require('assert');
 const nock = require('nock');
-const packageJson = require('../package.json');
 const path = require('path');
 const regexpEscape = require('regexp.escape');
-const swaggerSpecValidator = require('..');
 const url = require('url');
+
+const packageJson = require('../package.json');
+const swaggerSpecValidator = require('..');
 
 const defaultUrl = url.parse(swaggerSpecValidator.DEFAULT_URL);
 const defaultProtoHost = `${defaultUrl.protocol}//${defaultUrl.host}`;
 
-const swaggerJsonPath =
-  path.join(__dirname, '..', 'test-data', 'petstore-minimal.json');
-const swaggerYamlPath =
-  path.join(__dirname, '..', 'test-data', 'petstore-minimal.yaml');
-const emptyPath =
-  path.join(__dirname, '..', 'test-data', 'empty.txt');
+const swaggerJsonPath
+  = path.join(__dirname, '..', 'test-data', 'petstore-minimal.json');
+const swaggerYamlPath
+  = path.join(__dirname, '..', 'test-data', 'petstore-minimal.yaml');
+const emptyPath
+  = path.join(__dirname, '..', 'test-data', 'empty.txt');
 
 function neverCalled() {
   throw new Error('should not be called');
@@ -299,8 +300,8 @@ describe('swaggerSpecValidator', () => {
         });
     });
 
-    it('Error for non-string, non-Buffer, non-Readable spec', () =>
-      swaggerSpecValidator.validate(true)
+    it('Error for non-string, non-Buffer, non-Readable spec',
+      () => swaggerSpecValidator.validate(true)
         .then(
           neverCalled,
           (err) => {

@@ -11,6 +11,7 @@ const path = require('path');
 const regexpEscape = require('regexp.escape');
 const sinon = require('sinon');
 const stream = require('stream');
+
 const swaggerSpecValidatorCmd = require('../bin/swagger-spec-validator');
 
 // Note: Match result to ease debugging (all properties are printed on mismatch)
@@ -20,12 +21,12 @@ const match = sinon.match;
 // Simulate arguments passed by the node runtime
 const RUNTIME_ARGS = ['node', 'swagger-spec-validator'];
 
-const swaggerJsonPath =
-  path.join(__dirname, '..', 'test-data', 'petstore-minimal.json');
-const swaggerYamlPath =
-  path.join(__dirname, '..', 'test-data', 'petstore-minimal.yaml');
-const invalidYamlPath =
-  path.join(__dirname, '..', 'test-data', 'petstore-invalid.yaml');
+const swaggerJsonPath
+  = path.join(__dirname, '..', 'test-data', 'petstore-minimal.json');
+const swaggerYamlPath
+  = path.join(__dirname, '..', 'test-data', 'petstore-minimal.yaml');
+const invalidYamlPath
+  = path.join(__dirname, '..', 'test-data', 'petstore-invalid.yaml');
 
 describe('swagger-spec-validator', () => {
   it('validates JSON and YAML files', (done) => {

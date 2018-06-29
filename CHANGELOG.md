@@ -1,7 +1,15 @@
 # Change Log
 
-## [2.0.0](https://github.com/kevinoid/swagger-spec-validator/tree/2.0.0) (2018-04-19)
-[Full Changelog](https://github.com/kevinoid/swagger-spec-validator/compare/v1.0.1...2.0.0)
+## [v3.0.0](https://github.com/kevinoid/swagger-spec-validator/tree/v3.0.0) (2018-06-29)
+[Full Changelog](https://github.com/kevinoid/swagger-spec-validator/compare/v2.0.0...v3.0.0)
+
+- **BREAKING** Drop support for Node < 6.
+- Dependency version updates.
+- Drop unnecessary dependencies.
+- Code style improvements.
+
+## [v2.0.0](https://github.com/kevinoid/swagger-spec-validator/tree/v2.0.0) (2018-04-19)
+[Full Changelog](https://github.com/kevinoid/swagger-spec-validator/compare/v1.0.1...v2.0.0)
 
 - **Major:** Drop support for Node v0.12.  Require Node v4 or later.
 - Replace DigiCert intermediate+root certificates with GoDaddy, which is now
@@ -9,19 +17,19 @@
   ([\#38](https://github.com/kevinoid/swagger-spec-validator/issues/38))
 - Update dependency versions.  Drop unnecessary dependencies.
 
-## [1.0.1](https://github.com/kevinoid/swagger-spec-validator/tree/1.0.1) (2017-05-07)
-[Full Changelog](https://github.com/kevinoid/swagger-spec-validator/compare/1.0.0...1.0.1)
+## [v1.0.1](https://github.com/kevinoid/swagger-spec-validator/tree/v1.0.1) (2017-05-07)
+[Full Changelog](https://github.com/kevinoid/swagger-spec-validator/compare/v1.0.0...v1.0.1)
 
 - Include DigiCert Global Root CA in package to fix SSL validation on Debian.
 
-## [1.0.0](https://github.com/kevinoid/swagger-spec-validator/tree/1.0.0) (2017-03-16)
-[Full Changelog](https://github.com/kevinoid/swagger-spec-validator/compare/0.1.2...1.0.0)
+## [v1.0.0](https://github.com/kevinoid/swagger-spec-validator/tree/v1.0.0) (2017-03-16)
+[Full Changelog](https://github.com/kevinoid/swagger-spec-validator/compare/v0.1.2...v1.0.0)
 
 - **No API Changes** Change to v1.0.0 is only a declaration of stability.
 - Dev dependency version updates.
 
-## [0.1.2](https://github.com/kevinoid/swagger-spec-validator/tree/0.1.2) (2017-03-03)
-[Full Changelog](https://github.com/kevinoid/swagger-spec-validator/compare/v0.1.2...0.1.2)
+## [v0.1.2](https://github.com/kevinoid/swagger-spec-validator/tree/v0.1.2) (2017-03-03)
+[Full Changelog](https://github.com/kevinoid/swagger-spec-validator/compare/v0.1.2...v0.1.2)
 
 ## [v0.1.2](https://github.com/kevinoid/swagger-spec-validator/tree/v0.1.2) (2017-03-03)
 [Full Changelog](https://github.com/kevinoid/swagger-spec-validator/compare/v0.1.1...v0.1.2)

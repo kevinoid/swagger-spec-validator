@@ -16,7 +16,7 @@ const swaggerSpecValidatorCmd = require('../bin/swagger-spec-validator');
 
 // Note: Match result to ease debugging (all properties are printed on mismatch)
 const assertMatch = sinon.assert.match;
-const match = sinon.match;
+const {match} = sinon;
 
 // Simulate arguments passed by the node runtime
 const RUNTIME_ARGS = ['node', 'swagger-spec-validator'];

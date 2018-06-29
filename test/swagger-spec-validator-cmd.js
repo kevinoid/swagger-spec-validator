@@ -19,7 +19,7 @@ const packageJson = require('../package.json');
 // Avoid modifying the shared module during mocking
 swaggerSpecValidator = assign({}, swaggerSpecValidator);
 
-const match = sinon.match;
+const {match} = sinon;
 
 // Simulate arguments passed by the node runtime
 const RUNTIME_ARGS = ['node', 'swagger-spec-validator'];

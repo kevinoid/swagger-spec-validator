@@ -35,8 +35,8 @@ function parseHeaders(lines) {
     // yargs passes [undefined] when insufficient arguments are given
     .filter((line) => line !== null && line !== undefined)
     .map(parseHeader)
-    .reduce((headerObj, header) => {
-      headerObj[header[0]] = header[1];
+    .reduce((headerObj, [headerName, headerVal]) => {
+      headerObj[headerName] = headerVal;
       return headerObj;
     }, {});
 }

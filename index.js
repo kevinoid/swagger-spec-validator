@@ -87,10 +87,9 @@ swaggerSpecValidator._getSwaggerIoAgent
  * With the capitalization and value of the last occurrence.
  * @private
  */
-function combineHeaders() {
+function combineHeaders(...args) {
   const combinedLower = {};
   const combined = {};
-  const args = Array.prototype.slice.call(arguments);
   args.reverse();
   args.forEach((headers) => {
     if (headers) {
@@ -158,7 +157,7 @@ function requestJson(options, callback) {
       });
     });
 
-  const body = options.body;
+  const {body} = options;
   if (typeof body === 'string' || Buffer.isBuffer(body)) {
     req.end(body);
   } else {
@@ -240,10 +239,10 @@ swaggerSpecValidator.validate
     reqOpts.body = spec;
 
     let calledBack = false;
-    function callbackOnce(err) {
+    function callbackOnce(...args) {
       if (!calledBack) {
         calledBack = true;
-        callback.apply(this, arguments);
+        callback.apply(this, args);
       }
     }
 

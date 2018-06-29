@@ -9,7 +9,6 @@
 'use strict';
 
 const Yargs = require('yargs/yargs');
-const arrayUniq = require('array-uniq');
 const assign = require('object-assign');
 const url = require('url');
 
@@ -275,7 +274,7 @@ function swaggerSpecValidatorCmd(args, options, callback) {
         options.out.write('Reading spec from stdin...\n');
       }
     } else if (specPaths.length > 1) {
-      specPaths = arrayUniq(specPaths);
+      specPaths = [...new Set(specPaths)];
     }
 
     const validateOpts = assign({}, options);

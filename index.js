@@ -51,8 +51,8 @@ let swaggerIoHttpsAgent;
  * @private
  */
 // eslint-disable-next-line no-underscore-dangle
-swaggerSpecValidator._getSwaggerIoAgent
-= function getSwaggerIoAgent() {
+swaggerSpecValidator._getSwaggerIoHttpsAgent
+= function _getSwaggerIoHttpsAgent() {
     if (!swaggerIoHttpsAgent) {
       const certsPath = path.join(__dirname, 'certs');
       swaggerIoHttpsAgent = readdirP(certsPath)
@@ -254,7 +254,7 @@ swaggerSpecValidator.validate
       }
 
       // eslint-disable-next-line no-underscore-dangle
-      swaggerSpecValidator._getSwaggerIoAgent()
+      swaggerSpecValidator._getSwaggerIoHttpsAgent()
         .then((agent) => {
           if (!calledBack) {
             reqOpts.agent = agent;

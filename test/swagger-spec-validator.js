@@ -162,10 +162,11 @@ describe('swaggerSpecValidator', () => {
         return Promise.reject(errTest);
       }
       /* eslint-disable no-underscore-dangle */
-      const getSwaggerIoAgent = swaggerSpecValidator._getSwaggerIoAgent;
+      const getSwaggerIoHttpsAgent
+        = swaggerSpecValidator._getSwaggerIoHttpsAgent;
       let result;
       try {
-        swaggerSpecValidator._getSwaggerIoAgent = getTestError;
+        swaggerSpecValidator._getSwaggerIoHttpsAgent = getTestError;
         result = swaggerSpecValidator.validate('swagger')
           .then(
             neverCalled,
@@ -175,7 +176,7 @@ describe('swaggerSpecValidator', () => {
             }
           );
       } finally {
-        swaggerSpecValidator._getSwaggerIoAgent = getSwaggerIoAgent;
+        swaggerSpecValidator._getSwaggerIoHttpsAgent = getSwaggerIoHttpsAgent;
       }
       /* eslint-enable no-underscore-dangle */
       return result;
@@ -436,10 +437,11 @@ describe('swaggerSpecValidator', () => {
         return new Promise(() => {});
       }
       /* eslint-disable no-underscore-dangle */
-      const getSwaggerIoAgent = swaggerSpecValidator._getSwaggerIoAgent;
+      const getSwaggerIoHttpsAgent
+        = swaggerSpecValidator._getSwaggerIoHttpsAgent;
       let result;
       try {
-        swaggerSpecValidator._getSwaggerIoAgent = waitForever;
+        swaggerSpecValidator._getSwaggerIoHttpsAgent = waitForever;
         result = swaggerSpecValidator.validateFile('nonexistent.yaml')
           .then(
             neverCalled,
@@ -449,7 +451,7 @@ describe('swaggerSpecValidator', () => {
             }
           );
       } finally {
-        swaggerSpecValidator._getSwaggerIoAgent = getSwaggerIoAgent;
+        swaggerSpecValidator._getSwaggerIoHttpsAgent = getSwaggerIoHttpsAgent;
       }
       /* eslint-enable no-underscore-dangle */
       return result;
@@ -468,16 +470,17 @@ describe('swaggerSpecValidator', () => {
         return Promise.reject(errTest);
       }
       /* eslint-disable no-underscore-dangle */
-      const getSwaggerIoAgent = swaggerSpecValidator._getSwaggerIoAgent;
+      const getSwaggerIoHttpsAgent
+        = swaggerSpecValidator._getSwaggerIoHttpsAgent;
       try {
-        swaggerSpecValidator._getSwaggerIoAgent = getTestError;
+        swaggerSpecValidator._getSwaggerIoHttpsAgent = getTestError;
         swaggerSpecValidator.validateFile('nonexistent.yaml', (err) => {
           assert(err === errTest || err.code === 'ENOENT');
           ne.done();
           done();
         });
       } finally {
-        swaggerSpecValidator._getSwaggerIoAgent = getSwaggerIoAgent;
+        swaggerSpecValidator._getSwaggerIoHttpsAgent = getSwaggerIoHttpsAgent;
       }
       /* eslint-enable no-underscore-dangle */
     });

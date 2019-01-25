@@ -84,6 +84,31 @@ describe('swaggerSpecValidator', () => {
         });
     });
 
+    it('POSTs to http://online.swagger.io from caller options', () => {
+      const testProtoHost = 'http://online.swagger.io';
+      const testPath = '/validator/debug';
+      const response = {};
+      const ne = nock(testProtoHost)
+        .post(testPath)
+        .reply(function(uri, requestBody) {
+          // FIXME: This test doesn't work because this.req is
+          // OverriddenClientRequest which doesn't have a copy of agent.
+          // Currently also tested in integration.js as a workaround.
+          assert.notStrictEqual(
+            this.req.agent,
+            /* eslint-disable no-underscore-dangle */
+            swaggerSpecValidator._getSwaggerIoHttpsAgent()
+          );
+          return [200, response];
+        });
+      const options = {request: url.parse(testProtoHost + testPath)};
+      return swaggerSpecValidator.validate('swagger', options)
+        .then((result) => {
+          assert.deepEqual(result, response);
+          ne.done();
+        });
+    });
+
     it('sends Accept: application/json by default', () => {
       const response = {};
       const ne = nock(defaultProtoHost)

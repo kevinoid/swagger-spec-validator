@@ -246,7 +246,8 @@ swaggerSpecValidator.validate
       }
     }
 
-    if (reqOpts.hostname === 'online.swagger.io'
+    if (reqOpts.protocol === 'https:'
+      && reqOpts.hostname === 'online.swagger.io'
       && !hasOwnProperty.call(reqOpts, 'agent')) {
       if (typeof spec.pipe === 'function') {
       // Stream can emit an error before Agent is loaded.  Handle this.

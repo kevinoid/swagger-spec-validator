@@ -48,6 +48,33 @@ swaggerSpecValidatorCmd(allArgs, options, (err, code) =&#x3E; {
   );
   done();
 });</code></pre></dd>
+        <dt>can validate using http://online.swagger.io</dt>
+        <dd><pre><code>const options = {
+  in: new stream.PassThrough(),
+  out: new stream.PassThrough({encoding: &#x27;utf-8&#x27;}),
+  err: new stream.PassThrough({encoding: &#x27;utf-8&#x27;})
+};
+const allArgs = RUNTIME_ARGS.concat([
+  &#x27;-u&#x27;,
+  &#x27;http://online.swagger.io/validator/debug&#x27;,
+  swaggerJsonPath
+]);
+swaggerSpecValidatorCmd(allArgs, options, (err, code) =&#x3E; {
+  assert.ifError(err);
+  assertMatch(
+    {
+      code,
+      out: options.out.read(),
+      err: options.err.read()
+    },
+    match({
+      code: 0,
+      out: null,
+      err: match(/\bvalid/i)
+    })
+  );
+  done();
+});</code></pre></dd>
         <dt>validates from stdin</dt>
         <dd><pre><code>const options = {
   in: fs.createReadStream(swaggerYamlPath),
@@ -1072,6 +1099,29 @@ return swaggerSpecValidator.validate(&#x27;swagger&#x27;, options)
     assert.deepEqual(result, response);
     ne.done();
   });</code></pre></dd>
+            <dt>POSTs to http://online.swagger.io from caller options</dt>
+            <dd><pre><code>const testProtoHost = &#x27;http://online.swagger.io&#x27;;
+const testPath = &#x27;/validator/debug&#x27;;
+const response = {};
+const ne = nock(testProtoHost)
+  .post(testPath)
+  .reply(function(uri, requestBody) {
+    // FIXME: This test doesn&#x27;t work because this.req is
+    // OverriddenClientRequest which doesn&#x27;t have a copy of agent.
+    // Currently also tested in integration.js as a workaround.
+    assert.notStrictEqual(
+      this.req.agent,
+      /* eslint-disable no-underscore-dangle */
+      swaggerSpecValidator._getSwaggerIoHttpsAgent()
+    );
+    return [200, response];
+  });
+const options = {request: url.parse(testProtoHost + testPath)};
+return swaggerSpecValidator.validate(&#x27;swagger&#x27;, options)
+  .then((result) =&#x3E; {
+    assert.deepEqual(result, response);
+    ne.done();
+  });</code></pre></dd>
             <dt>sends Accept: application/json by default</dt>
             <dd><pre><code>const response = {};
 const ne = nock(defaultProtoHost)
@@ -1141,10 +1191,11 @@ function getTestError() {
   return Promise.reject(errTest);
 }
 /* eslint-disable no-underscore-dangle */
-const getSwaggerIoAgent = swaggerSpecValidator._getSwaggerIoAgent;
+const getSwaggerIoHttpsAgent
+  = swaggerSpecValidator._getSwaggerIoHttpsAgent;
 let result;
 try {
-  swaggerSpecValidator._getSwaggerIoAgent = getTestError;
+  swaggerSpecValidator._getSwaggerIoHttpsAgent = getTestError;
   result = swaggerSpecValidator.validate(&#x27;swagger&#x27;)
     .then(
       neverCalled,
@@ -1154,7 +1205,7 @@ try {
       }
     );
 } finally {
-  swaggerSpecValidator._getSwaggerIoAgent = getSwaggerIoAgent;
+  swaggerSpecValidator._getSwaggerIoHttpsAgent = getSwaggerIoHttpsAgent;
 }
 /* eslint-enable no-underscore-dangle */
 return result;</code></pre></dd>
@@ -1378,10 +1429,11 @@ function waitForever() {
   return new Promise(() =&#x3E; {});
 }
 /* eslint-disable no-underscore-dangle */
-const getSwaggerIoAgent = swaggerSpecValidator._getSwaggerIoAgent;
+const getSwaggerIoHttpsAgent
+  = swaggerSpecValidator._getSwaggerIoHttpsAgent;
 let result;
 try {
-  swaggerSpecValidator._getSwaggerIoAgent = waitForever;
+  swaggerSpecValidator._getSwaggerIoHttpsAgent = waitForever;
   result = swaggerSpecValidator.validateFile(&#x27;nonexistent.yaml&#x27;)
     .then(
       neverCalled,
@@ -1391,7 +1443,7 @@ try {
       }
     );
 } finally {
-  swaggerSpecValidator._getSwaggerIoAgent = getSwaggerIoAgent;
+  swaggerSpecValidator._getSwaggerIoHttpsAgent = getSwaggerIoHttpsAgent;
 }
 /* eslint-enable no-underscore-dangle */
 return result;</code></pre></dd>
@@ -1407,16 +1459,17 @@ function getTestError() {
   return Promise.reject(errTest);
 }
 /* eslint-disable no-underscore-dangle */
-const getSwaggerIoAgent = swaggerSpecValidator._getSwaggerIoAgent;
+const getSwaggerIoHttpsAgent
+  = swaggerSpecValidator._getSwaggerIoHttpsAgent;
 try {
-  swaggerSpecValidator._getSwaggerIoAgent = getTestError;
+  swaggerSpecValidator._getSwaggerIoHttpsAgent = getTestError;
   swaggerSpecValidator.validateFile(&#x27;nonexistent.yaml&#x27;, (err) =&#x3E; {
     assert(err === errTest || err.code === &#x27;ENOENT&#x27;);
     ne.done();
     done();
   });
 } finally {
-  swaggerSpecValidator._getSwaggerIoAgent = getSwaggerIoAgent;
+  swaggerSpecValidator._getSwaggerIoHttpsAgent = getSwaggerIoHttpsAgent;
 }
 /* eslint-enable no-underscore-dangle */</code></pre></dd>
           </dl>

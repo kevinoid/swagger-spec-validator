@@ -28,7 +28,11 @@ const swaggerYamlPath
 const invalidYamlPath
   = path.join(__dirname, '..', 'test-data', 'petstore-invalid.yaml');
 
-describe('swagger-spec-validator', () => {
+describe('swagger-spec-validator', function() {
+  // Since these tests rely on external API responses, latency can vary a lot.
+  // Increase timeout to something more reasonable for external APIs.
+  this.timeout(6000);
+
   it('validates JSON and YAML files', (done) => {
     const options = {
       in: new stream.PassThrough(),

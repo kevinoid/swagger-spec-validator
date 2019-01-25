@@ -1,5 +1,12 @@
 # Change Log
 
+## [v3.0.1](https://github.com/kevinoid/swagger-spec-validator/tree/v3.0.1) (2019-01-24)
+[Full Changelog](https://github.com/kevinoid/swagger-spec-validator/compare/v3.0.0...v3.0.1)
+
+- Fix support for http://online.swagger.io (without HTTPS), when requested by
+  callers.
+- Developmental dependency version updates.
+
 ## [v3.0.0](https://github.com/kevinoid/swagger-spec-validator/tree/v3.0.0) (2018-06-29)
 [Full Changelog](https://github.com/kevinoid/swagger-spec-validator/compare/v2.0.0...v3.0.0)
 

@@ -44,7 +44,7 @@
   "dependencies": {
     "object-assign": "^4.1.0",
     "pify": "^4.0.0",
-    "yargs": "^12.0.1"
+    "yargs": "^13.1.0"
   },
   "devDependencies": {
     "codecov": "^3.0.0",

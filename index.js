@@ -10,14 +10,14 @@ const fs = require('fs');
 const http = require('http');
 const https = require('https');
 const path = require('path');
-const pify = require('pify');
 const tls = require('tls');
 const url = require('url');
+const util = require('util');
 
 const packageJson = require('./package.json');
 
-const readFileP = pify(fs.readFile);
-const readdirP = pify(fs.readdir);
+const readFileP = util.promisify(fs.readFile);
+const readdirP = util.promisify(fs.readdir);
 
 /** @exports swagger-spec-validator */
 const swaggerSpecValidator = {};

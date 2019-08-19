@@ -43,7 +43,7 @@
   },
   "dependencies": {
     "object-assign": "^4.1.0",
-    "yargs": "^13.1.0"
+    "yargs": "^14.0.0"
   },
   "devDependencies": {
     "codecov": "^3.0.0",

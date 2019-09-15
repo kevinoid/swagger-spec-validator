@@ -6,7 +6,6 @@
 'use strict';
 
 const assert = require('assert');
-const assign = require('object-assign');
 const proxyquire = require('proxyquire');
 const regexpEscape = require('regexp.escape');
 const sinon = require('sinon');
@@ -17,7 +16,7 @@ let swaggerSpecValidator = require('..');
 const packageJson = require('../package.json');
 
 // Avoid modifying the shared module during mocking
-swaggerSpecValidator = assign({}, swaggerSpecValidator);
+swaggerSpecValidator = { ...swaggerSpecValidator };
 
 const { match } = sinon;
 

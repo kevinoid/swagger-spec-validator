@@ -42,7 +42,6 @@
     "version-deps": "npm install david depcheck git-branch-is npm-audit-resolver travis-status"
   },
   "dependencies": {
-    "object-assign": "^4.1.0",
     "yargs": "^13.1.0"
   },
   "devDependencies": {

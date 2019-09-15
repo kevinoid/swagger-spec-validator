@@ -5,7 +5,6 @@
 
 'use strict';
 
-const assign = require('object-assign');
 const fs = require('fs');
 const http = require('http');
 const https = require('https');
@@ -234,7 +233,7 @@ function validate(spec, options, callback) {
 
   const reqOpts = url.parse(DEFAULT_URL);
   reqOpts.method = 'POST';
-  assign(reqOpts, options && options.request);
+  Object.assign(reqOpts, options && options.request);
   reqOpts.headers = combineHeaders(DEFAULT_HEADERS, reqOpts.headers);
   reqOpts.body = spec;
 
@@ -299,9 +298,9 @@ function validateFile(specPath, options, callback) {
       : /\.ya?ml$/i.test(specPath) ? 'text/x-yaml'
         : null;
     if (contentType) {
-      options = assign({}, options);
-      options.request = assign({}, options.request);
-      options.request.headers = assign({}, options.request.headers);
+      options = { ...options };
+      options.request = { ...options.request };
+      options.request.headers = { ...options.request.headers };
       options.request.headers['Content-Type'] = contentType;
     }
   }

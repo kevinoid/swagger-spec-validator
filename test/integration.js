@@ -16,17 +16,17 @@ const swaggerSpecValidatorCmd = require('../bin/swagger-spec-validator');
 
 // Note: Match result to ease debugging (all properties are printed on mismatch)
 const assertMatch = sinon.assert.match;
-const {match} = sinon;
+const { match } = sinon;
 
 // Simulate arguments passed by the node runtime
 const RUNTIME_ARGS = ['node', 'swagger-spec-validator'];
 
-const swaggerJsonPath
-  = path.join(__dirname, '..', 'test-data', 'petstore-minimal.json');
-const swaggerYamlPath
-  = path.join(__dirname, '..', 'test-data', 'petstore-minimal.yaml');
-const invalidYamlPath
-  = path.join(__dirname, '..', 'test-data', 'petstore-invalid.yaml');
+const swaggerJsonPath =
+  path.join(__dirname, '..', 'test-data', 'petstore-minimal.json');
+const swaggerYamlPath =
+  path.join(__dirname, '..', 'test-data', 'petstore-minimal.yaml');
+const invalidYamlPath =
+  path.join(__dirname, '..', 'test-data', 'petstore-invalid.yaml');
 
 describe('swagger-spec-validator', function() {
   // Since these tests rely on external API responses, latency can vary a lot.
@@ -36,8 +36,8 @@ describe('swagger-spec-validator', function() {
   it('validates JSON and YAML files', (done) => {
     const options = {
       in: new stream.PassThrough(),
-      out: new stream.PassThrough({encoding: 'utf-8'}),
-      err: new stream.PassThrough({encoding: 'utf-8'})
+      out: new stream.PassThrough({ encoding: 'utf-8' }),
+      err: new stream.PassThrough({ encoding: 'utf-8' }),
     };
     const allArgs = RUNTIME_ARGS.concat([swaggerJsonPath, swaggerYamlPath]);
     swaggerSpecValidatorCmd(allArgs, options, (err, code) => {
@@ -46,13 +46,13 @@ describe('swagger-spec-validator', function() {
         {
           code,
           out: options.out.read(),
-          err: options.err.read()
+          err: options.err.read(),
         },
         match({
           code: 0,
           out: null,
-          err: match(/\bvalid/i)
-        })
+          err: match(/\bvalid/i),
+        }),
       );
       done();
     });
@@ -64,13 +64,13 @@ describe('swagger-spec-validator', function() {
   it('can validate using http://online.swagger.io', (done) => {
     const options = {
       in: new stream.PassThrough(),
-      out: new stream.PassThrough({encoding: 'utf-8'}),
-      err: new stream.PassThrough({encoding: 'utf-8'})
+      out: new stream.PassThrough({ encoding: 'utf-8' }),
+      err: new stream.PassThrough({ encoding: 'utf-8' }),
     };
     const allArgs = RUNTIME_ARGS.concat([
       '-u',
       'http://online.swagger.io/validator/debug',
-      swaggerJsonPath
+      swaggerJsonPath,
     ]);
     swaggerSpecValidatorCmd(allArgs, options, (err, code) => {
       assert.ifError(err);
@@ -78,13 +78,13 @@ describe('swagger-spec-validator', function() {
         {
           code,
           out: options.out.read(),
-          err: options.err.read()
+          err: options.err.read(),
         },
         match({
           code: 0,
           out: null,
-          err: match(/\bvalid/i)
-        })
+          err: match(/\bvalid/i),
+        }),
       );
       done();
     });
@@ -93,8 +93,8 @@ describe('swagger-spec-validator', function() {
   it('validates from stdin', (done) => {
     const options = {
       in: fs.createReadStream(swaggerYamlPath),
-      out: new stream.PassThrough({encoding: 'utf-8'}),
-      err: new stream.PassThrough({encoding: 'utf-8'})
+      out: new stream.PassThrough({ encoding: 'utf-8' }),
+      err: new stream.PassThrough({ encoding: 'utf-8' }),
     };
     swaggerSpecValidatorCmd(RUNTIME_ARGS, options, (err, code) => {
       assert.ifError(err);
@@ -102,13 +102,13 @@ describe('swagger-spec-validator', function() {
         {
           code,
           out: options.out.read(),
-          err: options.err.read()
+          err: options.err.read(),
         },
         match({
           code: 0,
           out: null,
-          err: match(/\bvalid/i)
-        })
+          err: match(/\bvalid/i),
+        }),
       );
       done();
     });
@@ -117,8 +117,8 @@ describe('swagger-spec-validator', function() {
   it('handles validation failures', (done) => {
     const options = {
       in: new stream.PassThrough(),
-      out: new stream.PassThrough({encoding: 'utf-8'}),
-      err: new stream.PassThrough({encoding: 'utf-8'})
+      out: new stream.PassThrough({ encoding: 'utf-8' }),
+      err: new stream.PassThrough({ encoding: 'utf-8' }),
     };
     const allArgs = RUNTIME_ARGS.concat([invalidYamlPath]);
     swaggerSpecValidatorCmd(allArgs, options, (err, code) => {
@@ -127,13 +127,13 @@ describe('swagger-spec-validator', function() {
         {
           code,
           out: options.out.read(),
-          err: options.err.read()
+          err: options.err.read(),
         },
         match({
           code: 1,
           out: match(new RegExp(`^${regexpEscape(invalidYamlPath)}:`)),
-          err: null
-        })
+          err: null,
+        }),
       );
       done();
     });
@@ -142,8 +142,8 @@ describe('swagger-spec-validator', function() {
   it('handles unreadable file errors', (done) => {
     const options = {
       in: new stream.PassThrough(),
-      out: new stream.PassThrough({encoding: 'utf-8'}),
-      err: new stream.PassThrough({encoding: 'utf-8'})
+      out: new stream.PassThrough({ encoding: 'utf-8' }),
+      err: new stream.PassThrough({ encoding: 'utf-8' }),
     };
     const nonexistentPath = 'nonexistent.yaml';
     const allArgs = RUNTIME_ARGS.concat([nonexistentPath]);
@@ -153,15 +153,15 @@ describe('swagger-spec-validator', function() {
         {
           code,
           out: options.out.read(),
-          err: options.err.read()
+          err: options.err.read(),
         },
         match({
           code: 2,
           out: null,
           err: match(new RegExp(
-            `^${regexpEscape(nonexistentPath)}:.*\\bENOENT\\b`
-          ))
-        })
+            `^${regexpEscape(nonexistentPath)}:.*\\bENOENT\\b`,
+          )),
+        }),
       );
       done();
     });

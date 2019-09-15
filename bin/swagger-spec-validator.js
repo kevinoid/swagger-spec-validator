@@ -74,7 +74,7 @@ function getMessages(result) {
   }
   if (result.schemaValidationMessages) {
     messages = messages.concat(
-      result.schemaValidationMessages.map((m) => `${m.level}: ${m.message}`)
+      result.schemaValidationMessages.map((m) => `${m.level}: ${m.message}`),
     );
   }
   return messages;
@@ -99,8 +99,8 @@ function validateAll(specPaths, options, callback) {
         if (messages.length > 0) {
           hadInvalid = true;
           if (options.verbosity >= 0) {
-            const messagesWithPath
-              = messages.map((message) => `${specPath}: ${message}`);
+            const messagesWithPath =
+              messages.map((message) => `${specPath}: ${message}`);
             options.out.write(`${messagesWithPath.join('\n')}\n`);
           }
         }
@@ -184,14 +184,12 @@ function swaggerSpecValidatorCmd(args, options, callback) {
       throw new TypeError('options must be an object');
     }
 
-    options = Object.assign(
-      {
-        in: process.stdin,
-        out: process.stdout,
-        err: process.stderr
-      },
-      options
-    );
+    options = {
+      in: process.stdin,
+      out: process.stdout,
+      err: process.stderr,
+      ...options,
+    };
 
     if (!options.in || typeof options.in.on !== 'function') {
       throw new TypeError('options.in must be a stream.Readable');
@@ -216,7 +214,7 @@ function swaggerSpecValidatorCmd(args, options, callback) {
     .parserConfiguration({
       'parse-numbers': false,
       'duplicate-arguments-array': false,
-      'flatten-duplicate-arrays': false
+      'flatten-duplicate-arrays': false,
     })
     .usage('Usage: $0 [options] [swagger.yaml...]')
     .option('header', {
@@ -226,7 +224,7 @@ function swaggerSpecValidatorCmd(args, options, callback) {
       array: true,
       // Prevent array from eating non-option arguments
       nargs: 1,
-      coerce: parseHeaders
+      coerce: parseHeaders,
     })
     .help()
     .alias('help', 'h')
@@ -234,18 +232,18 @@ function swaggerSpecValidatorCmd(args, options, callback) {
     .option('quiet', {
       alias: 'q',
       describe: 'Print less output',
-      count: true
+      count: true,
     })
     .option('url', {
       alias: 'u',
       describe: 'Validator URL',
       defaultDescription: swaggerSpecValidator.DEFAULT_URL,
-      nargs: 1
+      nargs: 1,
     })
     .option('verbose', {
       alias: 'v',
       describe: 'Print more output',
-      count: true
+      count: true,
     })
     .version(`${packageJson.name} ${packageJson.version}`)
     .alias('version', 'V')
@@ -303,7 +301,7 @@ if (require.main === module) {
   const mainOptions = {
     in: process.stdin,
     out: process.stdout,
-    err: process.stderr
+    err: process.stderr,
   };
   swaggerSpecValidatorCmd(process.argv, mainOptions, (err, exitCode) => {
     if (err) {

@@ -17,12 +17,12 @@ const swaggerSpecValidator = require('..');
 const defaultUrl = url.parse(swaggerSpecValidator.DEFAULT_URL);
 const defaultProtoHost = `${defaultUrl.protocol}//${defaultUrl.host}`;
 
-const swaggerJsonPath
-  = path.join(__dirname, '..', 'test-data', 'petstore-minimal.json');
-const swaggerYamlPath
-  = path.join(__dirname, '..', 'test-data', 'petstore-minimal.yaml');
-const emptyPath
-  = path.join(__dirname, '..', 'test-data', 'empty.txt');
+const swaggerJsonPath =
+  path.join(__dirname, '..', 'test-data', 'petstore-minimal.json');
+const swaggerYamlPath =
+  path.join(__dirname, '..', 'test-data', 'petstore-minimal.yaml');
+const emptyPath =
+  path.join(__dirname, '..', 'test-data', 'empty.txt');
 
 function neverCalled() {
   throw new Error('should not be called');
@@ -62,7 +62,7 @@ describe('swaggerSpecValidator', () => {
       const ne = nock(testProtoHost)
         .post(testPath)
         .reply(200, response);
-      const options = {request: url.parse(testProtoHost + testPath)};
+      const options = { request: url.parse(testProtoHost + testPath) };
       return swaggerSpecValidator.validate('swagger', options)
         .then((result) => {
           assert.deepEqual(result, response);
@@ -76,7 +76,7 @@ describe('swaggerSpecValidator', () => {
       const ne = nock(defaultProtoHost)
         .post(testPath)
         .reply(200, response);
-      const options = {request: {path: testPath}};
+      const options = { request: { path: testPath } };
       return swaggerSpecValidator.validate('swagger', options)
         .then((result) => {
           assert.deepEqual(result, response);
@@ -97,11 +97,11 @@ describe('swaggerSpecValidator', () => {
           assert.notStrictEqual(
             this.req.agent,
             /* eslint-disable no-underscore-dangle */
-            swaggerSpecValidator._getSwaggerIoHttpsAgent()
+            swaggerSpecValidator._getSwaggerIoHttpsAgent(),
           );
           return [200, response];
         });
-      const options = {request: url.parse(testProtoHost + testPath)};
+      const options = { request: url.parse(testProtoHost + testPath) };
       return swaggerSpecValidator.validate('swagger', options)
         .then((result) => {
           assert.deepEqual(result, response);
@@ -124,7 +124,7 @@ describe('swaggerSpecValidator', () => {
 
     it('sends User-Agent with package version by default', () => {
       const uaRE = new RegExp(
-        `^${regexpEscape(`${packageJson.name}/${packageJson.version}`)}`
+        `^${regexpEscape(`${packageJson.name}/${packageJson.version}`)}`,
       );
       const response = {};
       const ne = nock(defaultProtoHost)
@@ -140,7 +140,7 @@ describe('swaggerSpecValidator', () => {
 
     it('can override default headers', () => {
       const uaRE = new RegExp(
-        `^${regexpEscape(`${packageJson.name}/${packageJson.version}`)}`
+        `^${regexpEscape(`${packageJson.name}/${packageJson.version}`)}`,
       );
       const response = {};
       const ne = nock(defaultProtoHost)
@@ -148,7 +148,7 @@ describe('swaggerSpecValidator', () => {
         .matchHeader('User-Agent', uaRE)
         .post(defaultUrl.path)
         .reply(200, response);
-      const options = {request: {headers: {Accept: 'text/plain'}}};
+      const options = { request: { headers: { Accept: 'text/plain' } } };
       return swaggerSpecValidator.validate('swagger', options)
         .then((result) => {
           assert.deepEqual(result, response);
@@ -158,7 +158,7 @@ describe('swaggerSpecValidator', () => {
 
     it('can override default headers case-insensitively', () => {
       const uaRE = new RegExp(
-        `^${regexpEscape(`${packageJson.name}/${packageJson.version}`)}`
+        `^${regexpEscape(`${packageJson.name}/${packageJson.version}`)}`,
       );
       const response = {};
       const ne = nock(defaultProtoHost)
@@ -166,7 +166,7 @@ describe('swaggerSpecValidator', () => {
         .matchHeader('User-Agent', uaRE)
         .post(defaultUrl.path)
         .reply(200, response);
-      const options = {request: {headers: {accept: 'text/plain'}}};
+      const options = { request: { headers: { accept: 'text/plain' } } };
       return swaggerSpecValidator.validate('swagger', options)
         .then((result) => {
           assert.deepEqual(result, response);
@@ -187,8 +187,8 @@ describe('swaggerSpecValidator', () => {
         return Promise.reject(errTest);
       }
       /* eslint-disable no-underscore-dangle */
-      const getSwaggerIoHttpsAgent
-        = swaggerSpecValidator._getSwaggerIoHttpsAgent;
+      const getSwaggerIoHttpsAgent =
+        swaggerSpecValidator._getSwaggerIoHttpsAgent;
       let result;
       try {
         swaggerSpecValidator._getSwaggerIoHttpsAgent = getTestError;
@@ -198,7 +198,7 @@ describe('swaggerSpecValidator', () => {
             (err) => {
               assert.strictEqual(err, errTest);
               ne.done();
-            }
+            },
           );
       } finally {
         swaggerSpecValidator._getSwaggerIoHttpsAgent = getSwaggerIoHttpsAgent;
@@ -213,7 +213,7 @@ describe('swaggerSpecValidator', () => {
       const testType = 'application/json';
       const ne = nock(defaultProtoHost)
         .post(defaultUrl.path)
-        .reply(testStatusCode, testResponse, {'Content-Type': testType});
+        .reply(testStatusCode, testResponse, { 'Content-Type': testType });
       return swaggerSpecValidator.validate('swagger')
         .then(
           neverCalled,
@@ -222,17 +222,17 @@ describe('swaggerSpecValidator', () => {
             assert.strictEqual(err.headers['content-type'], testType);
             assert.strictEqual(String(err.body), testResponse);
             ne.done();
-          }
+          },
         );
     });
 
     it('returns Error with JSON body for 4XX/5XX response', () => {
-      const response = {message: 'test'};
+      const response = { message: 'test' };
       const testStatusCode = 400;
       const testType = 'application/json';
       const ne = nock(defaultProtoHost)
         .post(defaultUrl.path)
-        .reply(testStatusCode, response, {'Content-Type': testType});
+        .reply(testStatusCode, response, { 'Content-Type': testType });
       return swaggerSpecValidator.validate('swagger')
         .then(
           neverCalled,
@@ -241,7 +241,7 @@ describe('swaggerSpecValidator', () => {
             assert.strictEqual(err.headers['content-type'], testType);
             assert.deepEqual(err.body, response);
             ne.done();
-          }
+          },
         );
     });
 
@@ -251,7 +251,7 @@ describe('swaggerSpecValidator', () => {
       const testType = 'text/plain';
       const ne = nock(defaultProtoHost)
         .post(defaultUrl.path)
-        .reply(testStatusCode, response, {'Content-Type': testType});
+        .reply(testStatusCode, response, { 'Content-Type': testType });
       return swaggerSpecValidator.validate('swagger')
         .then(
           neverCalled,
@@ -260,24 +260,24 @@ describe('swaggerSpecValidator', () => {
             assert.strictEqual(err.headers['content-type'], testType);
             assert.strictEqual(String(err.body), response);
             ne.done();
-          }
+          },
         );
     });
 
     it('returns Error for unsupported protocol', () => {
-      const options = {request: url.parse('ftp://example.com')};
+      const options = { request: url.parse('ftp://example.com') };
       return swaggerSpecValidator.validateFile(swaggerJsonPath, options)
         .then(
           neverCalled,
           (err) => {
             assert.ok(/ftp/.test(err.message));
-          }
+          },
         );
     });
 
     it('returns validator JSON with errors', () => {
       const testBody = 'swagger';
-      const response = {messages: ['test1', 'test2']};
+      const response = { messages: ['test1', 'test2'] };
       const ne = nock(defaultProtoHost)
         .post(defaultUrl.path, testBody)
         .reply(200, response);
@@ -309,7 +309,7 @@ describe('swaggerSpecValidator', () => {
           swaggerSpecValidator.validate(testBody, {}, true);
         },
         TypeError,
-        /\bcallback\b/
+        /\bcallback\b/,
       );
     });
 
@@ -333,7 +333,7 @@ describe('swaggerSpecValidator', () => {
           (err) => {
             assert.ok(err instanceof TypeError);
             assert.ok(/\bspec\b/.test(err.message));
-          }
+          },
         ));
 
     it('Error for non-object options', () => {
@@ -344,7 +344,7 @@ describe('swaggerSpecValidator', () => {
           (err) => {
             assert.ok(err instanceof TypeError);
             assert.ok(/\boptions\b/.test(err.message));
-          }
+          },
         );
     });
   });
@@ -409,7 +409,7 @@ describe('swaggerSpecValidator', () => {
         .matchHeader('Content-Type', testType)
         .post(defaultUrl.path)
         .reply(200, response);
-      const options = {request: {headers: {'content-type': testType}}};
+      const options = { request: { headers: { 'content-type': testType } } };
       return swaggerSpecValidator.validateFile(swaggerYamlPath, options)
         .then((result) => {
           assert.deepEqual(result, response);
@@ -443,7 +443,7 @@ describe('swaggerSpecValidator', () => {
           (err) => {
             assert.strictEqual(err.code, 'ENOENT');
             ne.done();
-          }
+          },
         );
     });
 
@@ -462,8 +462,8 @@ describe('swaggerSpecValidator', () => {
         return new Promise(() => {});
       }
       /* eslint-disable no-underscore-dangle */
-      const getSwaggerIoHttpsAgent
-        = swaggerSpecValidator._getSwaggerIoHttpsAgent;
+      const getSwaggerIoHttpsAgent =
+        swaggerSpecValidator._getSwaggerIoHttpsAgent;
       let result;
       try {
         swaggerSpecValidator._getSwaggerIoHttpsAgent = waitForever;
@@ -473,7 +473,7 @@ describe('swaggerSpecValidator', () => {
             (err) => {
               assert.strictEqual(err.code, 'ENOENT');
               ne.done();
-            }
+            },
           );
       } finally {
         swaggerSpecValidator._getSwaggerIoHttpsAgent = getSwaggerIoHttpsAgent;
@@ -495,8 +495,8 @@ describe('swaggerSpecValidator', () => {
         return Promise.reject(errTest);
       }
       /* eslint-disable no-underscore-dangle */
-      const getSwaggerIoHttpsAgent
-        = swaggerSpecValidator._getSwaggerIoHttpsAgent;
+      const getSwaggerIoHttpsAgent =
+        swaggerSpecValidator._getSwaggerIoHttpsAgent;
       try {
         swaggerSpecValidator._getSwaggerIoHttpsAgent = getTestError;
         swaggerSpecValidator.validateFile('nonexistent.yaml', (err) => {

@@ -19,7 +19,7 @@ const packageJson = require('../package.json');
 // Avoid modifying the shared module during mocking
 swaggerSpecValidator = assign({}, swaggerSpecValidator);
 
-const {match} = sinon;
+const { match } = sinon;
 
 // Simulate arguments passed by the node runtime
 const RUNTIME_ARGS = ['node', 'swagger-spec-validator'];
@@ -34,7 +34,7 @@ describe('swagger-spec-validator command', () => {
   // swagger-spec-validator module.
   const swaggerSpecValidatorCmd = proxyquire(
     '../bin/swagger-spec-validator',
-    {'..': swaggerSpecValidator}
+    { '..': swaggerSpecValidator },
   );
 
   // Ensure that expectations are not carried over between tests
@@ -53,7 +53,7 @@ describe('swagger-spec-validator command', () => {
     options = {
       in: new stream.PassThrough(),
       out: new stream.PassThrough(),
-      err: new stream.PassThrough()
+      err: new stream.PassThrough(),
     };
   });
 
@@ -63,10 +63,10 @@ describe('swagger-spec-validator command', () => {
       .withArgs(
         options.in,
         match.object,
-        match.func
+        match.func,
       );
-    const result
-      = swaggerSpecValidatorCmd(RUNTIME_ARGS, options, sinon.mock().never());
+    const result =
+      swaggerSpecValidatorCmd(RUNTIME_ARGS, options, sinon.mock().never());
     swaggerSpecValidatorMock.verify();
     assert.strictEqual(result, undefined);
   });
@@ -77,11 +77,11 @@ describe('swagger-spec-validator command', () => {
       .withArgs(
         options.in,
         match.object,
-        match.func
+        match.func,
       );
     const allArgs = RUNTIME_ARGS.concat('-');
-    const result
-      = swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
+    const result =
+      swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
     swaggerSpecValidatorMock.verify();
     assert.strictEqual(result, undefined);
   });
@@ -92,11 +92,11 @@ describe('swagger-spec-validator command', () => {
       .withArgs(
         './-',
         match.object,
-        match.func
+        match.func,
       );
     const allArgs = RUNTIME_ARGS.concat('./-');
-    const result
-      = swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
+    const result =
+      swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
     swaggerSpecValidatorMock.verify();
     assert.strictEqual(result, undefined);
   });
@@ -107,17 +107,17 @@ describe('swagger-spec-validator command', () => {
       .withArgs(
         'file1',
         match.object,
-        match.func
+        match.func,
       );
     swaggerSpecValidatorMock.expects('validateFile').once()
       .withArgs(
         'file2',
         match.object,
-        match.func
+        match.func,
       );
     const allArgs = RUNTIME_ARGS.concat('file1', 'file2');
-    const result
-      = swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
+    const result =
+      swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
     swaggerSpecValidatorMock.verify();
     assert.strictEqual(result, undefined);
   });
@@ -129,11 +129,11 @@ describe('swagger-spec-validator command', () => {
       .withArgs(
         'file1',
         match.object,
-        match.func
+        match.func,
       );
     const allArgs = RUNTIME_ARGS.concat('file1', 'file1');
-    const result
-      = swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
+    const result =
+      swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
     swaggerSpecValidatorMock.verify();
     assert.strictEqual(result, undefined);
   });
@@ -145,17 +145,17 @@ describe('swagger-spec-validator command', () => {
       .withArgs(
         'file1',
         match.object,
-        match.func
+        match.func,
       );
     swaggerSpecValidatorMock.expects('validateFile').once()
       .withArgs(
         './file1',
         match.object,
-        match.func
+        match.func,
       );
     const allArgs = RUNTIME_ARGS.concat('file1', './file1');
-    const result
-      = swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
+    const result =
+      swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
     swaggerSpecValidatorMock.verify();
     assert.strictEqual(result, undefined);
   });
@@ -165,23 +165,23 @@ describe('swagger-spec-validator command', () => {
       .withArgs(
         'file1',
         match.object,
-        match.func
+        match.func,
       );
     swaggerSpecValidatorMock.expects('validateFile').once()
       .withArgs(
         'file2',
         match.object,
-        match.func
+        match.func,
       );
     swaggerSpecValidatorMock.expects('validate').once()
       .withArgs(
         options.in,
         match.object,
-        match.func
+        match.func,
       );
     const allArgs = RUNTIME_ARGS.concat('file1', '-', 'file2');
-    const result
-      = swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
+    const result =
+      swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
     swaggerSpecValidatorMock.verify();
     assert.strictEqual(result, undefined);
   });
@@ -193,7 +193,7 @@ describe('swagger-spec-validator command', () => {
         .withArgs(
           options.in,
           expectObj,
-          match.func
+          match.func,
         );
       const allArgs = RUNTIME_ARGS.concat(args);
       swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
@@ -231,43 +231,43 @@ describe('swagger-spec-validator command', () => {
   // Check individual arguments are handled correctly
   expectArgsAs(
     ['--header', 'Content-Type:text/plain'],
-    match({request: match({headers: {'Content-Type': 'text/plain'}})})
+    match({ request: match({ headers: { 'Content-Type': 'text/plain' } }) }),
   );
   expectArgsAs(
     ['--header', 'content-type: text/plain'],
-    match({request: match({headers: {'content-type': 'text/plain'}})})
+    match({ request: match({ headers: { 'content-type': 'text/plain' } }) }),
   );
-  expectArgsAs(['--quiet'], match({verbosity: -1}));
+  expectArgsAs(['--quiet'], match({ verbosity: -1 }));
   expectArgsAs(
     ['--url', 'http://example.com'],
-    match({request: match(url.parse('http://example.com'))})
+    match({ request: match(url.parse('http://example.com')) }),
   );
-  expectArgsAs(['--verbose'], match({verbosity: 1}));
+  expectArgsAs(['--verbose'], match({ verbosity: 1 }));
   expectArgsAs(
     ['-H', 'Content-Type:text/plain'],
-    match({request: match({headers: {'Content-Type': 'text/plain'}})})
+    match({ request: match({ headers: { 'Content-Type': 'text/plain' } }) }),
   );
   expectArgsAs(
     ['-u', 'https://example.com/path?query'],
-    match({request: match(url.parse('https://example.com/path?query'))})
+    match({ request: match(url.parse('https://example.com/path?query')) }),
   );
-  expectArgsAs(['-q'], match({verbosity: -1}));
-  expectArgsAs(['-v'], match({verbosity: 1}));
+  expectArgsAs(['-q'], match({ verbosity: -1 }));
+  expectArgsAs(['-v'], match({ verbosity: 1 }));
 
   // Can send empty header like curl (although it's value is dubious)
   expectArgsAs(
     ['-H', 'Content-Type: '],
-    match({request: match({headers: {'Content-Type': ''}})})
+    match({ request: match({ headers: { 'Content-Type': '' } }) }),
   );
   // Excess whitespace in value is preserved
   expectArgsAs(
     ['-H', 'Content-Type:  text/plain '],
-    match({request: match({headers: {'Content-Type': ' text/plain '}})})
+    match({ request: match({ headers: { 'Content-Type': ' text/plain ' } }) }),
   );
   // Excess whitespace in header is not preserved (would cause Node error)
   expectArgsAs(
     ['-H', '  Content-Type  : text/plain'],
-    match({request: match({headers: {'Content-Type': 'text/plain'}})})
+    match({ request: match({ headers: { 'Content-Type': 'text/plain' } }) }),
   );
 
   // Headers are combined
@@ -275,9 +275,9 @@ describe('swagger-spec-validator command', () => {
     ['-H', 'Content-Type:text/plain', '-H', 'X-Foo : bar'],
     match({
       request: match({
-        headers: {'Content-Type': 'text/plain', 'X-Foo': 'bar'}
-      })
-    })
+        headers: { 'Content-Type': 'text/plain', 'X-Foo': 'bar' },
+      }),
+    }),
   );
 
   // Default yargs handling of array type consumes all non-option args
@@ -286,25 +286,25 @@ describe('swagger-spec-validator command', () => {
     swaggerSpecValidatorMock.expects('validateFile').once()
       .withArgs(
         'file',
-        match({request: match({headers: {'Content-Type': 'text/plain'}})}),
-        match.func
+        match({ request: match({ headers: { 'Content-Type': 'text/plain' } }) }),
+        match.func,
       );
-    const allArgs
-      = RUNTIME_ARGS.concat('-H', 'Content-Type: text/plain', 'file');
-    const result
-      = swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
+    const allArgs =
+      RUNTIME_ARGS.concat('-H', 'Content-Type: text/plain', 'file');
+    const result =
+      swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
     swaggerSpecValidatorMock.verify();
     assert.strictEqual(result, undefined);
   });
 
-  expectArgsAs(['-qqq'], match({verbosity: -3}));
-  expectArgsAs(['-vvv'], match({verbosity: 3}));
-  expectArgsAs(['-qvv'], match({verbosity: 1}));
+  expectArgsAs(['-qqq'], match({ verbosity: -3 }));
+  expectArgsAs(['-vvv'], match({ verbosity: 3 }));
+  expectArgsAs(['-qvv'], match({ verbosity: 1 }));
 
   // URL validation is not done in the argument parser
   expectArgsAs(
     ['-u', 'notaurl'],
-    match({request: match(url.parse('notaurl'))})
+    match({ request: match(url.parse('notaurl')) }),
   );
 
   // Check argument errors are handled correctly
@@ -318,7 +318,7 @@ describe('swagger-spec-validator command', () => {
     ['--badtestopt'],
     3,
     null,
-    /\bbadtestopt\b/i
+    /\bbadtestopt\b/i,
   );
 
   expectArgsResult(['--help'], 0, /usage/i, null);
@@ -328,7 +328,7 @@ describe('swagger-spec-validator command', () => {
   // Satisfy GNU Coding Standards --version convention:
   // https://www.gnu.org/prep/standards/html_node/_002d_002dversion.html
   const versionRE = new RegExp(
-    `^${regexpEscape(`${packageJson.name} ${packageJson.version}`)}\n`
+    `^${regexpEscape(`${packageJson.name} ${packageJson.version}`)}\n`,
   );
   expectArgsResult(['--version'], 0, versionRE, null);
   expectArgsResult(['-V'], 0, versionRE, null);
@@ -339,7 +339,7 @@ describe('swagger-spec-validator command', () => {
       .withArgs(
         options.in,
         match.object,
-        match.func
+        match.func,
       );
     swaggerSpecValidatorCmd(RUNTIME_ARGS, options, (err, code) => {
       assert.ifError(err);
@@ -358,7 +358,7 @@ describe('swagger-spec-validator command', () => {
         .withArgs(
           options.in,
           match.object,
-          match.func
+          match.func,
         );
       const allArgs = RUNTIME_ARGS.concat(arg);
       swaggerSpecValidatorCmd(allArgs, options, (err, code) => {
@@ -378,7 +378,7 @@ describe('swagger-spec-validator command', () => {
       .withArgs(
         options.in,
         match.object,
-        match.func
+        match.func,
       );
     swaggerSpecValidatorCmd(RUNTIME_ARGS, options, (err, code) => {
       assert.ifError(err);
@@ -396,7 +396,7 @@ describe('swagger-spec-validator command', () => {
       .withArgs(
         options.in,
         match.object,
-        match.func
+        match.func,
       );
     const allArgs = RUNTIME_ARGS.concat('-v');
     swaggerSpecValidatorCmd(allArgs, options, (err, code) => {
@@ -417,7 +417,7 @@ describe('swagger-spec-validator command', () => {
       .withArgs(
         options.in,
         match.object,
-        match.func
+        match.func,
       );
     swaggerSpecValidatorCmd(RUNTIME_ARGS, options, (err, code) => {
       assert.ifError(err);
@@ -427,7 +427,7 @@ describe('swagger-spec-validator command', () => {
       done();
     });
     validate.yield(null, {
-      messages: ['testmsg']
+      messages: ['testmsg'],
     });
   });
 
@@ -437,7 +437,7 @@ describe('swagger-spec-validator command', () => {
       .withArgs(
         options.in,
         match.object,
-        match.func
+        match.func,
       );
     swaggerSpecValidatorCmd(RUNTIME_ARGS, options, (err, code) => {
       assert.ifError(err);
@@ -448,8 +448,8 @@ describe('swagger-spec-validator command', () => {
     });
     validate.yield(null, {
       schemaValidationMessages: [
-        {level: 'level', message: 'testmsg'}
-      ]
+        { level: 'level', message: 'testmsg' },
+      ],
     });
   });
 
@@ -460,7 +460,7 @@ describe('swagger-spec-validator command', () => {
         .withArgs(
           options.in,
           match.object,
-          match.func
+          match.func,
         );
       const allArgs = RUNTIME_ARGS.concat(arg);
       swaggerSpecValidatorCmd(allArgs, options, (err, code) => {
@@ -479,7 +479,7 @@ describe('swagger-spec-validator command', () => {
         .withArgs(
           options.in,
           match.object,
-          match.func
+          match.func,
         );
       const allArgs = RUNTIME_ARGS.concat(arg);
       swaggerSpecValidatorCmd(allArgs, options, (err, code) => {
@@ -492,8 +492,8 @@ describe('swagger-spec-validator command', () => {
       validate.yield(null, {
         messages: ['testmsg'],
         schemaValidationMessages: [
-          {level: 'level', message: 'testmsg'}
-        ]
+          { level: 'level', message: 'testmsg' },
+        ],
       });
     });
   });
@@ -504,7 +504,7 @@ describe('swagger-spec-validator command', () => {
       .withArgs(
         options.in,
         match.object,
-        match.func
+        match.func,
       );
     const result = swaggerSpecValidatorCmd(null, options, sinon.mock().never());
     swaggerSpecValidatorMock.verify();
@@ -517,7 +517,7 @@ describe('swagger-spec-validator command', () => {
       .withArgs(
         options.in,
         match.object,
-        match.func
+        match.func,
       );
     const result = swaggerSpecValidatorCmd([], options, sinon.mock().never());
     swaggerSpecValidatorMock.verify();
@@ -530,7 +530,7 @@ describe('swagger-spec-validator command', () => {
     assert.throws(
       () => { swaggerSpecValidatorCmd(RUNTIME_ARGS, {}, true); },
       TypeError,
-      /\bcallback\b/
+      /\bcallback\b/,
     );
     swaggerSpecValidatorMock.verify();
   });
@@ -563,7 +563,7 @@ describe('swagger-spec-validator command', () => {
       .withArgs(
         process.stdin,
         match.object,
-        match.func
+        match.func,
       );
     const result = swaggerSpecValidatorCmd(RUNTIME_ARGS, sinon.mock().never());
     swaggerSpecValidatorMock.verify();
@@ -584,7 +584,7 @@ describe('swagger-spec-validator command', () => {
   it('returns Error for non-Readable in', (done) => {
     swaggerSpecValidatorMock.expects('validate').never();
     swaggerSpecValidatorMock.expects('validateFile').never();
-    swaggerSpecValidatorCmd(RUNTIME_ARGS, {in: {}}, (err) => {
+    swaggerSpecValidatorCmd(RUNTIME_ARGS, { in: {} }, (err) => {
       assert.ok(err instanceof TypeError);
       assertMatch(err.message, /\boptions.in\b/);
       swaggerSpecValidatorMock.verify();
@@ -622,7 +622,7 @@ describe('swagger-spec-validator command', () => {
       .withArgs(
         options.in,
         match.object,
-        match.func
+        match.func,
       );
     const result = swaggerSpecValidatorCmd(RUNTIME_ARGS, options);
     assert(result instanceof Promise);
@@ -635,7 +635,7 @@ describe('swagger-spec-validator command', () => {
       .withArgs(
         options.in,
         match.object,
-        match.func
+        match.func,
       );
     const result = swaggerSpecValidatorCmd(RUNTIME_ARGS, options);
     validate.yield(null, {});
@@ -651,7 +651,7 @@ describe('swagger-spec-validator command', () => {
       .withArgs(
         options.in,
         match.object,
-        match.func
+        match.func,
       );
     const result = swaggerSpecValidatorCmd(RUNTIME_ARGS, options);
     const testErr = new Error('test');
@@ -671,7 +671,7 @@ describe('swagger-spec-validator command', () => {
         (err) => {
           assert.ok(err instanceof Error);
           swaggerSpecValidatorMock.verify();
-        }
+        },
       );
   });
 });

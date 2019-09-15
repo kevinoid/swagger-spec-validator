@@ -286,7 +286,9 @@ describe('swagger-spec-validator command', () => {
     swaggerSpecValidatorMock.expects('validateFile').once()
       .withArgs(
         'file',
-        match({ request: match({ headers: { 'Content-Type': 'text/plain' } }) }),
+        match({
+          request: match({ headers: { 'Content-Type': 'text/plain' } }),
+        }),
         match.func,
       );
     const allArgs =

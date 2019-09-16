@@ -10,7 +10,6 @@ const proxyquire = require('proxyquire');
 const regexpEscape = require('regexp.escape');
 const sinon = require('sinon');
 const stream = require('stream');
-const url = require('url');
 
 let swaggerSpecValidator = require('..');
 const packageJson = require('../package.json');
@@ -239,7 +238,7 @@ describe('swagger-spec-validator command', () => {
   expectArgsAs(['--quiet'], match({ verbosity: -1 }));
   expectArgsAs(
     ['--url', 'http://example.com'],
-    match({ request: match(url.parse('http://example.com')) }),
+    match({ url: 'http://example.com' }),
   );
   expectArgsAs(['--verbose'], match({ verbosity: 1 }));
   expectArgsAs(
@@ -248,7 +247,7 @@ describe('swagger-spec-validator command', () => {
   );
   expectArgsAs(
     ['-u', 'https://example.com/path?query'],
-    match({ request: match(url.parse('https://example.com/path?query')) }),
+    match({ url: 'https://example.com/path?query' }),
   );
   expectArgsAs(['-q'], match({ verbosity: -1 }));
   expectArgsAs(['-v'], match({ verbosity: 1 }));
@@ -305,7 +304,7 @@ describe('swagger-spec-validator command', () => {
   // URL validation is not done in the argument parser
   expectArgsAs(
     ['-u', 'notaurl'],
-    match({ request: match(url.parse('notaurl')) }),
+    match({ url: 'notaurl' }),
   );
 
   // Check argument errors are handled correctly

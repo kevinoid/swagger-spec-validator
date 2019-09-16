@@ -9,7 +9,6 @@
 'use strict';
 
 const Yargs = require('yargs/yargs');
-const url = require('url');
 
 const packageJson = require('../package.json');
 const swaggerSpecValidator = require('..');
@@ -280,11 +279,12 @@ function swaggerSpecValidatorCmd(args, options, callback) {
       specPaths = [...new Set(specPaths)];
     }
 
-    const validateOpts = { ...options };
-    validateOpts.request = argOpts.url ? url.parse(argOpts.url) : {};
-    validateOpts.request.headers = argOpts.header;
-    validateOpts.verbosity = verbosity;
-
+    const validateOpts = {
+      ...options,
+      request: argOpts.header ? { headers: argOpts.header } : null,
+      url: argOpts.url,
+      verbosity,
+    };
     validateAll(specPaths, validateOpts, callback);
   });
 

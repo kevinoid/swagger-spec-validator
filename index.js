@@ -10,7 +10,8 @@ const http = require('http');
 const https = require('https');
 const path = require('path');
 const tls = require('tls');
-const url = require('url');
+// TODO [engine:node@>=10]: Use URL defined globally
+const { URL } = require('url'); // eslint-disable-line no-shadow
 const util = require('util');
 
 const packageJson = require('./package.json');
@@ -107,18 +108,19 @@ function combineHeaders(...args) {
 /** Makes an HTTP(S) request and parses the JSON response.
  * @private
  */
-function requestJson(options, callback) {
-  const proto = options.protocol === 'https:' ? https
-    : options.protocol === 'http:' ? http
+function requestJson(url, options, callback) {
+  const protocol = options.protocol || url.protocol;
+  const proto = protocol === 'https:' ? https
+    : protocol === 'http:' ? http
       : null;
   if (!proto) {
     callback(
-      new Error(`Unsupported protocol "${options.protocol}" for validator URL`),
+      new Error(`Unsupported protocol "${protocol}" for validator URL`),
     );
     return;
   }
 
-  const req = proto.request(options)
+  const req = proto.request(url, options)
     .once('error', callback)
     .once('response', (res) => {
       res.on('error', callback);
@@ -173,11 +175,13 @@ function requestJson(options, callback) {
  * @typedef {{
  *   err: (stream.Writable|undefined),
  *   request: (Object|undefined),
+ *   url: (URL|Object|string|undefined),
  *   verbosity: (number|undefined)
  * }} ValidateOptions
  * @property {stream.Writable=} err Stream to which errors (and non-output
  * status messages) are written. (default: <code>process.stderr</code>)
  * @property {Object=} request Options passed to <code>http.request()</code>.
+ * @property {URL|Object|string=} url URL passed to <code>http.request()</code>.
  * @property {number=} verbosity Amount of output to produce.  Larger numbers
  * produce more output.
  */
@@ -231,11 +235,20 @@ function validate(spec, options, callback) {
     return undefined;
   }
 
-  const reqOpts = url.parse(DEFAULT_URL);
-  reqOpts.method = 'POST';
-  Object.assign(reqOpts, options && options.request);
-  reqOpts.headers = combineHeaders(DEFAULT_HEADERS, reqOpts.headers);
-  reqOpts.body = spec;
+  // Note: Options on URL object are ignored by https.request()
+  // Don't combine into single options object without conversion to generic obj.
+  const reqUrl =
+    !options || !options.url ? new URL(DEFAULT_URL)
+      : typeof options.url === 'object' ? options.url
+        : new URL(options.url);
+  const reqOpts = {
+    method: 'POST',
+    ...options && options.request,
+    body: spec,
+  };
+  reqOpts.headers =
+    reqOpts.headers ? combineHeaders(DEFAULT_HEADERS, reqOpts.headers)
+      : DEFAULT_HEADERS;
 
   let calledBack = false;
   function callbackOnce(...args) {
@@ -245,8 +258,8 @@ function validate(spec, options, callback) {
     }
   }
 
-  if (reqOpts.protocol === 'https:'
-      && reqOpts.hostname === 'online.swagger.io'
+  if ((reqOpts.protocol || reqUrl.protocol) === 'https:'
+      && (reqOpts.hostname || reqUrl.hostname) === 'online.swagger.io'
       && !hasOwnProperty.call(reqOpts, 'agent')) {
     if (typeof spec.pipe === 'function') {
       // Stream can emit an error before Agent is loaded.  Handle this.
@@ -258,12 +271,12 @@ function validate(spec, options, callback) {
       .then((agent) => {
         if (!calledBack) {
           reqOpts.agent = agent;
-          requestJson(reqOpts, callbackOnce);
+          requestJson(reqUrl, reqOpts, callbackOnce);
         }
       })
       .catch(callbackOnce);
   } else {
-    requestJson(reqOpts, callback);
+    requestJson(reqUrl, reqOpts, callback);
   }
 
   return undefined;

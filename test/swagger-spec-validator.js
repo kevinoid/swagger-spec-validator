@@ -58,6 +58,52 @@ describe('swaggerSpecValidator', () => {
         });
     });
 
+    it('POSTs to string in options.url', () => {
+      const testProtoHost = 'http://example.com';
+      const testPath = '/foo/bar?baz=quux';
+      const response = {};
+      const ne = nock(testProtoHost)
+        .post(testPath)
+        .reply(200, response);
+      const options = { url: testProtoHost + testPath };
+      return swaggerSpecValidator.validate('swagger', options)
+        .then((result) => {
+          assert.deepStrictEqual(result, response);
+          ne.done();
+        });
+    });
+
+    it('POSTs to URL in options.url', () => {
+      const testProtoHost = 'http://example.com';
+      const testPath = '/foo/bar?baz=quux';
+      const response = {};
+      const ne = nock(testProtoHost)
+        .post(testPath)
+        .reply(200, response);
+      const options = { url: new URL(testProtoHost + testPath) };
+      return swaggerSpecValidator.validate('swagger', options)
+        .then((result) => {
+          assert.deepStrictEqual(result, response);
+          ne.done();
+        });
+    });
+
+    it('POSTs to url.parse in options.url', () => {
+      const testProtoHost = 'http://example.com';
+      const testPath = '/foo/bar?baz=quux';
+      const response = {};
+      const ne = nock(testProtoHost)
+        .post(testPath)
+        .reply(200, response);
+      // eslint-disable-next-line node/no-deprecated-api
+      const options = { url: url.parse(testProtoHost + testPath) };
+      return swaggerSpecValidator.validate('swagger', options)
+        .then((result) => {
+          assert.deepStrictEqual(result, response);
+          ne.done();
+        });
+    });
+
     it('POSTs to url.parse in request options', () => {
       const testProtoHost = 'http://example.com';
       const testPath = '/foo/bar?baz=quux';
@@ -67,6 +113,26 @@ describe('swaggerSpecValidator', () => {
         .reply(200, response);
       // eslint-disable-next-line node/no-deprecated-api
       const options = { request: url.parse(testProtoHost + testPath) };
+      return swaggerSpecValidator.validate('swagger', options)
+        .then((result) => {
+          assert.deepStrictEqual(result, response);
+          ne.done();
+        });
+    });
+
+    // Note: options overrides url, as in http.request(url, options)
+    it('path in request options overrides path in options.url', () => {
+      const testProtoHost = 'http://example.com';
+      const testPath1 = '/foo/bar?baz=quux';
+      const testPath2 = '/foo2/bar2?baz2=quux2';
+      const response = {};
+      const ne = nock(testProtoHost)
+        .post(testPath2)
+        .reply(200, response);
+      const options = {
+        request: { path: testPath2 },
+        url: testProtoHost + testPath1,
+      };
       return swaggerSpecValidator.validate('swagger', options)
         .then((result) => {
           assert.deepStrictEqual(result, response);

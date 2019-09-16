@@ -10,12 +10,15 @@ const nock = require('nock');
 const path = require('path');
 const regexpEscape = require('regexp.escape');
 const url = require('url');
+// TODO [engine:node@>=10]: Use URL defined globally
+const { URL } = url; // eslint-disable-line no-shadow
 
 const packageJson = require('../package.json');
 const swaggerSpecValidator = require('..');
 
-const defaultUrl = url.parse(swaggerSpecValidator.DEFAULT_URL);
+const defaultUrl = new URL(swaggerSpecValidator.DEFAULT_URL);
 const defaultProtoHost = `${defaultUrl.protocol}//${defaultUrl.host}`;
+const defaultUrlPath = defaultUrl.pathname + defaultUrl.search;
 
 const swaggerJsonPath =
   path.join(__dirname, '..', 'test-data', 'petstore-minimal.json');
@@ -46,7 +49,7 @@ describe('swaggerSpecValidator', () => {
       const testBody = 'swagger';
       const response = {};
       const ne = nock(defaultProtoHost)
-        .post(defaultUrl.path, testBody)
+        .post(defaultUrlPath, testBody)
         .reply(200, response);
       return swaggerSpecValidator.validate(testBody)
         .then((result) => {
@@ -113,7 +116,7 @@ describe('swaggerSpecValidator', () => {
       const response = {};
       const ne = nock(defaultProtoHost)
         .matchHeader('Accept', 'application/json')
-        .post(defaultUrl.path)
+        .post(defaultUrlPath)
         .reply(200, response);
       return swaggerSpecValidator.validate('swagger')
         .then((result) => {
@@ -129,7 +132,7 @@ describe('swaggerSpecValidator', () => {
       const response = {};
       const ne = nock(defaultProtoHost)
         .matchHeader('User-Agent', uaRE)
-        .post(defaultUrl.path)
+        .post(defaultUrlPath)
         .reply(200, response);
       return swaggerSpecValidator.validate('swagger')
         .then((result) => {
@@ -146,7 +149,7 @@ describe('swaggerSpecValidator', () => {
       const ne = nock(defaultProtoHost)
         .matchHeader('Accept', 'text/plain')
         .matchHeader('User-Agent', uaRE)
-        .post(defaultUrl.path)
+        .post(defaultUrlPath)
         .reply(200, response);
       const options = { request: { headers: { Accept: 'text/plain' } } };
       return swaggerSpecValidator.validate('swagger', options)
@@ -164,7 +167,7 @@ describe('swaggerSpecValidator', () => {
       const ne = nock(defaultProtoHost)
         .matchHeader('Accept', 'text/plain')
         .matchHeader('User-Agent', uaRE)
-        .post(defaultUrl.path)
+        .post(defaultUrlPath)
         .reply(200, response);
       const options = { request: { headers: { accept: 'text/plain' } } };
       return swaggerSpecValidator.validate('swagger', options)
@@ -178,7 +181,7 @@ describe('swaggerSpecValidator', () => {
       const testStatusCode = 200;
       const testResponse = {};
       const ne = nock(defaultProtoHost)
-        .post(defaultUrl.path)
+        .post(defaultUrlPath)
         .optionally()
         .reply(testStatusCode, testResponse);
 
@@ -212,7 +215,7 @@ describe('swaggerSpecValidator', () => {
       const testResponse = '{"bad": "json"';
       const testType = 'application/json';
       const ne = nock(defaultProtoHost)
-        .post(defaultUrl.path)
+        .post(defaultUrlPath)
         .reply(testStatusCode, testResponse, { 'Content-Type': testType });
       return swaggerSpecValidator.validate('swagger')
         .then(
@@ -231,7 +234,7 @@ describe('swaggerSpecValidator', () => {
       const testStatusCode = 400;
       const testType = 'application/json';
       const ne = nock(defaultProtoHost)
-        .post(defaultUrl.path)
+        .post(defaultUrlPath)
         .reply(testStatusCode, response, { 'Content-Type': testType });
       return swaggerSpecValidator.validate('swagger')
         .then(
@@ -250,7 +253,7 @@ describe('swaggerSpecValidator', () => {
       const testStatusCode = 500;
       const testType = 'text/plain';
       const ne = nock(defaultProtoHost)
-        .post(defaultUrl.path)
+        .post(defaultUrlPath)
         .reply(testStatusCode, response, { 'Content-Type': testType });
       return swaggerSpecValidator.validate('swagger')
         .then(
@@ -279,7 +282,7 @@ describe('swaggerSpecValidator', () => {
       const testBody = 'swagger';
       const response = { messages: ['test1', 'test2'] };
       const ne = nock(defaultProtoHost)
-        .post(defaultUrl.path, testBody)
+        .post(defaultUrlPath, testBody)
         .reply(200, response);
       return swaggerSpecValidator.validate(testBody)
         .then((result) => {
@@ -292,7 +295,7 @@ describe('swaggerSpecValidator', () => {
       const testBody = 'swagger';
       const testResponse = {};
       const ne = nock(defaultProtoHost)
-        .post(defaultUrl.path, testBody)
+        .post(defaultUrlPath, testBody)
         .reply(200, testResponse);
       swaggerSpecValidator.validate(testBody, (err, result) => {
         assert.ifError(err);
@@ -317,7 +320,7 @@ describe('swaggerSpecValidator', () => {
       const testBody = 'swagger';
       const response = {};
       const ne = nock(defaultProtoHost)
-        .post(defaultUrl.path, testBody)
+        .post(defaultUrlPath, testBody)
         .reply(200, response);
       return swaggerSpecValidator.validate(Buffer.from(testBody))
         .then((result) => {
@@ -353,7 +356,7 @@ describe('swaggerSpecValidator', () => {
     it('POSTs to DEFAULT_URL by default', () => {
       const response = {};
       const ne = nock(defaultProtoHost)
-        .post(defaultUrl.path)
+        .post(defaultUrlPath)
         .reply(200, response);
       return swaggerSpecValidator.validateFile(swaggerJsonPath)
         .then((result) => {
@@ -366,7 +369,7 @@ describe('swaggerSpecValidator', () => {
       const response = {};
       const ne = nock(defaultProtoHost)
         .matchHeader('Content-Type', 'application/json')
-        .post(defaultUrl.path)
+        .post(defaultUrlPath)
         .reply(200, response);
       return swaggerSpecValidator.validateFile(swaggerJsonPath)
         .then((result) => {
@@ -379,7 +382,7 @@ describe('swaggerSpecValidator', () => {
       const response = {};
       const ne = nock(defaultProtoHost)
         .matchHeader('Content-Type', 'text/x-yaml')
-        .post(defaultUrl.path)
+        .post(defaultUrlPath)
         .reply(200, response);
       return swaggerSpecValidator.validateFile(swaggerYamlPath)
         .then((result) => {
@@ -393,7 +396,7 @@ describe('swaggerSpecValidator', () => {
       const response = {};
       const ne = nock(defaultProtoHost)
         .matchHeader('Content-Type', (val) => val === undefined)
-        .post(defaultUrl.path)
+        .post(defaultUrlPath)
         .reply(200, response);
       return swaggerSpecValidator.validateFile(emptyPath)
         .then((result) => {
@@ -407,7 +410,7 @@ describe('swaggerSpecValidator', () => {
       const testType = 'text/plain';
       const ne = nock(defaultProtoHost)
         .matchHeader('Content-Type', testType)
-        .post(defaultUrl.path)
+        .post(defaultUrlPath)
         .reply(200, response);
       const options = { request: { headers: { 'content-type': testType } } };
       return swaggerSpecValidator.validateFile(swaggerYamlPath, options)
@@ -420,7 +423,7 @@ describe('swaggerSpecValidator', () => {
     it('can be called with callback without options', (done) => {
       const response = {};
       const ne = nock(defaultProtoHost)
-        .post(defaultUrl.path)
+        .post(defaultUrlPath)
         .reply(200, response);
       swaggerSpecValidator.validateFile(swaggerYamlPath, (err, result) => {
         assert.ifError(err);
@@ -434,7 +437,7 @@ describe('swaggerSpecValidator', () => {
       const testStatusCode = 200;
       const testResponse = {};
       const ne = nock(defaultProtoHost)
-        .post(defaultUrl.path)
+        .post(defaultUrlPath)
         .optionally()
         .reply(testStatusCode, testResponse);
       return swaggerSpecValidator.validateFile('nonexistent.yaml')
@@ -454,7 +457,7 @@ describe('swaggerSpecValidator', () => {
       const testStatusCode = 200;
       const testResponse = {};
       const ne = nock(defaultProtoHost)
-        .post(defaultUrl.path)
+        .post(defaultUrlPath)
         .optionally()
         .reply(testStatusCode, testResponse);
 
@@ -486,7 +489,7 @@ describe('swaggerSpecValidator', () => {
       const testStatusCode = 200;
       const testResponse = {};
       const ne = nock(defaultProtoHost)
-        .post(defaultUrl.path)
+        .post(defaultUrlPath)
         .optionally()
         .reply(testStatusCode, testResponse);
 

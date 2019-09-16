@@ -58,7 +58,7 @@ describe('swaggerSpecValidator', () => {
         });
     });
 
-    it('POSTs to URL from caller options', () => {
+    it('POSTs to url.parse in request options', () => {
       const testProtoHost = 'http://example.com';
       const testPath = '/foo/bar?baz=quux';
       const response = {};
@@ -73,7 +73,7 @@ describe('swaggerSpecValidator', () => {
         });
     });
 
-    it('POSTs to URL path from caller options with default host', () => {
+    it('POSTs to URL path in request options with default host', () => {
       const testPath = '/foo/bar?baz=quux';
       const response = {};
       const ne = nock(defaultProtoHost)
@@ -87,7 +87,7 @@ describe('swaggerSpecValidator', () => {
         });
     });
 
-    it('POSTs to http://online.swagger.io from caller options', () => {
+    it('POSTs to http://online.swagger.io in request options', () => {
       const testProtoHost = 'http://online.swagger.io';
       const testPath = '/validator/debug';
       const response = {};
@@ -267,7 +267,7 @@ describe('swaggerSpecValidator', () => {
         );
     });
 
-    it('returns Error for unsupported protocol', () => {
+    it('returns Error for unsupported protocol in request options', () => {
       const options = { request: url.parse('ftp://example.com') };
       return swaggerSpecValidator.validateFile(swaggerJsonPath, options)
         .then(

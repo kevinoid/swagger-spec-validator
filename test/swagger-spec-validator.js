@@ -50,7 +50,7 @@ describe('swaggerSpecValidator', () => {
         .reply(200, response);
       return swaggerSpecValidator.validate(testBody)
         .then((result) => {
-          assert.deepEqual(result, response);
+          assert.deepStrictEqual(result, response);
           ne.done();
         });
     });
@@ -65,7 +65,7 @@ describe('swaggerSpecValidator', () => {
       const options = { request: url.parse(testProtoHost + testPath) };
       return swaggerSpecValidator.validate('swagger', options)
         .then((result) => {
-          assert.deepEqual(result, response);
+          assert.deepStrictEqual(result, response);
           ne.done();
         });
     });
@@ -79,7 +79,7 @@ describe('swaggerSpecValidator', () => {
       const options = { request: { path: testPath } };
       return swaggerSpecValidator.validate('swagger', options)
         .then((result) => {
-          assert.deepEqual(result, response);
+          assert.deepStrictEqual(result, response);
           ne.done();
         });
     });
@@ -104,7 +104,7 @@ describe('swaggerSpecValidator', () => {
       const options = { request: url.parse(testProtoHost + testPath) };
       return swaggerSpecValidator.validate('swagger', options)
         .then((result) => {
-          assert.deepEqual(result, response);
+          assert.deepStrictEqual(result, response);
           ne.done();
         });
     });
@@ -117,7 +117,7 @@ describe('swaggerSpecValidator', () => {
         .reply(200, response);
       return swaggerSpecValidator.validate('swagger')
         .then((result) => {
-          assert.deepEqual(result, response);
+          assert.deepStrictEqual(result, response);
           ne.done();
         });
     });
@@ -133,7 +133,7 @@ describe('swaggerSpecValidator', () => {
         .reply(200, response);
       return swaggerSpecValidator.validate('swagger')
         .then((result) => {
-          assert.deepEqual(result, response);
+          assert.deepStrictEqual(result, response);
           ne.done();
         });
     });
@@ -151,7 +151,7 @@ describe('swaggerSpecValidator', () => {
       const options = { request: { headers: { Accept: 'text/plain' } } };
       return swaggerSpecValidator.validate('swagger', options)
         .then((result) => {
-          assert.deepEqual(result, response);
+          assert.deepStrictEqual(result, response);
           ne.done();
         });
     });
@@ -169,7 +169,7 @@ describe('swaggerSpecValidator', () => {
       const options = { request: { headers: { accept: 'text/plain' } } };
       return swaggerSpecValidator.validate('swagger', options)
         .then((result) => {
-          assert.deepEqual(result, response);
+          assert.deepStrictEqual(result, response);
           ne.done();
         });
     });
@@ -239,7 +239,7 @@ describe('swaggerSpecValidator', () => {
           (err) => {
             assert.strictEqual(err.statusCode, testStatusCode);
             assert.strictEqual(err.headers['content-type'], testType);
-            assert.deepEqual(err.body, response);
+            assert.deepStrictEqual(err.body, response);
             ne.done();
           },
         );
@@ -283,7 +283,7 @@ describe('swaggerSpecValidator', () => {
         .reply(200, response);
       return swaggerSpecValidator.validate(testBody)
         .then((result) => {
-          assert.deepEqual(result, response);
+          assert.deepStrictEqual(result, response);
           ne.done();
         });
     });
@@ -296,7 +296,7 @@ describe('swaggerSpecValidator', () => {
         .reply(200, testResponse);
       swaggerSpecValidator.validate(testBody, (err, result) => {
         assert.ifError(err);
-        assert.deepEqual(result, testResponse);
+        assert.deepStrictEqual(result, testResponse);
         ne.done();
         done();
       });
@@ -321,7 +321,7 @@ describe('swaggerSpecValidator', () => {
         .reply(200, response);
       return swaggerSpecValidator.validate(Buffer.from(testBody))
         .then((result) => {
-          assert.deepEqual(result, response);
+          assert.deepStrictEqual(result, response);
           ne.done();
         });
     });
@@ -357,7 +357,7 @@ describe('swaggerSpecValidator', () => {
         .reply(200, response);
       return swaggerSpecValidator.validateFile(swaggerJsonPath)
         .then((result) => {
-          assert.deepEqual(result, response);
+          assert.deepStrictEqual(result, response);
           ne.done();
         });
     });
@@ -370,7 +370,7 @@ describe('swaggerSpecValidator', () => {
         .reply(200, response);
       return swaggerSpecValidator.validateFile(swaggerJsonPath)
         .then((result) => {
-          assert.deepEqual(result, response);
+          assert.deepStrictEqual(result, response);
           ne.done();
         });
     });
@@ -383,7 +383,7 @@ describe('swaggerSpecValidator', () => {
         .reply(200, response);
       return swaggerSpecValidator.validateFile(swaggerYamlPath)
         .then((result) => {
-          assert.deepEqual(result, response);
+          assert.deepStrictEqual(result, response);
           ne.done();
         });
     });
@@ -397,7 +397,7 @@ describe('swaggerSpecValidator', () => {
         .reply(200, response);
       return swaggerSpecValidator.validateFile(emptyPath)
         .then((result) => {
-          assert.deepEqual(result, response);
+          assert.deepStrictEqual(result, response);
           ne.done();
         });
     });
@@ -412,7 +412,7 @@ describe('swaggerSpecValidator', () => {
       const options = { request: { headers: { 'content-type': testType } } };
       return swaggerSpecValidator.validateFile(swaggerYamlPath, options)
         .then((result) => {
-          assert.deepEqual(result, response);
+          assert.deepStrictEqual(result, response);
           ne.done();
         });
     });
@@ -424,7 +424,7 @@ describe('swaggerSpecValidator', () => {
         .reply(200, response);
       swaggerSpecValidator.validateFile(swaggerYamlPath, (err, result) => {
         assert.ifError(err);
-        assert.deepEqual(result, response);
+        assert.deepStrictEqual(result, response);
         ne.done();
         done();
       });

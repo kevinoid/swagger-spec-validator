@@ -31,6 +31,10 @@ function neverCalled() {
   throw new Error('should not be called');
 }
 
+function waitForever() {
+  return new Promise(() => {});
+}
+
 describe('swaggerSpecValidator', () => {
   afterEach(() => {
     nock.cleanAll();
@@ -530,9 +534,6 @@ describe('swaggerSpecValidator', () => {
         .optionally()
         .reply(testStatusCode, testResponse);
 
-      function waitForever() {
-        return new Promise(() => {});
-      }
       /* eslint-disable no-underscore-dangle */
       const getSwaggerIoHttpsAgent =
         swaggerSpecValidator._getSwaggerIoHttpsAgent;

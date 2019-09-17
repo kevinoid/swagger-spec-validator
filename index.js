@@ -120,7 +120,17 @@ function requestJson(url, options, callback) {
     return;
   }
 
-  const req = proto.request(url, options)
+  // http.request and https.request only accept string or URL as url argument.
+  // This module allows url object since it is unambiguous in named options.
+  // If url is not a URL, combine with options.
+  const req =
+    url instanceof URL ? proto.request(url, options)
+      : proto.request({
+        ...url,
+        ...options,
+      });
+
+  req
     .once('error', callback)
     .once('response', (res) => {
       res.on('error', callback);

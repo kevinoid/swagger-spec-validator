@@ -42,7 +42,7 @@
     "version-deps": "npm install david depcheck git-branch-is npm-audit-resolver travis-status"
   },
   "dependencies": {
-    "yargs": "^13.1.0"
+    "yargs": "^14.2.0"
   },
   "devDependencies": {
     "@kevinoid/eslint-config": "^0.4.1",

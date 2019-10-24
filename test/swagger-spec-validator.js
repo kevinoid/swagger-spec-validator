@@ -402,6 +402,21 @@ describe('swaggerSpecValidator', () => {
         });
     });
 
+    it('accepts spec as Uint8Array', () => {
+      const testBody = 'swagger';
+      const response = {};
+      const ne = nock(defaultProtoHost)
+        .post(defaultUrlPath, testBody)
+        .reply(200, response);
+      return swaggerSpecValidator.validate(
+        new Uint8Array(Buffer.from(testBody)),
+      )
+        .then((result) => {
+          assert.deepStrictEqual(result, response);
+          ne.done();
+        });
+    });
+
     it('Error for non-string, non-Buffer, non-Readable spec',
       () => swaggerSpecValidator.validate(true)
         .then(

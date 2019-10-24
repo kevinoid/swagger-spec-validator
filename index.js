@@ -16,6 +16,14 @@ const util = require('util');
 
 const packageJson = require('./package.json');
 
+// stream.Writable (and therefore http.ClientRequest) accept any Uint8Array
+// TODO [engine:node@>=10]: Use util.types unconditionally
+// eslint-disable-next-line node/no-unsupported-features/node-builtins
+const isUint8Array = util.types ? util.types.isUint8Array
+  : function isUint8Array(obj) {
+    return Object.prototype.toString.call(obj) === '[object Uint8Array]';
+  };
+
 const readFileP = util.promisify(fs.readFile);
 const readdirP = util.promisify(fs.readdir);
 
@@ -169,7 +177,7 @@ function requestJson(url, options, callback) {
     });
 
   const { body } = options;
-  if (typeof body === 'string' || Buffer.isBuffer(body)) {
+  if (typeof body === 'string' || isUint8Array(body)) {
     req.end(body);
   } else {
     body.on('error', (err) => {
@@ -199,7 +207,7 @@ function requestJson(url, options, callback) {
 
 /** Validates an OpenAPI/Swagger API specification.
  *
- * @param {string|!Buffer|!stream.Readable} spec OpenAPI/Swagger API
+ * @param {string|!Uint8Array|!stream.Readable} spec OpenAPI/Swagger API
  * specification content.
  * @param {ValidateOptions=} options Validation options.
  * @param {?function(Error, Object=)=} callback Callback for the validation
@@ -230,9 +238,9 @@ function validate(spec, options, callback) {
     if (spec === undefined
         || spec === null
         || (typeof spec !== 'string'
-         && !Buffer.isBuffer(spec)
+         && !isUint8Array(spec)
          && typeof spec.pipe !== 'function')) {
-      throw new TypeError('spec must be a string, Buffer, or Readable');
+      throw new TypeError('spec must be a string, Uint8Array, or Readable');
     }
 
     if (options !== undefined && typeof options !== 'object') {

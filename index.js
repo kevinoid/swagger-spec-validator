@@ -316,9 +316,11 @@ function validateFile(specPath, options, callback) {
       && Object.keys(headers)
         .some((name) => name.toLowerCase() === 'content-type');
   if (!hasContentType) {
-    // Server ignores Content-Type, so not worth depending on a Media Type db.
+    // application/yaml is the only known supported type on validator.swagger.io
+    // online.swagger.io ignores Content-Type
+    // https://github.com/swagger-api/validator-badge/issues/136#issuecomment-545945678
     const contentType = /\.json$/i.test(specPath) ? 'application/json'
-      : /\.ya?ml$/i.test(specPath) ? 'text/x-yaml'
+      : /\.ya?ml$/i.test(specPath) ? 'application/yaml'
         : null;
     if (contentType) {
       options = { ...options };

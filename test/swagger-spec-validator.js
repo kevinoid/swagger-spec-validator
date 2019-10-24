@@ -451,10 +451,13 @@ describe('swaggerSpecValidator', () => {
         });
     });
 
-    it('adds Content-Type: text/x-yaml for .yaml files', () => {
+    // application/yaml is the only known supported type on validator.swagger.io
+    // online.swagger.io ignores Content-Type
+    // https://github.com/swagger-api/validator-badge/issues/136#issuecomment-545945678
+    it('adds Content-Type: application/yaml .yaml files', () => {
       const response = {};
       const ne = nock(defaultProtoHost)
-        .matchHeader('Content-Type', 'text/x-yaml')
+        .matchHeader('Content-Type', 'application/yaml')
         .post(defaultUrlPath)
         .reply(200, response);
       return swaggerSpecValidator.validateFile(swaggerYamlPath)

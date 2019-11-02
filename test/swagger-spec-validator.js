@@ -20,6 +20,13 @@ const defaultUrl = new URL(swaggerSpecValidator.DEFAULT_URL);
 const defaultProtoHost = `${defaultUrl.protocol}//${defaultUrl.host}`;
 const defaultUrlPath = defaultUrl.pathname + defaultUrl.search;
 
+const onlineSwaggerIoUrl =
+  new URL('https://online.swagger.io/validator/debug');
+const onlineSwaggerIoProtoHost =
+  `${onlineSwaggerIoUrl.protocol}//${onlineSwaggerIoUrl.host}`;
+const onlineSwaggerIoUrlPath =
+  onlineSwaggerIoUrl.pathname + onlineSwaggerIoUrl.search;
+
 const swaggerJsonPath =
   path.join(__dirname, '..', 'test-data', 'petstore-minimal.json');
 const swaggerYamlPath =
@@ -249,11 +256,11 @@ describe('swaggerSpecValidator', () => {
         });
     });
 
-    it('returns Error loading Agent', () => {
+    it('returns Error loading custom Agent for online.swagger.io', () => {
       const testStatusCode = 200;
       const testResponse = {};
-      const ne = nock(defaultProtoHost)
-        .post(defaultUrlPath)
+      const ne = nock(onlineSwaggerIoProtoHost)
+        .post(onlineSwaggerIoUrlPath)
         .optionally()
         .reply(testStatusCode, testResponse);
 
@@ -267,7 +274,8 @@ describe('swaggerSpecValidator', () => {
       let result;
       try {
         swaggerSpecValidator._getSwaggerIoHttpsAgent = getTestError;
-        result = swaggerSpecValidator.validate('swagger')
+        result = swaggerSpecValidator
+          .validate('swagger', { url: onlineSwaggerIoUrl })
           .then(
             neverCalled,
             (err) => {

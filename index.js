@@ -289,7 +289,8 @@ function validate(spec, options, callback) {
     body: spec,
   };
   reqOpts.headers =
-    reqOpts.headers ? combineHeaders(DEFAULT_HEADERS, reqOpts.headers)
+    reqOpts.headers
+      ? combineHeaders(DEFAULT_HEADERS, reqOpts.headers || reqUrl.headers)
       : DEFAULT_HEADERS;
 
   let calledBack = false;

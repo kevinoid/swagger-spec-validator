@@ -126,6 +126,31 @@ function combineHeaders(...args) {
   return combined;
 }
 
+
+/** Reads all data from a stream.Readable.
+ * @private
+ * @param {!stream.Readable} stream Stream from which to read all data.
+ * @return {string|Buffer} Data from stream, if any.
+ */
+function getStreamData(stream) {
+  return new Promise((resolve, reject) => {
+    const chunks = [];
+    stream
+      .on('data', (chunk) => chunks.push(chunk))
+      .once('error', reject)
+      .once(
+        'end',
+        () => resolve(
+          chunks.length === 0 ? undefined
+            : Buffer.isBuffer(chunks[0]) ? Buffer.concat(chunks)
+              : typeof chunks[0] === 'string' ? chunks.join('')
+                : chunks,
+        ),
+      );
+  });
+}
+
+
 /** Makes an HTTP(S) request and parses the JSON response.
  * @private
  */
@@ -200,6 +225,71 @@ function requestJson(url, options, callback) {
     body.pipe(req);
   }
 }
+
+
+/** Guesses Content-Type of OpenAPI/Swagger spec data.
+ *
+ * @private
+ * @param {string|!Uint8Array} spec OpenAPI/Swagger API specification content.
+ * @return {string} Content type of spec.
+ */
+function guessSpecDataContentType(spec, options) {
+  try {
+    JSON.parse(spec);
+    return JSON_CONTENT_TYPE;
+  } catch (err) {
+    if (options.verbosity >= 1) {
+      options.err.write(
+        'Unable to parse spec content as JSON.  Assuming YAML.\n',
+      );
+    }
+
+    return YAML_CONTENT_TYPE;
+  }
+}
+
+
+/** Guesses Content-Type of OpenAPI/Swagger spec data or stream.
+ *
+ * Note: All current versions of the OpenAPI Specification require OpenAPI
+ * documents to be JSON or YAML, so this function attempts to distinguish
+ * between only those two types.
+ *
+ * @private
+ * @param {string|!Uint8Array|!stream.Readable} spec OpenAPI/Swagger API
+ * specification content.
+ */
+function guessSpecContentType(spec, options) {
+  let contentType;
+  if (typeof spec === 'string' || isUint8Array(spec)) {
+    contentType = guessSpecDataContentType(spec, options);
+  } else if (spec.path) {
+    // fs.ReadStream#path is string or Buffer with file path.
+    if (/\.json$/i.test(spec.path)) {
+      contentType = JSON_CONTENT_TYPE;
+    } else if (/\.ya?ml$/i.test(spec.path)) {
+      contentType = YAML_CONTENT_TYPE;
+    }
+  }
+
+  if (contentType) {
+    return Promise.resolve({ contentType });
+  }
+
+  if (options.verbosity >= 1) {
+    options.err.write(
+      'Content-Type not specified and can\'t be inferred from filename.\n'
+      + 'Reading spec content...\n',
+    );
+  }
+
+  return getStreamData(spec)
+    .then((specContent) => ({
+      contentType: guessSpecDataContentType(specContent, options),
+      specContent,
+    }));
+}
+
 
 /** Validation options
  *
@@ -291,7 +381,7 @@ function validate(spec, options, callback) {
   reqOpts.headers =
     reqOpts.headers
       ? combineHeaders(DEFAULT_HEADERS, reqOpts.headers || reqUrl.headers)
-      : DEFAULT_HEADERS;
+      : { ...DEFAULT_HEADERS };
 
   let calledBack = false;
   function callbackOnce(...args) {
@@ -301,26 +391,44 @@ function validate(spec, options, callback) {
     }
   }
 
+  if (typeof spec.pipe === 'function') {
+    // Stream can emit an error before Agent is loaded.  Handle this.
+    spec.once('error', callbackOnce);
+  }
+
+  // online.swagger.io requires a special Agent for HTTPS
+  let agentP;
   if ((reqOpts.protocol || reqUrl.protocol) === 'https:'
       && (reqOpts.hostname || reqUrl.hostname) === 'online.swagger.io'
       && !hasOwnProperty.call(reqOpts, 'agent')) {
-    if (typeof spec.pipe === 'function') {
-      // Stream can emit an error before Agent is loaded.  Handle this.
-      spec.on('error', callbackOnce);
-    }
-
     // eslint-disable-next-line no-underscore-dangle
-    swaggerSpecValidator._getSwaggerIoHttpsAgent()
-      .then((agent) => {
-        if (!calledBack) {
-          reqOpts.agent = agent;
-          requestJson(reqUrl, reqOpts, callbackOnce);
-        }
-      })
-      .catch(callbackOnce);
-  } else {
-    requestJson(reqUrl, reqOpts, callback);
+    agentP = swaggerSpecValidator._getSwaggerIoHttpsAgent();
   }
+
+  let contentInfoP;
+  if (!Object.keys(reqOpts.headers)
+    .some((name) => name.toLowerCase() === 'content-type')) {
+    contentInfoP = guessSpecContentType(spec, options);
+  }
+
+  Promise.all([agentP, contentInfoP])
+    .then(([agent, contentInfo]) => {
+      if (agent) {
+        reqOpts.agent = agent;
+      }
+
+      if (contentInfo) {
+        const { contentType, specContent } = contentInfo;
+        reqOpts.headers['Content-Type'] = contentType;
+
+        if (specContent) {
+          reqOpts.body = specContent;
+        }
+      }
+
+      requestJson(reqUrl, reqOpts, callbackOnce);
+    })
+    .catch(callbackOnce);
 
   return undefined;
 };
@@ -342,25 +450,6 @@ function validateFile(specPath, options, callback) {
   if (!callback && typeof options === 'function') {
     callback = options;
     options = null;
-  }
-
-  const headers = options && options.request && options.request.headers;
-  const hasContentType = headers
-      && Object.keys(headers)
-        .some((name) => name.toLowerCase() === 'content-type');
-  if (!hasContentType) {
-    // application/yaml is the only known supported type on validator.swagger.io
-    // online.swagger.io ignores Content-Type
-    // https://github.com/swagger-api/validator-badge/issues/136#issuecomment-545945678
-    const contentType = /\.json$/i.test(specPath) ? 'application/json'
-      : /\.ya?ml$/i.test(specPath) ? 'application/yaml'
-        : null;
-    if (contentType) {
-      options = { ...options };
-      options.request = { ...options.request };
-      options.request.headers = { ...options.request.headers };
-      options.request.headers['Content-Type'] = contentType;
-    }
   }
 
   const specStream = fs.createReadStream(specPath);

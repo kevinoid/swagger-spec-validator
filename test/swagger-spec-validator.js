@@ -488,8 +488,8 @@ describe('swaggerSpecValidator', () => {
         });
     });
 
-    // application/yaml is the only known supported type on validator.swagger.io
-    // online.swagger.io ignores Content-Type
+    // application/yaml is the only known supported YAML type on
+    // validator.swagger.io and online.swagger.io
     // https://github.com/swagger-api/validator-badge/issues/136#issuecomment-545945678
     it('adds Content-Type: application/yaml .yaml files', () => {
       const response = {};
@@ -504,14 +504,95 @@ describe('swaggerSpecValidator', () => {
         });
     });
 
-    // This may change in the future.  Test to ensure header is reasonable.
-    it('doesn\'t add Content-Type for other extensions', () => {
+    it('adds Content-Type: application/json for non-.json JSON files', () => {
       const response = {};
       const ne = nock(defaultProtoHost)
-        .matchHeader('Content-Type', (val) => val === undefined)
+        .matchHeader('Content-Type', 'application/json')
+        .post(defaultUrlPath)
+        .reply(200, response);
+      return swaggerSpecValidator.validateFile(swaggerJsonPath.slice(0, -3))
+        .then((result) => {
+          assert.deepStrictEqual(result, response);
+          ne.done();
+        });
+    });
+
+    it('adds Content-Type: application/yaml for non-.yaml YAML files', () => {
+      const response = {};
+      const ne = nock(defaultProtoHost)
+        .matchHeader('Content-Type', 'application/yaml')
+        .post(defaultUrlPath)
+        .reply(200, response);
+      return swaggerSpecValidator.validateFile(swaggerYamlPath.slice(0, -3))
+        .then((result) => {
+          assert.deepStrictEqual(result, response);
+          ne.done();
+        });
+    });
+
+    it('adds Content-Type: application/yaml for non-JSON files', () => {
+      const response = {};
+      const ne = nock(defaultProtoHost)
+        .matchHeader('Content-Type', 'application/yaml')
         .post(defaultUrlPath)
         .reply(200, response);
       return swaggerSpecValidator.validateFile(emptyPath)
+        .then((result) => {
+          assert.deepStrictEqual(result, response);
+          ne.done();
+        });
+    });
+
+    it('adds Content-Type: application/json for JSON content', () => {
+      const response = {};
+      const ne = nock(defaultProtoHost)
+        .matchHeader('Content-Type', 'application/json')
+        .post(defaultUrlPath)
+        .reply(200, response);
+      return swaggerSpecValidator.validate('{}')
+        .then((result) => {
+          assert.deepStrictEqual(result, response);
+          ne.done();
+        });
+    });
+
+    it('adds Content-Type: application/yaml for non-JSON content', () => {
+      const response = {};
+      const ne = nock(defaultProtoHost)
+        .matchHeader('Content-Type', 'application/yaml')
+        .post(defaultUrlPath)
+        .reply(200, response);
+      return swaggerSpecValidator.validate('swagger: "2.0"')
+        .then((result) => {
+          assert.deepStrictEqual(result, response);
+          ne.done();
+        });
+    });
+
+    it('adds Content-Type: application/json for JSON stream', () => {
+      const spec = new stream.PassThrough();
+      spec.end('{}');
+      const response = {};
+      const ne = nock(defaultProtoHost)
+        .matchHeader('Content-Type', 'application/json')
+        .post(defaultUrlPath)
+        .reply(200, response);
+      return swaggerSpecValidator.validate(spec)
+        .then((result) => {
+          assert.deepStrictEqual(result, response);
+          ne.done();
+        });
+    });
+
+    it('adds Content-Type: application/yaml for non-JSON stream', () => {
+      const spec = new stream.PassThrough();
+      spec.end('swagger: "2.0"');
+      const response = {};
+      const ne = nock(defaultProtoHost)
+        .matchHeader('Content-Type', 'application/yaml')
+        .post(defaultUrlPath)
+        .reply(200, response);
+      return swaggerSpecValidator.validate(spec)
         .then((result) => {
           assert.deepStrictEqual(result, response);
           ne.done();

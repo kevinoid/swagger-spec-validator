@@ -28,8 +28,8 @@ section section section section {
         <dt>validates JSON and YAML files</dt>
         <dd><pre><code>const options = {
   in: new stream.PassThrough(),
-  out: new stream.PassThrough({encoding: &#x27;utf-8&#x27;}),
-  err: new stream.PassThrough({encoding: &#x27;utf-8&#x27;})
+  out: new stream.PassThrough({ encoding: &#x27;utf-8&#x27; }),
+  err: new stream.PassThrough({ encoding: &#x27;utf-8&#x27; }),
 };
 const allArgs = RUNTIME_ARGS.concat([swaggerJsonPath, swaggerYamlPath]);
 swaggerSpecValidatorCmd(allArgs, options, (err, code) =&#x3E; {
@@ -38,26 +38,26 @@ swaggerSpecValidatorCmd(allArgs, options, (err, code) =&#x3E; {
     {
       code,
       out: options.out.read(),
-      err: options.err.read()
+      err: options.err.read(),
     },
     match({
       code: 0,
       out: null,
-      err: match(/\bvalid/i)
-    })
+      err: match(/\bvalid/i),
+    }),
   );
   done();
 });</code></pre></dd>
         <dt>can validate using http://online.swagger.io</dt>
         <dd><pre><code>const options = {
   in: new stream.PassThrough(),
-  out: new stream.PassThrough({encoding: &#x27;utf-8&#x27;}),
-  err: new stream.PassThrough({encoding: &#x27;utf-8&#x27;})
+  out: new stream.PassThrough({ encoding: &#x27;utf-8&#x27; }),
+  err: new stream.PassThrough({ encoding: &#x27;utf-8&#x27; }),
 };
 const allArgs = RUNTIME_ARGS.concat([
   &#x27;-u&#x27;,
   &#x27;http://online.swagger.io/validator/debug&#x27;,
-  swaggerJsonPath
+  swaggerJsonPath,
 ]);
 swaggerSpecValidatorCmd(allArgs, options, (err, code) =&#x3E; {
   assert.ifError(err);
@@ -65,21 +65,48 @@ swaggerSpecValidatorCmd(allArgs, options, (err, code) =&#x3E; {
     {
       code,
       out: options.out.read(),
-      err: options.err.read()
+      err: options.err.read(),
     },
     match({
       code: 0,
       out: null,
-      err: match(/\bvalid/i)
-    })
+      err: match(/\bvalid/i),
+    }),
+  );
+  done();
+});</code></pre></dd>
+        <dt>can validate using https://online.swagger.io</dt>
+        <dd><pre><code>const options = {
+  in: new stream.PassThrough(),
+  out: new stream.PassThrough({ encoding: &#x27;utf-8&#x27; }),
+  err: new stream.PassThrough({ encoding: &#x27;utf-8&#x27; }),
+};
+const allArgs = RUNTIME_ARGS.concat([
+  &#x27;-u&#x27;,
+  &#x27;https://online.swagger.io/validator/debug&#x27;,
+  swaggerJsonPath,
+]);
+swaggerSpecValidatorCmd(allArgs, options, (err, code) =&#x3E; {
+  assert.ifError(err);
+  assertMatch(
+    {
+      code,
+      out: options.out.read(),
+      err: options.err.read(),
+    },
+    match({
+      code: 0,
+      out: null,
+      err: match(/\bvalid/i),
+    }),
   );
   done();
 });</code></pre></dd>
         <dt>validates from stdin</dt>
         <dd><pre><code>const options = {
   in: fs.createReadStream(swaggerYamlPath),
-  out: new stream.PassThrough({encoding: &#x27;utf-8&#x27;}),
-  err: new stream.PassThrough({encoding: &#x27;utf-8&#x27;})
+  out: new stream.PassThrough({ encoding: &#x27;utf-8&#x27; }),
+  err: new stream.PassThrough({ encoding: &#x27;utf-8&#x27; }),
 };
 swaggerSpecValidatorCmd(RUNTIME_ARGS, options, (err, code) =&#x3E; {
   assert.ifError(err);
@@ -87,21 +114,21 @@ swaggerSpecValidatorCmd(RUNTIME_ARGS, options, (err, code) =&#x3E; {
     {
       code,
       out: options.out.read(),
-      err: options.err.read()
+      err: options.err.read(),
     },
     match({
       code: 0,
       out: null,
-      err: match(/\bvalid/i)
-    })
+      err: match(/\bvalid/i),
+    }),
   );
   done();
 });</code></pre></dd>
         <dt>handles validation failures</dt>
         <dd><pre><code>const options = {
   in: new stream.PassThrough(),
-  out: new stream.PassThrough({encoding: &#x27;utf-8&#x27;}),
-  err: new stream.PassThrough({encoding: &#x27;utf-8&#x27;})
+  out: new stream.PassThrough({ encoding: &#x27;utf-8&#x27; }),
+  err: new stream.PassThrough({ encoding: &#x27;utf-8&#x27; }),
 };
 const allArgs = RUNTIME_ARGS.concat([invalidYamlPath]);
 swaggerSpecValidatorCmd(allArgs, options, (err, code) =&#x3E; {
@@ -110,21 +137,21 @@ swaggerSpecValidatorCmd(allArgs, options, (err, code) =&#x3E; {
     {
       code,
       out: options.out.read(),
-      err: options.err.read()
+      err: options.err.read(),
     },
     match({
       code: 1,
       out: match(new RegExp(&#x60;^${regexpEscape(invalidYamlPath)}:&#x60;)),
-      err: null
-    })
+      err: null,
+    }),
   );
   done();
 });</code></pre></dd>
         <dt>handles unreadable file errors</dt>
         <dd><pre><code>const options = {
   in: new stream.PassThrough(),
-  out: new stream.PassThrough({encoding: &#x27;utf-8&#x27;}),
-  err: new stream.PassThrough({encoding: &#x27;utf-8&#x27;})
+  out: new stream.PassThrough({ encoding: &#x27;utf-8&#x27; }),
+  err: new stream.PassThrough({ encoding: &#x27;utf-8&#x27; }),
 };
 const nonexistentPath = &#x27;nonexistent.yaml&#x27;;
 const allArgs = RUNTIME_ARGS.concat([nonexistentPath]);
@@ -134,15 +161,15 @@ swaggerSpecValidatorCmd(allArgs, options, (err, code) =&#x3E; {
     {
       code,
       out: options.out.read(),
-      err: options.err.read()
+      err: options.err.read(),
     },
     match({
       code: 2,
       out: null,
       err: match(new RegExp(
-        &#x60;^${regexpEscape(nonexistentPath)}:.*\\bENOENT\\b&#x60;
-      ))
-    })
+        &#x60;^${regexpEscape(nonexistentPath)}:.*\\bENOENT\\b&#x60;,
+      )),
+    }),
   );
   done();
 });</code></pre></dd>
@@ -157,10 +184,10 @@ swaggerSpecValidatorMock.expects(&#x27;validate&#x27;).once()
   .withArgs(
     options.in,
     match.object,
-    match.func
+    match.func,
   );
-const result
-  = swaggerSpecValidatorCmd(RUNTIME_ARGS, options, sinon.mock().never());
+const result =
+  swaggerSpecValidatorCmd(RUNTIME_ARGS, options, sinon.mock().never());
 swaggerSpecValidatorMock.verify();
 assert.strictEqual(result, undefined);</code></pre></dd>
         <dt>verifies stdin with &#x22;-&#x22; argument</dt>
@@ -169,11 +196,11 @@ swaggerSpecValidatorMock.expects(&#x27;validate&#x27;).once()
   .withArgs(
     options.in,
     match.object,
-    match.func
+    match.func,
   );
 const allArgs = RUNTIME_ARGS.concat(&#x27;-&#x27;);
-const result
-  = swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
+const result =
+  swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
 swaggerSpecValidatorMock.verify();
 assert.strictEqual(result, undefined);</code></pre></dd>
         <dt>verifies file named &#x22;-&#x22; with &#x22;./-&#x22; argument</dt>
@@ -182,11 +209,11 @@ swaggerSpecValidatorMock.expects(&#x27;validateFile&#x27;).once()
   .withArgs(
     &#x27;./-&#x27;,
     match.object,
-    match.func
+    match.func,
   );
 const allArgs = RUNTIME_ARGS.concat(&#x27;./-&#x27;);
-const result
-  = swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
+const result =
+  swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
 swaggerSpecValidatorMock.verify();
 assert.strictEqual(result, undefined);</code></pre></dd>
         <dt>verifies multiple named files</dt>
@@ -195,17 +222,17 @@ swaggerSpecValidatorMock.expects(&#x27;validateFile&#x27;).once()
   .withArgs(
     &#x27;file1&#x27;,
     match.object,
-    match.func
+    match.func,
   );
 swaggerSpecValidatorMock.expects(&#x27;validateFile&#x27;).once()
   .withArgs(
     &#x27;file2&#x27;,
     match.object,
-    match.func
+    match.func,
   );
 const allArgs = RUNTIME_ARGS.concat(&#x27;file1&#x27;, &#x27;file2&#x27;);
-const result
-  = swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
+const result =
+  swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
 swaggerSpecValidatorMock.verify();
 assert.strictEqual(result, undefined);</code></pre></dd>
         <dt>verifies multiply named files once</dt>
@@ -214,11 +241,11 @@ swaggerSpecValidatorMock.expects(&#x27;validateFile&#x27;).once()
   .withArgs(
     &#x27;file1&#x27;,
     match.object,
-    match.func
+    match.func,
   );
 const allArgs = RUNTIME_ARGS.concat(&#x27;file1&#x27;, &#x27;file1&#x27;);
-const result
-  = swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
+const result =
+  swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
 swaggerSpecValidatorMock.verify();
 assert.strictEqual(result, undefined);</code></pre></dd>
         <dt>does not normalize paths when merging duplicates</dt>
@@ -227,17 +254,17 @@ swaggerSpecValidatorMock.expects(&#x27;validateFile&#x27;).once()
   .withArgs(
     &#x27;file1&#x27;,
     match.object,
-    match.func
+    match.func,
   );
 swaggerSpecValidatorMock.expects(&#x27;validateFile&#x27;).once()
   .withArgs(
     &#x27;./file1&#x27;,
     match.object,
-    match.func
+    match.func,
   );
 const allArgs = RUNTIME_ARGS.concat(&#x27;file1&#x27;, &#x27;./file1&#x27;);
-const result
-  = swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
+const result =
+  swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
 swaggerSpecValidatorMock.verify();
 assert.strictEqual(result, undefined);</code></pre></dd>
         <dt>verifies mix of files and stdin</dt>
@@ -245,23 +272,23 @@ assert.strictEqual(result, undefined);</code></pre></dd>
   .withArgs(
     &#x27;file1&#x27;,
     match.object,
-    match.func
+    match.func,
   );
 swaggerSpecValidatorMock.expects(&#x27;validateFile&#x27;).once()
   .withArgs(
     &#x27;file2&#x27;,
     match.object,
-    match.func
+    match.func,
   );
 swaggerSpecValidatorMock.expects(&#x27;validate&#x27;).once()
   .withArgs(
     options.in,
     match.object,
-    match.func
+    match.func,
   );
 const allArgs = RUNTIME_ARGS.concat(&#x27;file1&#x27;, &#x27;-&#x27;, &#x27;file2&#x27;);
-const result
-  = swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
+const result =
+  swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
 swaggerSpecValidatorMock.verify();
 assert.strictEqual(result, undefined);</code></pre></dd>
         <dt>interprets --header Content-Type:text/plain as match(request: match(headers: [object Object]))</dt>
@@ -270,7 +297,7 @@ swaggerSpecValidatorMock.expects(&#x27;validate&#x27;).once()
   .withArgs(
     options.in,
     expectObj,
-    match.func
+    match.func,
   );
 const allArgs = RUNTIME_ARGS.concat(args);
 swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
@@ -281,7 +308,7 @@ swaggerSpecValidatorMock.expects(&#x27;validate&#x27;).once()
   .withArgs(
     options.in,
     expectObj,
-    match.func
+    match.func,
   );
 const allArgs = RUNTIME_ARGS.concat(args);
 swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
@@ -292,18 +319,18 @@ swaggerSpecValidatorMock.expects(&#x27;validate&#x27;).once()
   .withArgs(
     options.in,
     expectObj,
-    match.func
+    match.func,
   );
 const allArgs = RUNTIME_ARGS.concat(args);
 swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
 swaggerSpecValidatorMock.verify();</code></pre></dd>
-        <dt>interprets --url http://example.com as match(request: match(protocol: http:, slashes: true, auth: null, host: example.com, port: null, hostname: example.com, hash: null, search: null, query: null, pathname: /, path: /, href: http://example.com/))</dt>
+        <dt>interprets --url http://example.com as match(url: http://example.com)</dt>
         <dd><pre><code>swaggerSpecValidatorMock.expects(&#x27;validateFile&#x27;).never();
 swaggerSpecValidatorMock.expects(&#x27;validate&#x27;).once()
   .withArgs(
     options.in,
     expectObj,
-    match.func
+    match.func,
   );
 const allArgs = RUNTIME_ARGS.concat(args);
 swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
@@ -314,7 +341,7 @@ swaggerSpecValidatorMock.expects(&#x27;validate&#x27;).once()
   .withArgs(
     options.in,
     expectObj,
-    match.func
+    match.func,
   );
 const allArgs = RUNTIME_ARGS.concat(args);
 swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
@@ -325,18 +352,18 @@ swaggerSpecValidatorMock.expects(&#x27;validate&#x27;).once()
   .withArgs(
     options.in,
     expectObj,
-    match.func
+    match.func,
   );
 const allArgs = RUNTIME_ARGS.concat(args);
 swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
 swaggerSpecValidatorMock.verify();</code></pre></dd>
-        <dt>interprets -u https://example.com/path?query as match(request: match(protocol: https:, slashes: true, auth: null, host: example.com, port: null, hostname: example.com, hash: null, search: ?query, query: query, pathname: /path, path: /path?query, href: https://example.com/path?query))</dt>
+        <dt>interprets -u https://example.com/path?query as match(url: https://example.com/path?query)</dt>
         <dd><pre><code>swaggerSpecValidatorMock.expects(&#x27;validateFile&#x27;).never();
 swaggerSpecValidatorMock.expects(&#x27;validate&#x27;).once()
   .withArgs(
     options.in,
     expectObj,
-    match.func
+    match.func,
   );
 const allArgs = RUNTIME_ARGS.concat(args);
 swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
@@ -347,7 +374,7 @@ swaggerSpecValidatorMock.expects(&#x27;validate&#x27;).once()
   .withArgs(
     options.in,
     expectObj,
-    match.func
+    match.func,
   );
 const allArgs = RUNTIME_ARGS.concat(args);
 swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
@@ -358,7 +385,7 @@ swaggerSpecValidatorMock.expects(&#x27;validate&#x27;).once()
   .withArgs(
     options.in,
     expectObj,
-    match.func
+    match.func,
   );
 const allArgs = RUNTIME_ARGS.concat(args);
 swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
@@ -369,7 +396,7 @@ swaggerSpecValidatorMock.expects(&#x27;validate&#x27;).once()
   .withArgs(
     options.in,
     expectObj,
-    match.func
+    match.func,
   );
 const allArgs = RUNTIME_ARGS.concat(args);
 swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
@@ -380,7 +407,7 @@ swaggerSpecValidatorMock.expects(&#x27;validate&#x27;).once()
   .withArgs(
     options.in,
     expectObj,
-    match.func
+    match.func,
   );
 const allArgs = RUNTIME_ARGS.concat(args);
 swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
@@ -391,7 +418,7 @@ swaggerSpecValidatorMock.expects(&#x27;validate&#x27;).once()
   .withArgs(
     options.in,
     expectObj,
-    match.func
+    match.func,
   );
 const allArgs = RUNTIME_ARGS.concat(args);
 swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
@@ -402,7 +429,7 @@ swaggerSpecValidatorMock.expects(&#x27;validate&#x27;).once()
   .withArgs(
     options.in,
     expectObj,
-    match.func
+    match.func,
   );
 const allArgs = RUNTIME_ARGS.concat(args);
 swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
@@ -412,13 +439,15 @@ swaggerSpecValidatorMock.verify();</code></pre></dd>
 swaggerSpecValidatorMock.expects(&#x27;validateFile&#x27;).once()
   .withArgs(
     &#x27;file&#x27;,
-    match({request: match({headers: {&#x27;Content-Type&#x27;: &#x27;text/plain&#x27;}})}),
-    match.func
+    match({
+      request: match({ headers: { &#x27;Content-Type&#x27;: &#x27;text/plain&#x27; } }),
+    }),
+    match.func,
   );
-const allArgs
-  = RUNTIME_ARGS.concat(&#x27;-H&#x27;, &#x27;Content-Type: text/plain&#x27;, &#x27;file&#x27;);
-const result
-  = swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
+const allArgs =
+  RUNTIME_ARGS.concat(&#x27;-H&#x27;, &#x27;Content-Type: text/plain&#x27;, &#x27;file&#x27;);
+const result =
+  swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
 swaggerSpecValidatorMock.verify();
 assert.strictEqual(result, undefined);</code></pre></dd>
         <dt>interprets -qqq as match(verbosity: -3)</dt>
@@ -427,7 +456,7 @@ swaggerSpecValidatorMock.expects(&#x27;validate&#x27;).once()
   .withArgs(
     options.in,
     expectObj,
-    match.func
+    match.func,
   );
 const allArgs = RUNTIME_ARGS.concat(args);
 swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
@@ -438,7 +467,7 @@ swaggerSpecValidatorMock.expects(&#x27;validate&#x27;).once()
   .withArgs(
     options.in,
     expectObj,
-    match.func
+    match.func,
   );
 const allArgs = RUNTIME_ARGS.concat(args);
 swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
@@ -449,18 +478,18 @@ swaggerSpecValidatorMock.expects(&#x27;validate&#x27;).once()
   .withArgs(
     options.in,
     expectObj,
-    match.func
+    match.func,
   );
 const allArgs = RUNTIME_ARGS.concat(args);
 swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
 swaggerSpecValidatorMock.verify();</code></pre></dd>
-        <dt>interprets -u notaurl as match(request: match(protocol: null, slashes: null, auth: null, host: null, port: null, hostname: null, hash: null, search: null, query: null, pathname: notaurl, path: notaurl, href: notaurl))</dt>
+        <dt>interprets -u notaurl as match(url: notaurl)</dt>
         <dd><pre><code>swaggerSpecValidatorMock.expects(&#x27;validateFile&#x27;).never();
 swaggerSpecValidatorMock.expects(&#x27;validate&#x27;).once()
   .withArgs(
     options.in,
     expectObj,
-    match.func
+    match.func,
   );
 const allArgs = RUNTIME_ARGS.concat(args);
 swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
@@ -711,7 +740,7 @@ const validate = swaggerSpecValidatorMock.expects(&#x27;validate&#x27;).once()
   .withArgs(
     options.in,
     match.object,
-    match.func
+    match.func,
   );
 swaggerSpecValidatorCmd(RUNTIME_ARGS, options, (err, code) =&#x3E; {
   assert.ifError(err);
@@ -727,7 +756,7 @@ const validate = swaggerSpecValidatorMock.expects(&#x27;validate&#x27;).once()
   .withArgs(
     options.in,
     match.object,
-    match.func
+    match.func,
   );
 const allArgs = RUNTIME_ARGS.concat(arg);
 swaggerSpecValidatorCmd(allArgs, options, (err, code) =&#x3E; {
@@ -744,7 +773,7 @@ const validate = swaggerSpecValidatorMock.expects(&#x27;validate&#x27;).once()
   .withArgs(
     options.in,
     match.object,
-    match.func
+    match.func,
   );
 const allArgs = RUNTIME_ARGS.concat(arg);
 swaggerSpecValidatorCmd(allArgs, options, (err, code) =&#x3E; {
@@ -761,7 +790,7 @@ const validate = swaggerSpecValidatorMock.expects(&#x27;validate&#x27;).once()
   .withArgs(
     options.in,
     match.object,
-    match.func
+    match.func,
   );
 swaggerSpecValidatorCmd(RUNTIME_ARGS, options, (err, code) =&#x3E; {
   assert.ifError(err);
@@ -777,7 +806,7 @@ const validate = swaggerSpecValidatorMock.expects(&#x27;validate&#x27;).once()
   .withArgs(
     options.in,
     match.object,
-    match.func
+    match.func,
   );
 const allArgs = RUNTIME_ARGS.concat(&#x27;-v&#x27;);
 swaggerSpecValidatorCmd(allArgs, options, (err, code) =&#x3E; {
@@ -796,7 +825,7 @@ const validate = swaggerSpecValidatorMock.expects(&#x27;validate&#x27;).once()
   .withArgs(
     options.in,
     match.object,
-    match.func
+    match.func,
   );
 swaggerSpecValidatorCmd(RUNTIME_ARGS, options, (err, code) =&#x3E; {
   assert.ifError(err);
@@ -806,7 +835,7 @@ swaggerSpecValidatorCmd(RUNTIME_ARGS, options, (err, code) =&#x3E; {
   done();
 });
 validate.yield(null, {
-  messages: [&#x27;testmsg&#x27;]
+  messages: [&#x27;testmsg&#x27;],
 });</code></pre></dd>
         <dt>normally prints validation schema messages to stdout</dt>
         <dd><pre><code>swaggerSpecValidatorMock.expects(&#x27;validateFile&#x27;).never();
@@ -814,7 +843,7 @@ const validate = swaggerSpecValidatorMock.expects(&#x27;validate&#x27;).once()
   .withArgs(
     options.in,
     match.object,
-    match.func
+    match.func,
   );
 swaggerSpecValidatorCmd(RUNTIME_ARGS, options, (err, code) =&#x3E; {
   assert.ifError(err);
@@ -825,8 +854,8 @@ swaggerSpecValidatorCmd(RUNTIME_ARGS, options, (err, code) =&#x3E; {
 });
 validate.yield(null, {
   schemaValidationMessages: [
-    {level: &#x27;level&#x27;, message: &#x27;testmsg&#x27;}
-  ]
+    { level: &#x27;level&#x27;, message: &#x27;testmsg&#x27; },
+  ],
 });</code></pre></dd>
         <dt>-qq exits without printing error</dt>
         <dd><pre><code>swaggerSpecValidatorMock.expects(&#x27;validateFile&#x27;).never();
@@ -834,7 +863,7 @@ const validate = swaggerSpecValidatorMock.expects(&#x27;validate&#x27;).once()
   .withArgs(
     options.in,
     match.object,
-    match.func
+    match.func,
   );
 const allArgs = RUNTIME_ARGS.concat(arg);
 swaggerSpecValidatorCmd(allArgs, options, (err, code) =&#x3E; {
@@ -851,7 +880,7 @@ const validate = swaggerSpecValidatorMock.expects(&#x27;validate&#x27;).once()
   .withArgs(
     options.in,
     match.object,
-    match.func
+    match.func,
   );
 const allArgs = RUNTIME_ARGS.concat(arg);
 swaggerSpecValidatorCmd(allArgs, options, (err, code) =&#x3E; {
@@ -864,8 +893,8 @@ swaggerSpecValidatorCmd(allArgs, options, (err, code) =&#x3E; {
 validate.yield(null, {
   messages: [&#x27;testmsg&#x27;],
   schemaValidationMessages: [
-    {level: &#x27;level&#x27;, message: &#x27;testmsg&#x27;}
-  ]
+    { level: &#x27;level&#x27;, message: &#x27;testmsg&#x27; },
+  ],
 });</code></pre></dd>
         <dt>--quiet,--quiet exits without printing error</dt>
         <dd><pre><code>swaggerSpecValidatorMock.expects(&#x27;validateFile&#x27;).never();
@@ -873,7 +902,7 @@ const validate = swaggerSpecValidatorMock.expects(&#x27;validate&#x27;).once()
   .withArgs(
     options.in,
     match.object,
-    match.func
+    match.func,
   );
 const allArgs = RUNTIME_ARGS.concat(arg);
 swaggerSpecValidatorCmd(allArgs, options, (err, code) =&#x3E; {
@@ -890,7 +919,7 @@ const validate = swaggerSpecValidatorMock.expects(&#x27;validate&#x27;).once()
   .withArgs(
     options.in,
     match.object,
-    match.func
+    match.func,
   );
 const allArgs = RUNTIME_ARGS.concat(arg);
 swaggerSpecValidatorCmd(allArgs, options, (err, code) =&#x3E; {
@@ -903,8 +932,8 @@ swaggerSpecValidatorCmd(allArgs, options, (err, code) =&#x3E; {
 validate.yield(null, {
   messages: [&#x27;testmsg&#x27;],
   schemaValidationMessages: [
-    {level: &#x27;level&#x27;, message: &#x27;testmsg&#x27;}
-  ]
+    { level: &#x27;level&#x27;, message: &#x27;testmsg&#x27; },
+  ],
 });</code></pre></dd>
         <dt>accepts null args</dt>
         <dd><pre><code>swaggerSpecValidatorMock.expects(&#x27;validateFile&#x27;).never();
@@ -912,7 +941,7 @@ swaggerSpecValidatorMock.expects(&#x27;validate&#x27;).once()
   .withArgs(
     options.in,
     match.object,
-    match.func
+    match.func,
   );
 const result = swaggerSpecValidatorCmd(null, options, sinon.mock().never());
 swaggerSpecValidatorMock.verify();
@@ -923,7 +952,7 @@ swaggerSpecValidatorMock.expects(&#x27;validate&#x27;).once()
   .withArgs(
     options.in,
     match.object,
-    match.func
+    match.func,
   );
 const result = swaggerSpecValidatorCmd([], options, sinon.mock().never());
 swaggerSpecValidatorMock.verify();
@@ -934,7 +963,7 @@ swaggerSpecValidatorMock.expects(&#x27;validateFile&#x27;).never();
 assert.throws(
   () =&#x3E; { swaggerSpecValidatorCmd(RUNTIME_ARGS, {}, true); },
   TypeError,
-  /\bcallback\b/
+  /\bcallback\b/,
 );
 swaggerSpecValidatorMock.verify();</code></pre></dd>
         <dt>returns Error for non-Array args</dt>
@@ -961,7 +990,7 @@ swaggerSpecValidatorMock.expects(&#x27;validate&#x27;).once()
   .withArgs(
     process.stdin,
     match.object,
-    match.func
+    match.func,
   );
 const result = swaggerSpecValidatorCmd(RUNTIME_ARGS, sinon.mock().never());
 swaggerSpecValidatorMock.verify();
@@ -978,7 +1007,7 @@ swaggerSpecValidatorCmd(RUNTIME_ARGS, true, (err) =&#x3E; {
         <dt>returns Error for non-Readable in</dt>
         <dd><pre><code>swaggerSpecValidatorMock.expects(&#x27;validate&#x27;).never();
 swaggerSpecValidatorMock.expects(&#x27;validateFile&#x27;).never();
-swaggerSpecValidatorCmd(RUNTIME_ARGS, {in: {}}, (err) =&#x3E; {
+swaggerSpecValidatorCmd(RUNTIME_ARGS, { in: {} }, (err) =&#x3E; {
   assert.ok(err instanceof TypeError);
   assertMatch(err.message, /\boptions.in\b/);
   swaggerSpecValidatorMock.verify();
@@ -1010,7 +1039,7 @@ swaggerSpecValidatorMock.expects(&#x27;validate&#x27;).once()
   .withArgs(
     options.in,
     match.object,
-    match.func
+    match.func,
   );
 const result = swaggerSpecValidatorCmd(RUNTIME_ARGS, options);
 assert(result instanceof Promise);
@@ -1021,7 +1050,7 @@ const validate = swaggerSpecValidatorMock.expects(&#x27;validate&#x27;).once()
   .withArgs(
     options.in,
     match.object,
-    match.func
+    match.func,
   );
 const result = swaggerSpecValidatorCmd(RUNTIME_ARGS, options);
 validate.yield(null, {});
@@ -1035,7 +1064,7 @@ const validate = swaggerSpecValidatorMock.expects(&#x27;validate&#x27;).once()
   .withArgs(
     options.in,
     match.object,
-    match.func
+    match.func,
   );
 const result = swaggerSpecValidatorCmd(RUNTIME_ARGS, options);
 const testErr = new Error(&#x27;test&#x27;);
@@ -1053,7 +1082,7 @@ return swaggerSpecValidatorCmd(true, options)
     (err) =&#x3E; {
       assert.ok(err instanceof Error);
       swaggerSpecValidatorMock.verify();
-    }
+    },
   );</code></pre></dd>
       </dl>
     </section>
@@ -1067,155 +1096,160 @@ return swaggerSpecValidatorCmd(true, options)
             <dd><pre><code>const testBody = &#x27;swagger&#x27;;
 const response = {};
 const ne = nock(defaultProtoHost)
-  .post(defaultUrl.path, testBody)
+  .post(defaultUrlPath, testBody)
   .reply(200, response);
 return swaggerSpecValidator.validate(testBody)
   .then((result) =&#x3E; {
-    assert.deepEqual(result, response);
+    assert.deepStrictEqual(result, response);
     ne.done();
   });</code></pre></dd>
-            <dt>POSTs to URL from caller options</dt>
+            <dt>POSTs to string in options.url</dt>
             <dd><pre><code>const testProtoHost = &#x27;http://example.com&#x27;;
 const testPath = &#x27;/foo/bar?baz=quux&#x27;;
 const response = {};
 const ne = nock(testProtoHost)
   .post(testPath)
   .reply(200, response);
-const options = {request: url.parse(testProtoHost + testPath)};
+const options = { url: testProtoHost + testPath };
 return swaggerSpecValidator.validate(&#x27;swagger&#x27;, options)
   .then((result) =&#x3E; {
-    assert.deepEqual(result, response);
+    assert.deepStrictEqual(result, response);
     ne.done();
   });</code></pre></dd>
-            <dt>POSTs to URL path from caller options with default host</dt>
+            <dt>POSTs to URL in options.url</dt>
+            <dd><pre><code>const testProtoHost = &#x27;http://example.com&#x27;;
+const testPath = &#x27;/foo/bar?baz=quux&#x27;;
+const response = {};
+const ne = nock(testProtoHost)
+  .post(testPath)
+  .reply(200, response);
+const options = { url: new URL(testProtoHost + testPath) };
+return swaggerSpecValidator.validate(&#x27;swagger&#x27;, options)
+  .then((result) =&#x3E; {
+    assert.deepStrictEqual(result, response);
+    ne.done();
+  });</code></pre></dd>
+            <dt>POSTs to url.parse in options.url</dt>
+            <dd><pre><code>const testProtoHost = &#x27;http://example.com&#x27;;
+const testPath = &#x27;/foo/bar?baz=quux&#x27;;
+const response = {};
+const ne = nock(testProtoHost)
+  .post(testPath)
+  .reply(200, response);
+// eslint-disable-next-line node/no-deprecated-api
+const options = { url: url.parse(testProtoHost + testPath) };
+return swaggerSpecValidator.validate(&#x27;swagger&#x27;, options)
+  .then((result) =&#x3E; {
+    assert.deepStrictEqual(result, response);
+    ne.done();
+  });</code></pre></dd>
+            <dt>POSTs to url.parse in request options</dt>
+            <dd><pre><code>const testProtoHost = &#x27;http://example.com&#x27;;
+const testPath = &#x27;/foo/bar?baz=quux&#x27;;
+const response = {};
+const ne = nock(testProtoHost)
+  .post(testPath)
+  .reply(200, response);
+// eslint-disable-next-line node/no-deprecated-api
+const options = { request: url.parse(testProtoHost + testPath) };
+return swaggerSpecValidator.validate(&#x27;swagger&#x27;, options)
+  .then((result) =&#x3E; {
+    assert.deepStrictEqual(result, response);
+    ne.done();
+  });</code></pre></dd>
+            <dt>path in request options overrides path in options.url</dt>
+            <dd><pre><code>const testProtoHost = &#x27;http://example.com&#x27;;
+const testPath1 = &#x27;/foo/bar?baz=quux&#x27;;
+const testPath2 = &#x27;/foo2/bar2?baz2=quux2&#x27;;
+const response = {};
+const ne = nock(testProtoHost)
+  .post(testPath2)
+  .reply(200, response);
+const options = {
+  request: { path: testPath2 },
+  url: testProtoHost + testPath1,
+};
+return swaggerSpecValidator.validate(&#x27;swagger&#x27;, options)
+  .then((result) =&#x3E; {
+    assert.deepStrictEqual(result, response);
+    ne.done();
+  });</code></pre></dd>
+            <dt>POSTs to URL path in request options with default host</dt>
             <dd><pre><code>const testPath = &#x27;/foo/bar?baz=quux&#x27;;
 const response = {};
 const ne = nock(defaultProtoHost)
   .post(testPath)
   .reply(200, response);
-const options = {request: {path: testPath}};
+const options = { request: { path: testPath } };
 return swaggerSpecValidator.validate(&#x27;swagger&#x27;, options)
   .then((result) =&#x3E; {
-    assert.deepEqual(result, response);
-    ne.done();
-  });</code></pre></dd>
-            <dt>POSTs to http://online.swagger.io from caller options</dt>
-            <dd><pre><code>const testProtoHost = &#x27;http://online.swagger.io&#x27;;
-const testPath = &#x27;/validator/debug&#x27;;
-const response = {};
-const ne = nock(testProtoHost)
-  .post(testPath)
-  .reply(function(uri, requestBody) {
-    // FIXME: This test doesn&#x27;t work because this.req is
-    // OverriddenClientRequest which doesn&#x27;t have a copy of agent.
-    // Currently also tested in integration.js as a workaround.
-    assert.notStrictEqual(
-      this.req.agent,
-      /* eslint-disable no-underscore-dangle */
-      swaggerSpecValidator._getSwaggerIoHttpsAgent()
-    );
-    return [200, response];
-  });
-const options = {request: url.parse(testProtoHost + testPath)};
-return swaggerSpecValidator.validate(&#x27;swagger&#x27;, options)
-  .then((result) =&#x3E; {
-    assert.deepEqual(result, response);
+    assert.deepStrictEqual(result, response);
     ne.done();
   });</code></pre></dd>
             <dt>sends Accept: application/json by default</dt>
             <dd><pre><code>const response = {};
 const ne = nock(defaultProtoHost)
   .matchHeader(&#x27;Accept&#x27;, &#x27;application/json&#x27;)
-  .post(defaultUrl.path)
+  .post(defaultUrlPath)
   .reply(200, response);
 return swaggerSpecValidator.validate(&#x27;swagger&#x27;)
   .then((result) =&#x3E; {
-    assert.deepEqual(result, response);
+    assert.deepStrictEqual(result, response);
     ne.done();
   });</code></pre></dd>
             <dt>sends User-Agent with package version by default</dt>
             <dd><pre><code>const uaRE = new RegExp(
-  &#x60;^${regexpEscape(&#x60;${packageJson.name}/${packageJson.version}&#x60;)}&#x60;
+  &#x60;^${regexpEscape(&#x60;${packageJson.name}/${packageJson.version}&#x60;)}&#x60;,
 );
 const response = {};
 const ne = nock(defaultProtoHost)
   .matchHeader(&#x27;User-Agent&#x27;, uaRE)
-  .post(defaultUrl.path)
+  .post(defaultUrlPath)
   .reply(200, response);
 return swaggerSpecValidator.validate(&#x27;swagger&#x27;)
   .then((result) =&#x3E; {
-    assert.deepEqual(result, response);
+    assert.deepStrictEqual(result, response);
     ne.done();
   });</code></pre></dd>
             <dt>can override default headers</dt>
             <dd><pre><code>const uaRE = new RegExp(
-  &#x60;^${regexpEscape(&#x60;${packageJson.name}/${packageJson.version}&#x60;)}&#x60;
+  &#x60;^${regexpEscape(&#x60;${packageJson.name}/${packageJson.version}&#x60;)}&#x60;,
 );
 const response = {};
 const ne = nock(defaultProtoHost)
   .matchHeader(&#x27;Accept&#x27;, &#x27;text/plain&#x27;)
   .matchHeader(&#x27;User-Agent&#x27;, uaRE)
-  .post(defaultUrl.path)
+  .post(defaultUrlPath)
   .reply(200, response);
-const options = {request: {headers: {Accept: &#x27;text/plain&#x27;}}};
+const options = { request: { headers: { Accept: &#x27;text/plain&#x27; } } };
 return swaggerSpecValidator.validate(&#x27;swagger&#x27;, options)
   .then((result) =&#x3E; {
-    assert.deepEqual(result, response);
+    assert.deepStrictEqual(result, response);
     ne.done();
   });</code></pre></dd>
             <dt>can override default headers case-insensitively</dt>
             <dd><pre><code>const uaRE = new RegExp(
-  &#x60;^${regexpEscape(&#x60;${packageJson.name}/${packageJson.version}&#x60;)}&#x60;
+  &#x60;^${regexpEscape(&#x60;${packageJson.name}/${packageJson.version}&#x60;)}&#x60;,
 );
 const response = {};
 const ne = nock(defaultProtoHost)
   .matchHeader(&#x27;Accept&#x27;, &#x27;text/plain&#x27;)
   .matchHeader(&#x27;User-Agent&#x27;, uaRE)
-  .post(defaultUrl.path)
+  .post(defaultUrlPath)
   .reply(200, response);
-const options = {request: {headers: {accept: &#x27;text/plain&#x27;}}};
+const options = { request: { headers: { accept: &#x27;text/plain&#x27; } } };
 return swaggerSpecValidator.validate(&#x27;swagger&#x27;, options)
   .then((result) =&#x3E; {
-    assert.deepEqual(result, response);
+    assert.deepStrictEqual(result, response);
     ne.done();
   });</code></pre></dd>
-            <dt>returns Error loading Agent</dt>
-            <dd><pre><code>const testStatusCode = 200;
-const testResponse = {};
-const ne = nock(defaultProtoHost)
-  .post(defaultUrl.path)
-  .optionally()
-  .reply(testStatusCode, testResponse);
-const errTest = new Error(&#x27;test error&#x27;);
-function getTestError() {
-  return Promise.reject(errTest);
-}
-/* eslint-disable no-underscore-dangle */
-const getSwaggerIoHttpsAgent
-  = swaggerSpecValidator._getSwaggerIoHttpsAgent;
-let result;
-try {
-  swaggerSpecValidator._getSwaggerIoHttpsAgent = getTestError;
-  result = swaggerSpecValidator.validate(&#x27;swagger&#x27;)
-    .then(
-      neverCalled,
-      (err) =&#x3E; {
-        assert.strictEqual(err, errTest);
-        ne.done();
-      }
-    );
-} finally {
-  swaggerSpecValidator._getSwaggerIoHttpsAgent = getSwaggerIoHttpsAgent;
-}
-/* eslint-enable no-underscore-dangle */
-return result;</code></pre></dd>
             <dt>returns Error for invalid JSON body</dt>
             <dd><pre><code>const testStatusCode = 200;
 const testResponse = &#x27;{&#x22;bad&#x22;: &#x22;json&#x22;&#x27;;
 const testType = &#x27;application/json&#x27;;
 const ne = nock(defaultProtoHost)
-  .post(defaultUrl.path)
-  .reply(testStatusCode, testResponse, {&#x27;Content-Type&#x27;: testType});
+  .post(defaultUrlPath)
+  .reply(testStatusCode, testResponse, { &#x27;Content-Type&#x27;: testType });
 return swaggerSpecValidator.validate(&#x27;swagger&#x27;)
   .then(
     neverCalled,
@@ -1224,32 +1258,32 @@ return swaggerSpecValidator.validate(&#x27;swagger&#x27;)
       assert.strictEqual(err.headers[&#x27;content-type&#x27;], testType);
       assert.strictEqual(String(err.body), testResponse);
       ne.done();
-    }
+    },
   );</code></pre></dd>
             <dt>returns Error with JSON body for 4XX/5XX response</dt>
-            <dd><pre><code>const response = {message: &#x27;test&#x27;};
+            <dd><pre><code>const response = { message: &#x27;test&#x27; };
 const testStatusCode = 400;
 const testType = &#x27;application/json&#x27;;
 const ne = nock(defaultProtoHost)
-  .post(defaultUrl.path)
-  .reply(testStatusCode, response, {&#x27;Content-Type&#x27;: testType});
+  .post(defaultUrlPath)
+  .reply(testStatusCode, response, { &#x27;Content-Type&#x27;: testType });
 return swaggerSpecValidator.validate(&#x27;swagger&#x27;)
   .then(
     neverCalled,
     (err) =&#x3E; {
       assert.strictEqual(err.statusCode, testStatusCode);
       assert.strictEqual(err.headers[&#x27;content-type&#x27;], testType);
-      assert.deepEqual(err.body, response);
+      assert.deepStrictEqual(err.body, response);
       ne.done();
-    }
+    },
   );</code></pre></dd>
             <dt>returns Error with non-JSON body for 4XX/5XX response</dt>
             <dd><pre><code>const response = &#x27;test message&#x27;;
 const testStatusCode = 500;
 const testType = &#x27;text/plain&#x27;;
 const ne = nock(defaultProtoHost)
-  .post(defaultUrl.path)
-  .reply(testStatusCode, response, {&#x27;Content-Type&#x27;: testType});
+  .post(defaultUrlPath)
+  .reply(testStatusCode, response, { &#x27;Content-Type&#x27;: testType });
 return swaggerSpecValidator.validate(&#x27;swagger&#x27;)
   .then(
     neverCalled,
@@ -1258,37 +1292,38 @@ return swaggerSpecValidator.validate(&#x27;swagger&#x27;)
       assert.strictEqual(err.headers[&#x27;content-type&#x27;], testType);
       assert.strictEqual(String(err.body), response);
       ne.done();
-    }
+    },
   );</code></pre></dd>
-            <dt>returns Error for unsupported protocol</dt>
-            <dd><pre><code>const options = {request: url.parse(&#x27;ftp://example.com&#x27;)};
+            <dt>returns Error for unsupported protocol in request options</dt>
+            <dd><pre><code>// eslint-disable-next-line node/no-deprecated-api
+const options = { request: url.parse(&#x27;ftp://example.com&#x27;) };
 return swaggerSpecValidator.validateFile(swaggerJsonPath, options)
   .then(
     neverCalled,
     (err) =&#x3E; {
       assert.ok(/ftp/.test(err.message));
-    }
+    },
   );</code></pre></dd>
             <dt>returns validator JSON with errors</dt>
             <dd><pre><code>const testBody = &#x27;swagger&#x27;;
-const response = {messages: [&#x27;test1&#x27;, &#x27;test2&#x27;]};
+const response = { messages: [&#x27;test1&#x27;, &#x27;test2&#x27;] };
 const ne = nock(defaultProtoHost)
-  .post(defaultUrl.path, testBody)
+  .post(defaultUrlPath, testBody)
   .reply(200, response);
 return swaggerSpecValidator.validate(testBody)
   .then((result) =&#x3E; {
-    assert.deepEqual(result, response);
+    assert.deepStrictEqual(result, response);
     ne.done();
   });</code></pre></dd>
             <dt>can be called with callback without options</dt>
             <dd><pre><code>const testBody = &#x27;swagger&#x27;;
 const testResponse = {};
 const ne = nock(defaultProtoHost)
-  .post(defaultUrl.path, testBody)
+  .post(defaultUrlPath, testBody)
   .reply(200, testResponse);
 swaggerSpecValidator.validate(testBody, (err, result) =&#x3E; {
   assert.ifError(err);
-  assert.deepEqual(result, testResponse);
+  assert.deepStrictEqual(result, testResponse);
   ne.done();
   done();
 });</code></pre></dd>
@@ -1299,17 +1334,30 @@ assert.throws(
     swaggerSpecValidator.validate(testBody, {}, true);
   },
   TypeError,
-  /\bcallback\b/
+  /\bcallback\b/,
 );</code></pre></dd>
             <dt>accepts spec as Buffer</dt>
             <dd><pre><code>const testBody = &#x27;swagger&#x27;;
 const response = {};
 const ne = nock(defaultProtoHost)
-  .post(defaultUrl.path, testBody)
+  .post(defaultUrlPath, testBody)
   .reply(200, response);
 return swaggerSpecValidator.validate(Buffer.from(testBody))
   .then((result) =&#x3E; {
-    assert.deepEqual(result, response);
+    assert.deepStrictEqual(result, response);
+    ne.done();
+  });</code></pre></dd>
+            <dt>accepts spec as Uint8Array</dt>
+            <dd><pre><code>const testBody = &#x27;swagger&#x27;;
+const response = {};
+const ne = nock(defaultProtoHost)
+  .post(defaultUrlPath, testBody)
+  .reply(200, response);
+return swaggerSpecValidator.validate(
+  new Uint8Array(Buffer.from(testBody)),
+)
+  .then((result) =&#x3E; {
+    assert.deepStrictEqual(result, response);
     ne.done();
   });</code></pre></dd>
             <dt>Error for non-string, non-Buffer, non-Readable spec</dt>
@@ -1319,7 +1367,7 @@ return swaggerSpecValidator.validate(Buffer.from(testBody))
           (err) =&#x3E; {
             assert.ok(err instanceof TypeError);
             assert.ok(/\bspec\b/.test(err.message));
-          }
+          },
         )</code></pre></dd>
             <dt>Error for non-object options</dt>
             <dd><pre><code>const testBody = &#x27;swagger&#x27;;
@@ -1329,7 +1377,18 @@ return swaggerSpecValidator.validate(testBody, true)
     (err) =&#x3E; {
       assert.ok(err instanceof TypeError);
       assert.ok(/\boptions\b/.test(err.message));
-    }
+    },
+  );</code></pre></dd>
+            <dt>Error for non-Writable options.err</dt>
+            <dd><pre><code>const testBody = &#x27;swagger&#x27;;
+const options = { err: new stream.Readable() };
+return swaggerSpecValidator.validate(testBody, options)
+  .then(
+    neverCalled,
+    (err) =&#x3E; {
+      assert.ok(err instanceof TypeError);
+      assert.ok(/\boptions\.err\b/.test(err.message));
+    },
   );</code></pre></dd>
           </dl>
         </section>
@@ -1339,44 +1398,114 @@ return swaggerSpecValidator.validate(testBody, true)
             <dt>POSTs to DEFAULT_URL by default</dt>
             <dd><pre><code>const response = {};
 const ne = nock(defaultProtoHost)
-  .post(defaultUrl.path)
+  .post(defaultUrlPath)
   .reply(200, response);
 return swaggerSpecValidator.validateFile(swaggerJsonPath)
   .then((result) =&#x3E; {
-    assert.deepEqual(result, response);
+    assert.deepStrictEqual(result, response);
     ne.done();
   });</code></pre></dd>
             <dt>adds Content-Type: application/json for .json files</dt>
             <dd><pre><code>const response = {};
 const ne = nock(defaultProtoHost)
   .matchHeader(&#x27;Content-Type&#x27;, &#x27;application/json&#x27;)
-  .post(defaultUrl.path)
+  .post(defaultUrlPath)
   .reply(200, response);
 return swaggerSpecValidator.validateFile(swaggerJsonPath)
   .then((result) =&#x3E; {
-    assert.deepEqual(result, response);
+    assert.deepStrictEqual(result, response);
     ne.done();
   });</code></pre></dd>
-            <dt>adds Content-Type: text/x-yaml for .yaml files</dt>
+            <dt>adds Content-Type: application/yaml .yaml files</dt>
             <dd><pre><code>const response = {};
 const ne = nock(defaultProtoHost)
-  .matchHeader(&#x27;Content-Type&#x27;, &#x27;text/x-yaml&#x27;)
-  .post(defaultUrl.path)
+  .matchHeader(&#x27;Content-Type&#x27;, &#x27;application/yaml&#x27;)
+  .post(defaultUrlPath)
   .reply(200, response);
 return swaggerSpecValidator.validateFile(swaggerYamlPath)
   .then((result) =&#x3E; {
-    assert.deepEqual(result, response);
+    assert.deepStrictEqual(result, response);
     ne.done();
   });</code></pre></dd>
-            <dt>doesn&#x27;t add Content-Type for other extensions</dt>
+            <dt>adds Content-Type: application/json for non-.json JSON files</dt>
             <dd><pre><code>const response = {};
 const ne = nock(defaultProtoHost)
-  .matchHeader(&#x27;Content-Type&#x27;, (val) =&#x3E; val === undefined)
-  .post(defaultUrl.path)
+  .matchHeader(&#x27;Content-Type&#x27;, &#x27;application/json&#x27;)
+  .post(defaultUrlPath)
+  .reply(200, response);
+return swaggerSpecValidator.validateFile(swaggerJsonPath.slice(0, -3))
+  .then((result) =&#x3E; {
+    assert.deepStrictEqual(result, response);
+    ne.done();
+  });</code></pre></dd>
+            <dt>adds Content-Type: application/yaml for non-.yaml YAML files</dt>
+            <dd><pre><code>const response = {};
+const ne = nock(defaultProtoHost)
+  .matchHeader(&#x27;Content-Type&#x27;, &#x27;application/yaml&#x27;)
+  .post(defaultUrlPath)
+  .reply(200, response);
+return swaggerSpecValidator.validateFile(swaggerYamlPath.slice(0, -3))
+  .then((result) =&#x3E; {
+    assert.deepStrictEqual(result, response);
+    ne.done();
+  });</code></pre></dd>
+            <dt>adds Content-Type: application/yaml for non-JSON files</dt>
+            <dd><pre><code>const response = {};
+const ne = nock(defaultProtoHost)
+  .matchHeader(&#x27;Content-Type&#x27;, &#x27;application/yaml&#x27;)
+  .post(defaultUrlPath)
   .reply(200, response);
 return swaggerSpecValidator.validateFile(emptyPath)
   .then((result) =&#x3E; {
-    assert.deepEqual(result, response);
+    assert.deepStrictEqual(result, response);
+    ne.done();
+  });</code></pre></dd>
+            <dt>adds Content-Type: application/json for JSON content</dt>
+            <dd><pre><code>const response = {};
+const ne = nock(defaultProtoHost)
+  .matchHeader(&#x27;Content-Type&#x27;, &#x27;application/json&#x27;)
+  .post(defaultUrlPath)
+  .reply(200, response);
+return swaggerSpecValidator.validate(&#x27;{}&#x27;)
+  .then((result) =&#x3E; {
+    assert.deepStrictEqual(result, response);
+    ne.done();
+  });</code></pre></dd>
+            <dt>adds Content-Type: application/yaml for non-JSON content</dt>
+            <dd><pre><code>const response = {};
+const ne = nock(defaultProtoHost)
+  .matchHeader(&#x27;Content-Type&#x27;, &#x27;application/yaml&#x27;)
+  .post(defaultUrlPath)
+  .reply(200, response);
+return swaggerSpecValidator.validate(&#x27;swagger: &#x22;2.0&#x22;&#x27;)
+  .then((result) =&#x3E; {
+    assert.deepStrictEqual(result, response);
+    ne.done();
+  });</code></pre></dd>
+            <dt>adds Content-Type: application/json for JSON stream</dt>
+            <dd><pre><code>const spec = new stream.PassThrough();
+spec.end(&#x27;{}&#x27;);
+const response = {};
+const ne = nock(defaultProtoHost)
+  .matchHeader(&#x27;Content-Type&#x27;, &#x27;application/json&#x27;)
+  .post(defaultUrlPath)
+  .reply(200, response);
+return swaggerSpecValidator.validate(spec)
+  .then((result) =&#x3E; {
+    assert.deepStrictEqual(result, response);
+    ne.done();
+  });</code></pre></dd>
+            <dt>adds Content-Type: application/yaml for non-JSON stream</dt>
+            <dd><pre><code>const spec = new stream.PassThrough();
+spec.end(&#x27;swagger: &#x22;2.0&#x22;&#x27;);
+const response = {};
+const ne = nock(defaultProtoHost)
+  .matchHeader(&#x27;Content-Type&#x27;, &#x27;application/yaml&#x27;)
+  .post(defaultUrlPath)
+  .reply(200, response);
+return swaggerSpecValidator.validate(spec)
+  .then((result) =&#x3E; {
+    assert.deepStrictEqual(result, response);
     ne.done();
   });</code></pre></dd>
             <dt>does not change caller-provided Content-Type</dt>
@@ -1384,22 +1513,22 @@ return swaggerSpecValidator.validateFile(emptyPath)
 const testType = &#x27;text/plain&#x27;;
 const ne = nock(defaultProtoHost)
   .matchHeader(&#x27;Content-Type&#x27;, testType)
-  .post(defaultUrl.path)
+  .post(defaultUrlPath)
   .reply(200, response);
-const options = {request: {headers: {&#x27;content-type&#x27;: testType}}};
+const options = { request: { headers: { &#x27;content-type&#x27;: testType } } };
 return swaggerSpecValidator.validateFile(swaggerYamlPath, options)
   .then((result) =&#x3E; {
-    assert.deepEqual(result, response);
+    assert.deepStrictEqual(result, response);
     ne.done();
   });</code></pre></dd>
             <dt>can be called with callback without options</dt>
             <dd><pre><code>const response = {};
 const ne = nock(defaultProtoHost)
-  .post(defaultUrl.path)
+  .post(defaultUrlPath)
   .reply(200, response);
 swaggerSpecValidator.validateFile(swaggerYamlPath, (err, result) =&#x3E; {
   assert.ifError(err);
-  assert.deepEqual(result, response);
+  assert.deepStrictEqual(result, response);
   ne.done();
   done();
 });</code></pre></dd>
@@ -1407,7 +1536,7 @@ swaggerSpecValidator.validateFile(swaggerYamlPath, (err, result) =&#x3E; {
             <dd><pre><code>const testStatusCode = 200;
 const testResponse = {};
 const ne = nock(defaultProtoHost)
-  .post(defaultUrl.path)
+  .post(defaultUrlPath)
   .optionally()
   .reply(testStatusCode, testResponse);
 return swaggerSpecValidator.validateFile(&#x27;nonexistent.yaml&#x27;)
@@ -1416,62 +1545,8 @@ return swaggerSpecValidator.validateFile(&#x27;nonexistent.yaml&#x27;)
     (err) =&#x3E; {
       assert.strictEqual(err.code, &#x27;ENOENT&#x27;);
       ne.done();
-    }
+    },
   );</code></pre></dd>
-            <dt>returns Error for unreadable file while loading Agent</dt>
-            <dd><pre><code>const testStatusCode = 200;
-const testResponse = {};
-const ne = nock(defaultProtoHost)
-  .post(defaultUrl.path)
-  .optionally()
-  .reply(testStatusCode, testResponse);
-function waitForever() {
-  return new Promise(() =&#x3E; {});
-}
-/* eslint-disable no-underscore-dangle */
-const getSwaggerIoHttpsAgent
-  = swaggerSpecValidator._getSwaggerIoHttpsAgent;
-let result;
-try {
-  swaggerSpecValidator._getSwaggerIoHttpsAgent = waitForever;
-  result = swaggerSpecValidator.validateFile(&#x27;nonexistent.yaml&#x27;)
-    .then(
-      neverCalled,
-      (err) =&#x3E; {
-        assert.strictEqual(err.code, &#x27;ENOENT&#x27;);
-        ne.done();
-      }
-    );
-} finally {
-  swaggerSpecValidator._getSwaggerIoHttpsAgent = getSwaggerIoHttpsAgent;
-}
-/* eslint-enable no-underscore-dangle */
-return result;</code></pre></dd>
-            <dt>returns one Error for unreadable file and Agent</dt>
-            <dd><pre><code>const testStatusCode = 200;
-const testResponse = {};
-const ne = nock(defaultProtoHost)
-  .post(defaultUrl.path)
-  .optionally()
-  .reply(testStatusCode, testResponse);
-const errTest = new Error(&#x27;test error&#x27;);
-function getTestError() {
-  return Promise.reject(errTest);
-}
-/* eslint-disable no-underscore-dangle */
-const getSwaggerIoHttpsAgent
-  = swaggerSpecValidator._getSwaggerIoHttpsAgent;
-try {
-  swaggerSpecValidator._getSwaggerIoHttpsAgent = getTestError;
-  swaggerSpecValidator.validateFile(&#x27;nonexistent.yaml&#x27;, (err) =&#x3E; {
-    assert(err === errTest || err.code === &#x27;ENOENT&#x27;);
-    ne.done();
-    done();
-  });
-} finally {
-  swaggerSpecValidator._getSwaggerIoHttpsAgent = getSwaggerIoHttpsAgent;
-}
-/* eslint-enable no-underscore-dangle */</code></pre></dd>
           </dl>
         </section>
       </dl>

@@ -43,21 +43,16 @@
 
 
     <section>
-        <article><h1>OpenAPI/Swagger Specification Validator</h1><p><a href="https://travis-ci.org/kevinoid/swagger-spec-validator"><img src="https://img.shields.io/travis/kevinoid/swagger-spec-validator/master.svg?style=flat&amp;label=build+on+linux" alt="Build Status: Linux"></a>
+        <article><h1>OpenAPI/Swagger Specification Validator</h1>
+<p><a href="https://travis-ci.org/kevinoid/swagger-spec-validator"><img src="https://img.shields.io/travis/kevinoid/swagger-spec-validator/master.svg?style=flat&amp;label=build+on+linux" alt="Build Status: Linux"></a>
 <a href="https://ci.appveyor.com/project/kevinoid/swagger-spec-validator"><img src="https://img.shields.io/appveyor/ci/kevinoid/swagger-spec-validator/master.svg?style=flat&amp;label=build+on+windows" alt="Build Status: Windows"></a>
 <a href="https://codecov.io/github/kevinoid/swagger-spec-validator?branch=master"><img src="https://img.shields.io/codecov/c/github/kevinoid/swagger-spec-validator.svg?style=flat" alt="Coverage"></a>
 <a href="https://david-dm.org/kevinoid/swagger-spec-validator"><img src="https://img.shields.io/david/kevinoid/swagger-spec-validator.svg?style=flat" alt="Dependency Status"></a>
 <a href="https://www.npmjs.com/package/swagger-spec-validator"><img src="https://img.shields.io/node/v/swagger-spec-validator.svg?style=flat" alt="Supported Node Version"></a>
 <a href="https://www.npmjs.com/package/swagger-spec-validator"><img src="https://img.shields.io/npm/v/swagger-spec-validator.svg?style=flat" alt="Version on NPM"></a></p>
-<p>Validate an OpenAPI/Swagger API specification against the <a href="https://github.com/OAI/OpenAPI-Specification">OpenAPI
+<p>Validate an OpenAPI/Swagger v2 or v3 API specification against the <a href="https://github.com/OAI/OpenAPI-Specification">OpenAPI
 Specification</a> using the
-<a href="https://github.com/swagger-api/validator-badge">swagger.io online validator</a>.
-Currently only <a href="https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md">OpenAPI
-2.0</a>
-is supported.  Support for <a href="https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.0.md">OpenAPI
-3.0</a>
-is under development (see
-<a href="https://github.com/swagger-api/validator-badge/issues/115">swagger-api/validator-badge#115</a>).</p>
+<a href="https://github.com/swagger-api/validator-badge">swagger.io online validator</a>.</p>
 <p>The validation performed by this module differs from the validation performed
 by <a href="https://github.com/BigstickCarpet/swagger-cli">swagger-cli</a>.
 <code>swagger-cli</code> uses
@@ -67,9 +62,12 @@ offline.  This module relies on the validator hosted at swagger.io which uses
 Java-based parser and validator implementations.  Therefore, it requires
 Internet access to use and requires significantly less code to be installed as
 a result.</p>
-<h2>Introductory Example</h2><p>To use <code>swagger-spec-validator</code> from the command line, simply invoke it with
+<h2>Introductory Example</h2>
+<p>To use <code>swagger-spec-validator</code> from the command line, simply invoke it with
 the specification files to validate as arguments:</p>
-<pre class="prettyprint source lang-sh"><code>$ swagger-spec-validator swagger.yaml</code></pre><p>If no arguments are given, the specification will be read from <code>stdin</code>.</p>
+<pre class="prettyprint source lang-sh"><code>$ swagger-spec-validator swagger.yaml
+</code></pre>
+<p>If no arguments are given, the specification will be read from <code>stdin</code>.</p>
 <p><code>swagger-spec-validator</code> can be used as a library as follows:</p>
 <pre class="prettyprint source lang-js"><code>const swaggerSpecValidator = require('swagger-spec-validator');
 swaggerSpecValidator.validateFile('swagger.yaml')
@@ -80,20 +78,29 @@ swaggerSpecValidator.validateFile('swagger.yaml')
       console.log('Valid!');
     }
   })
-  .catch(err => console.error('Unable to validate: ' + err));</code></pre><h2>Installation</h2><p><a href="https://www.npmjs.com/package/swagger-spec-validator">This package</a> can be
+  .catch(err => console.error('Unable to validate: ' + err));
+</code></pre>
+<h2>Installation</h2>
+<p><a href="https://www.npmjs.com/package/swagger-spec-validator">This package</a> can be
 installed using <a href="https://www.npmjs.com/">npm</a>, either globally or locally, by
 running:</p>
-<pre class="prettyprint source lang-sh"><code>npm install swagger-spec-validator</code></pre><h2>Recipes</h2><p>More examples can be found in the <a href="https://kevinoid.github.io/swagger-spec-validator/spec">test
+<pre class="prettyprint source lang-sh"><code>npm install swagger-spec-validator
+</code></pre>
+<h2>Recipes</h2>
+<p>More examples can be found in the <a href="https://kevinoid.github.io/swagger-spec-validator/spec">test
 specifications</a>.</p>
-<h2>API Docs</h2><p>To use this module as a library, see the <a href="https://kevinoid.github.io/swagger-spec-validator/api">API
+<h2>API Docs</h2>
+<p>To use this module as a library, see the <a href="https://kevinoid.github.io/swagger-spec-validator/api">API
 Documentation</a>.</p>
-<h2>Contributing</h2><p>Contributions are welcome and very much appreciated!  Please add tests to
+<h2>Contributing</h2>
+<p>Contributions are welcome and very much appreciated!  Please add tests to
 cover any changes and ensure <code>npm test</code> passes.</p>
 <p>If the desired change is large, complex, backwards-incompatible, can have
 significantly differing implementations, or may not be in scope for this
 project, opening an issue before writing the code can avoid frustration and
 save a lot of time and effort.</p>
-<h2>License</h2><p>This package is available under the terms of the
+<h2>License</h2>
+<p>This package is available under the terms of the
 <a href="https://opensource.org/licenses/MIT">MIT License</a>.</p></article>
     </section>
 
@@ -105,13 +112,13 @@ save a lot of time and effort.</p>
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-swagger-spec-validator.html">swagger-spec-validator</a></li><li><a href="module-swagger-spec-validator_bin_swagger-spec-validator.html">swagger-spec-validator/bin/swagger-spec-validator</a></li></ul><h3><a href="global.html">Global</a></h3>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-swagger-spec-validator.html">swagger-spec-validator</a></li><li><a href="module-swagger-spec-validator_bin_swagger-spec-validator.html">swagger-spec-validator/bin/swagger-spec-validator</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu Jan 24 2019 18:13:06 GMT-0700 (MST)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Sun Nov 03 2019 16:11:42 GMT-0700 (Mountain Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>

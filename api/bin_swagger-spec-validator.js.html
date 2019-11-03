@@ -30,15 +30,13 @@
 /**
  * swagger-spec-validator executable command.
  *
- * @copyright Copyright 2017 Kevin Locke &lt;kevin@kevinlocke.name>
+ * @copyright Copyright 2017-2019 Kevin Locke &lt;kevin@kevinlocke.name>
  * @license MIT
  */
 
 'use strict';
 
 const Yargs = require('yargs/yargs');
-const assign = require('object-assign');
-const url = require('url');
 
 const packageJson = require('../package.json');
 const swaggerSpecValidator = require('..');
@@ -68,30 +66,6 @@ function parseHeaders(lines) {
     }, {});
 }
 
-/** Calls &lt;code>yargs.parse&lt;/code> and passes any thrown errors to the callback.
- * Workaround for https://github.com/yargs/yargs/issues/755
- * @private
- */
-function parseYargs(yargs, args, callback) {
-  // Since yargs doesn't nextTick its callback, this function must be careful
-  // that exceptions thrown from callback (which propagate through yargs.parse)
-  // are not caught and passed to a second invocation of callback.
-  let called = false;
-  try {
-    yargs.parse(args, function(...cbargs) {
-      called = true;
-      return callback.apply(this, cbargs);
-    });
-  } catch (err) {
-    if (called) {
-      // err was thrown after or by callback.  Let it propagate.
-      throw err;
-    } else {
-      callback(err);
-    }
-  }
-}
-
 /** Gets validation messages from a validation response object.
  * @private
  */
@@ -102,7 +76,7 @@ function getMessages(result) {
   }
   if (result.schemaValidationMessages) {
     messages = messages.concat(
-      result.schemaValidationMessages.map((m) => `${m.level}: ${m.message}`)
+      result.schemaValidationMessages.map((m) => `${m.level}: ${m.message}`),
     );
   }
   return messages;
@@ -127,8 +101,8 @@ function validateAll(specPaths, options, callback) {
         if (messages.length > 0) {
           hadInvalid = true;
           if (options.verbosity >= 0) {
-            const messagesWithPath
-              = messages.map((message) => `${specPath}: ${message}`);
+            const messagesWithPath =
+              messages.map((message) => `${specPath}: ${message}`);
             options.out.write(`${messagesWithPath.join('\n')}\n`);
           }
         }
@@ -212,14 +186,12 @@ function swaggerSpecValidatorCmd(args, options, callback) {
       throw new TypeError('options must be an object');
     }
 
-    options = Object.assign(
-      {
-        in: process.stdin,
-        out: process.stdout,
-        err: process.stderr
-      },
-      options
-    );
+    options = {
+      in: process.stdin,
+      out: process.stdout,
+      err: process.stderr,
+      ...options,
+    };
 
     if (!options.in || typeof options.in.on !== 'function') {
       throw new TypeError('options.in must be a stream.Readable');
@@ -238,8 +210,14 @@ function swaggerSpecValidatorCmd(args, options, callback) {
   }
 
   // Workaround for https://github.com/yargs/yargs/issues/783
+  // Necessary because mocha package.json overrides .parserConfiguration()
   require.main = module;
   const yargs = new Yargs(null, null, require)
+    .parserConfiguration({
+      'parse-numbers': false,
+      'duplicate-arguments-array': false,
+      'flatten-duplicate-arrays': false,
+    })
     .usage('Usage: $0 [options] [swagger.yaml...]')
     .option('header', {
       alias: 'H',
@@ -248,7 +226,7 @@ function swaggerSpecValidatorCmd(args, options, callback) {
       array: true,
       // Prevent array from eating non-option arguments
       nargs: 1,
-      coerce: parseHeaders
+      coerce: parseHeaders,
     })
     .help()
     .alias('help', 'h')
@@ -256,23 +234,23 @@ function swaggerSpecValidatorCmd(args, options, callback) {
     .option('quiet', {
       alias: 'q',
       describe: 'Print less output',
-      count: true
+      count: true,
     })
     .option('url', {
       alias: 'u',
       describe: 'Validator URL',
       defaultDescription: swaggerSpecValidator.DEFAULT_URL,
-      nargs: 1
+      nargs: 1,
     })
     .option('verbose', {
       alias: 'v',
       describe: 'Print more output',
-      count: true
+      count: true,
     })
     .version(`${packageJson.name} ${packageJson.version}`)
     .alias('version', 'V')
     .strict();
-  parseYargs(yargs, args, (err, argOpts, output) => {
+  yargs.parse(args, (err, argOpts, output) => {
     if (err) {
       if (output) {
         options.err.write(`${output}\n`);
@@ -305,11 +283,12 @@ function swaggerSpecValidatorCmd(args, options, callback) {
       specPaths = [...new Set(specPaths)];
     }
 
-    const validateOpts = assign({}, options);
-    validateOpts.request = argOpts.url ? url.parse(argOpts.url) : {};
-    validateOpts.request.headers = argOpts.header;
-    validateOpts.verbosity = verbosity;
-
+    const validateOpts = {
+      ...options,
+      request: argOpts.header ? { headers: argOpts.header } : null,
+      url: argOpts.url,
+      verbosity,
+    };
     validateAll(specPaths, validateOpts, callback);
   });
 
@@ -325,7 +304,7 @@ if (require.main === module) {
   const mainOptions = {
     in: process.stdin,
     out: process.stdout,
-    err: process.stderr
+    err: process.stderr,
   };
   swaggerSpecValidatorCmd(process.argv, mainOptions, (err, exitCode) => {
     if (err) {
@@ -349,13 +328,13 @@ if (require.main === module) {
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-swagger-spec-validator.html">swagger-spec-validator</a></li><li><a href="module-swagger-spec-validator_bin_swagger-spec-validator.html">swagger-spec-validator/bin/swagger-spec-validator</a></li></ul><h3><a href="global.html">Global</a></h3>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-swagger-spec-validator.html">swagger-spec-validator</a></li><li><a href="module-swagger-spec-validator_bin_swagger-spec-validator.html">swagger-spec-validator/bin/swagger-spec-validator</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu Jan 24 2019 18:13:06 GMT-0700 (MST)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Sun Nov 03 2019 16:11:42 GMT-0700 (Mountain Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>

@@ -1,5 +1,25 @@
 # Change Log
 
+## [v4.0.0](https://github.com/kevinoid/swagger-spec-validator/tree/v4.0.0) (2019-11-03)
+[Full Changelog](https://github.com/kevinoid/swagger-spec-validator/compare/v3.0.1...v4.0.0)
+
+- **BREAKING** Drop support for Node &lt; 8.3.
+- Default to https://validator.swagger.io instead of https://online.swagger.io
+  which is newer and described in the swagger-api/validator-badge README and
+  **supports OpenAPI Specification v3**.
+- The `Content-Type` header is now sent on every request (since it is now
+  required by `validator.swagger.io` and `online.swagger.io`).  It is
+  determined from caller (or command-line) options, or file extension, or file
+  content (which requires buffering the document before sending), in that order.
+- Specification data may now be passed as `Uint8Array` in addition to
+  `string`, `Buffer`, and `stream.Readable` types.
+- New `url` option which allows specifying the validator URL separately from
+  any request options and (optionally) as a `URL` object.
+- Remove HTTPS workarounds for https://online.swagger.io which are no longer
+  necessary (see swagger-api/validator-badge#98).
+- Replace `pify` dependency with `util.promisify`.
+- Dependency version updates.
+
 ## [v3.0.1](https://github.com/kevinoid/swagger-spec-validator/tree/v3.0.1) (2019-01-24)
 [Full Changelog](https://github.com/kevinoid/swagger-spec-validator/compare/v3.0.0...v3.0.1)
 

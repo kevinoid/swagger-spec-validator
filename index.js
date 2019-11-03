@@ -8,8 +8,6 @@
 const fs = require('fs');
 const http = require('http');
 const https = require('https');
-const path = require('path');
-const tls = require('tls');
 // TODO [engine:node@>=10]: Use URL defined globally
 const { URL } = require('url'); // eslint-disable-line no-shadow
 const util = require('util');
@@ -23,9 +21,6 @@ const isUint8Array = util.types ? util.types.isUint8Array
   : function isUint8Array(obj) {
     return Object.prototype.toString.call(obj) === '[object Uint8Array]';
   };
-
-const readFileP = util.promisify(fs.readFile);
-const readdirP = util.promisify(fs.readdir);
 
 /** @exports swagger-spec-validator */
 const swaggerSpecValidator = {};
@@ -59,50 +54,6 @@ const DEFAULT_HEADERS = Object.freeze({
 });
 swaggerSpecValidator.DEFAULT_HEADERS = DEFAULT_HEADERS;
 
-/** HTTPS Agent for online.swagger.io which can valididate the HTTPS
- * certificate lacking an intermediate.
- * See https://github.com/swagger-api/validator-badge/issues/98
- * @private
- */
-let swaggerIoHttpsAgent;
-
-/** Adds our default HTTP Agent to the request options.
- *
- * This private function is exported to allow it to be overridden for testing.
- * @private
- */
-// eslint-disable-next-line no-underscore-dangle
-swaggerSpecValidator._getSwaggerIoHttpsAgent =
-function _getSwaggerIoHttpsAgent() {
-  if (!swaggerIoHttpsAgent) {
-    const certsPath = path.join(__dirname, 'certs');
-    swaggerIoHttpsAgent = readdirP(certsPath)
-      .then((certNames) => Promise.all(
-        certNames.map((certName) => {
-          const certPath = path.join(certsPath, certName);
-          return readFileP(certPath, { encoding: 'utf8' });
-        }),
-      ))
-      .then((certs) => {
-        // Note: Using undocumented API to use both root and loaded certs.
-        //       Specifying options.ca skips root certs, which could cause cert
-        //       verification to fail if online.swagger.io changed certs.
-        // Note: First call to addCACert reloads root certs without
-        //       NODE_EXTRA_CA_CERTS. On Debian this includes all root CAs.
-        //       This is why the DigiCert Root CA file is in the package.
-        const secureContext = tls.createSecureContext();
-        certs.forEach((cert) => {
-          secureContext.context.addCACert(cert);
-        });
-        return new https.Agent({
-          keepAlive: true,
-          secureContext,
-        });
-      });
-  }
-
-  return swaggerIoHttpsAgent;
-};
 
 /** Combines HTTP headers objects.
  * With the capitalization and value of the last occurrence.
@@ -391,32 +342,16 @@ function validate(spec, options, callback) {
     }
   }
 
-  if (typeof spec.pipe === 'function') {
-    // Stream can emit an error before Agent is loaded.  Handle this.
-    spec.once('error', callbackOnce);
-  }
-
-  // online.swagger.io requires a special Agent for HTTPS
-  let agentP;
-  if ((reqOpts.protocol || reqUrl.protocol) === 'https:'
-      && (reqOpts.hostname || reqUrl.hostname) === 'online.swagger.io'
-      && !hasOwnProperty.call(reqOpts, 'agent')) {
-    // eslint-disable-next-line no-underscore-dangle
-    agentP = swaggerSpecValidator._getSwaggerIoHttpsAgent();
-  }
-
   let contentInfoP;
   if (!Object.keys(reqOpts.headers)
     .some((name) => name.toLowerCase() === 'content-type')) {
     contentInfoP = guessSpecContentType(spec, options);
+  } else {
+    contentInfoP = Promise.resolve(null);
   }
 
-  Promise.all([agentP, contentInfoP])
-    .then(([agent, contentInfo]) => {
-      if (agent) {
-        reqOpts.agent = agent;
-      }
-
+  contentInfoP
+    .then((contentInfo) => {
       if (contentInfo) {
         const { contentType, specContent } = contentInfo;
         reqOpts.headers['Content-Type'] = contentType;

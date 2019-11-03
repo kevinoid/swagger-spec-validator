@@ -21,13 +21,6 @@ const defaultUrl = new URL(swaggerSpecValidator.DEFAULT_URL);
 const defaultProtoHost = `${defaultUrl.protocol}//${defaultUrl.host}`;
 const defaultUrlPath = defaultUrl.pathname + defaultUrl.search;
 
-const onlineSwaggerIoUrl =
-  new URL('https://online.swagger.io/validator/debug');
-const onlineSwaggerIoProtoHost =
-  `${onlineSwaggerIoUrl.protocol}//${onlineSwaggerIoUrl.host}`;
-const onlineSwaggerIoUrlPath =
-  onlineSwaggerIoUrl.pathname + onlineSwaggerIoUrl.search;
-
 const swaggerJsonPath =
   path.join(__dirname, '..', 'test-data', 'petstore-minimal.json');
 const swaggerYamlPath =
@@ -37,10 +30,6 @@ const emptyPath =
 
 function neverCalled() {
   throw new Error('should not be called');
-}
-
-function waitForever() {
-  return new Promise(() => {});
 }
 
 describe('swaggerSpecValidator', () => {
@@ -166,32 +155,6 @@ describe('swaggerSpecValidator', () => {
         });
     });
 
-    it('POSTs to http://validator.swagger.io in request options', () => {
-      const testProtoHost = 'http://validator.swagger.io';
-      const testPath = '/validator/debug';
-      const response = {};
-      const ne = nock(testProtoHost)
-        .post(testPath)
-        .reply(function(uri, requestBody) {
-          // FIXME: This test doesn't work because this.req is
-          // OverriddenClientRequest which doesn't have a copy of agent.
-          // Currently also tested in integration.js as a workaround.
-          assert.notStrictEqual(
-            this.req.agent,
-            /* eslint-disable no-underscore-dangle */
-            swaggerSpecValidator._getSwaggerIoHttpsAgent(),
-          );
-          return [200, response];
-        });
-      // eslint-disable-next-line node/no-deprecated-api
-      const options = { request: url.parse(testProtoHost + testPath) };
-      return swaggerSpecValidator.validate('swagger', options)
-        .then((result) => {
-          assert.deepStrictEqual(result, response);
-          ne.done();
-        });
-    });
-
     it('sends Accept: application/json by default', () => {
       const response = {};
       const ne = nock(defaultProtoHost)
@@ -255,40 +218,6 @@ describe('swaggerSpecValidator', () => {
           assert.deepStrictEqual(result, response);
           ne.done();
         });
-    });
-
-    it('returns Error loading custom Agent for online.swagger.io', () => {
-      const testStatusCode = 200;
-      const testResponse = {};
-      const ne = nock(onlineSwaggerIoProtoHost)
-        .post(onlineSwaggerIoUrlPath)
-        .optionally()
-        .reply(testStatusCode, testResponse);
-
-      const errTest = new Error('test error');
-      function getTestError() {
-        return Promise.reject(errTest);
-      }
-      /* eslint-disable no-underscore-dangle */
-      const getSwaggerIoHttpsAgent =
-        swaggerSpecValidator._getSwaggerIoHttpsAgent;
-      let result;
-      try {
-        swaggerSpecValidator._getSwaggerIoHttpsAgent = getTestError;
-        result = swaggerSpecValidator
-          .validate('swagger', { url: onlineSwaggerIoUrl })
-          .then(
-            neverCalled,
-            (err) => {
-              assert.strictEqual(err, errTest);
-              ne.done();
-            },
-          );
-      } finally {
-        swaggerSpecValidator._getSwaggerIoHttpsAgent = getSwaggerIoHttpsAgent;
-      }
-      /* eslint-enable no-underscore-dangle */
-      return result;
     });
 
     it('returns Error for invalid JSON body', () => {
@@ -642,66 +571,6 @@ describe('swaggerSpecValidator', () => {
             ne.done();
           },
         );
-    });
-
-    // The error event can be emitted from a file stream before reading begins.
-    // If this happens before a listener is attached, it will cause an unhandled
-    // exception.  This test covers a case where that could occur.
-    it('returns Error for unreadable file while loading Agent', () => {
-      const testStatusCode = 200;
-      const testResponse = {};
-      const ne = nock(defaultProtoHost)
-        .post(defaultUrlPath)
-        .optionally()
-        .reply(testStatusCode, testResponse);
-
-      /* eslint-disable no-underscore-dangle */
-      const getSwaggerIoHttpsAgent =
-        swaggerSpecValidator._getSwaggerIoHttpsAgent;
-      let result;
-      try {
-        swaggerSpecValidator._getSwaggerIoHttpsAgent = waitForever;
-        result = swaggerSpecValidator.validateFile('nonexistent.yaml')
-          .then(
-            neverCalled,
-            (err) => {
-              assert.strictEqual(err.code, 'ENOENT');
-              ne.done();
-            },
-          );
-      } finally {
-        swaggerSpecValidator._getSwaggerIoHttpsAgent = getSwaggerIoHttpsAgent;
-      }
-      /* eslint-enable no-underscore-dangle */
-      return result;
-    });
-
-    it('returns one Error for unreadable file and Agent', (done) => {
-      const testStatusCode = 200;
-      const testResponse = {};
-      const ne = nock(defaultProtoHost)
-        .post(defaultUrlPath)
-        .optionally()
-        .reply(testStatusCode, testResponse);
-
-      const errTest = new Error('test error');
-      function getTestError() {
-        return Promise.reject(errTest);
-      }
-      /* eslint-disable no-underscore-dangle */
-      const getSwaggerIoHttpsAgent =
-        swaggerSpecValidator._getSwaggerIoHttpsAgent;
-      try {
-        swaggerSpecValidator._getSwaggerIoHttpsAgent = getTestError;
-        swaggerSpecValidator.validateFile('nonexistent.yaml', (err) => {
-          assert(err === errTest || err.code === 'ENOENT');
-          ne.done();
-          done();
-        });
-      } finally {
-        swaggerSpecValidator._getSwaggerIoHttpsAgent = getSwaggerIoHttpsAgent;
-      }
-      /* eslint-enable no-underscore-dangle */
     });
   });
 });

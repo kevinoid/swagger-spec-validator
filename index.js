@@ -30,6 +30,19 @@ const readdirP = util.promisify(fs.readdir);
 /** @exports swagger-spec-validator */
 const swaggerSpecValidator = {};
 
+/** JSON Content-Type accepted by online.swagger.io and validator.swagger.io.
+ * @const
+ * @private
+ */
+const JSON_CONTENT_TYPE = 'application/json';
+
+/** YAML Content-Type accepted by online.swagger.io and validator.swagger.io.
+ * See https://github.com/swagger-api/validator-badge/issues/136
+ * @const
+ * @private
+ */
+const YAML_CONTENT_TYPE = 'application/yaml';
+
 /** Default URL to which validation requests are sent.
  * @const
  */
@@ -40,7 +53,7 @@ swaggerSpecValidator.DEFAULT_URL = DEFAULT_URL;
  * @const
  */
 const DEFAULT_HEADERS = Object.freeze({
-  Accept: 'application/json',
+  Accept: JSON_CONTENT_TYPE,
   'User-Agent': `${packageJson.name}/${packageJson.version} `
     + `Node.js/${process.version.slice(1)}`,
 });

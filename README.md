@@ -8,15 +8,9 @@ OpenAPI/Swagger Specification Validator
 [![Supported Node Version](https://img.shields.io/node/v/swagger-spec-validator.svg?style=flat)](https://www.npmjs.com/package/swagger-spec-validator)
 [![Version on NPM](https://img.shields.io/npm/v/swagger-spec-validator.svg?style=flat)](https://www.npmjs.com/package/swagger-spec-validator)
 
-Validate an OpenAPI/Swagger API specification against the [OpenAPI
+Validate an OpenAPI/Swagger v2 or v3 API specification against the [OpenAPI
 Specification](https://github.com/OAI/OpenAPI-Specification) using the
 [swagger.io online validator](https://github.com/swagger-api/validator-badge).
-Currently only [OpenAPI
-2.0](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md)
-is supported.  Support for [OpenAPI
-3.0](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.0.md)
-is under development (see
-[swagger-api/validator-badge#115](https://github.com/swagger-api/validator-badge/issues/115)).
 
 The validation performed by this module differs from the validation performed
 by [swagger-cli](https://github.com/BigstickCarpet/swagger-cli).

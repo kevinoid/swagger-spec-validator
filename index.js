@@ -46,7 +46,7 @@ const YAML_CONTENT_TYPE = 'application/yaml';
 /** Default URL to which validation requests are sent.
  * @const
  */
-const DEFAULT_URL = 'https://online.swagger.io/validator/debug';
+const DEFAULT_URL = 'https://validator.swagger.io/validator/debug';
 swaggerSpecValidator.DEFAULT_URL = DEFAULT_URL;
 
 /** Default headers sent with API requests.

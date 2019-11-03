@@ -166,8 +166,8 @@ describe('swaggerSpecValidator', () => {
         });
     });
 
-    it('POSTs to http://online.swagger.io in request options', () => {
-      const testProtoHost = 'http://online.swagger.io';
+    it('POSTs to http://validator.swagger.io in request options', () => {
+      const testProtoHost = 'http://validator.swagger.io';
       const testPath = '/validator/debug';
       const response = {};
       const ne = nock(testProtoHost)

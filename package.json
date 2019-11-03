@@ -6,6 +6,7 @@
     "cli",
     "openapi",
     "openapi2",
+    "openapi3",
     "swagger",
     "validator"
   ],

@@ -256,8 +256,14 @@ function validate(spec, options, callback) {
       throw new TypeError('spec must be a string, Uint8Array, or Readable');
     }
 
-    if (options !== undefined && typeof options !== 'object') {
-      throw new TypeError('options must be an object');
+    if (options != null) {
+      if (typeof options !== 'object') {
+        throw new TypeError('options must be an object');
+      }
+
+      if (options.err != null && typeof options.err.write !== 'function') {
+        throw new TypeError('options.err must be a stream.Writable');
+      }
     }
   } catch (err) {
     process.nextTick(() => {
@@ -266,15 +272,20 @@ function validate(spec, options, callback) {
     return undefined;
   }
 
+  options = { ...options };
+  if (!options.err) {
+    options.err = process.stderr;
+  }
+
   // Note: Options on URL object are ignored by https.request()
   // Don't combine into single options object without conversion to generic obj.
   const reqUrl =
-    !options || !options.url ? new URL(DEFAULT_URL)
+    !options.url ? new URL(DEFAULT_URL)
       : typeof options.url === 'object' ? options.url
         : new URL(options.url);
   const reqOpts = {
     method: 'POST',
-    ...options && options.request,
+    ...options.request,
     body: spec,
   };
   reqOpts.headers =

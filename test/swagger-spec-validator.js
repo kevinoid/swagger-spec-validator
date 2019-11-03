@@ -9,6 +9,7 @@ const assert = require('assert');
 const nock = require('nock');
 const path = require('path');
 const regexpEscape = require('regexp.escape');
+const stream = require('stream');
 const url = require('url');
 // TODO [engine:node@>=10]: Use URL defined globally
 const { URL } = url; // eslint-disable-line no-shadow
@@ -443,6 +444,19 @@ describe('swaggerSpecValidator', () => {
           (err) => {
             assert.ok(err instanceof TypeError);
             assert.ok(/\boptions\b/.test(err.message));
+          },
+        );
+    });
+
+    it('Error for non-Writable options.err', () => {
+      const testBody = 'swagger';
+      const options = { err: new stream.Readable() };
+      return swaggerSpecValidator.validate(testBody, options)
+        .then(
+          neverCalled,
+          (err) => {
+            assert.ok(err instanceof TypeError);
+            assert.ok(/\boptions\.err\b/.test(err.message));
           },
         );
     });

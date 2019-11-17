@@ -70,8 +70,13 @@ Documentation](https://kevinoid.github.io/swagger-spec-validator/api).
 
 ## Contributing
 
-Contributions are welcome and very much appreciated!  Please add tests to
-cover any changes and ensure `npm test` passes.
+Contributions are appreciated.  Contributors agree to abide by the [Contributor
+Covenant Code of
+Conduct](https://www.contributor-covenant.org/version/1/4/code-of-conduct.html).
+If this is your first time contributing to a Free and Open Source Software
+project, consider reading [How to Contribute to Open
+Source](https://opensource.guide/how-to-contribute/)
+in the Open Source Guides.
 
 If the desired change is large, complex, backwards-incompatible, can have
 significantly differing implementations, or may not be in scope for this
@@ -80,5 +85,5 @@ save a lot of time and effort.
 
 ## License
 
-This package is available under the terms of the
-[MIT License](https://opensource.org/licenses/MIT).
+This project is available under the terms of the [MIT License](LICENSE.txt).
+See the [summary at TLDRLegal](https://tldrlegal.com/license/mit-license).

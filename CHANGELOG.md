@@ -1,5 +1,10 @@
 # Change Log
 
+## [v4.0.1](https://github.com/kevinoid/swagger-spec-validator/tree/v4.0.1) (2019-11-16)
+[Full Changelog](https://github.com/kevinoid/swagger-spec-validator/compare/v4.0.0...v4.0.1)
+
+- Update `yargs` to `^15.0.1`.
+
 ## [v4.0.0](https://github.com/kevinoid/swagger-spec-validator/tree/v4.0.0) (2019-11-03)
 [Full Changelog](https://github.com/kevinoid/swagger-spec-validator/compare/v3.0.1...v4.0.0)
 

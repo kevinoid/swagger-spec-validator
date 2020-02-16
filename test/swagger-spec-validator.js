@@ -11,8 +11,6 @@ const path = require('path');
 const regexpEscape = require('regexp.escape');
 const stream = require('stream');
 const url = require('url');
-// TODO [engine:node@>=10]: Use URL defined globally
-const { URL } = url; // eslint-disable-line no-shadow
 
 const packageJson = require('../package.json');
 const swaggerSpecValidator = require('..');

@@ -8,19 +8,12 @@
 const fs = require('fs');
 const http = require('http');
 const https = require('https');
-// TODO [engine:node@>=10]: Use URL defined globally
-const { URL } = require('url'); // eslint-disable-line no-shadow
 const util = require('util');
 
 const packageJson = require('./package.json');
 
 // stream.Writable (and therefore http.ClientRequest) accept any Uint8Array
-// TODO [engine:node@>=10]: Use util.types unconditionally
-// eslint-disable-next-line node/no-unsupported-features/node-builtins
-const isUint8Array = util.types ? util.types.isUint8Array
-  : function isUint8Array(obj) {
-    return Object.prototype.toString.call(obj) === '[object Uint8Array]';
-  };
+const { isUint8Array } = util.types;
 
 /** @exports swagger-spec-validator */
 const swaggerSpecValidator = {};

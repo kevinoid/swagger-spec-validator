@@ -266,7 +266,7 @@ swaggerSpecValidator.validate =
 function validate(spec, options, callback) {
   if (!callback && typeof options === 'function') {
     callback = options;
-    options = null;
+    options = undefined;
   }
 
   if (!callback) {

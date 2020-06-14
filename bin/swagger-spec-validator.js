@@ -87,6 +87,8 @@ function validateAll(specPaths, options, callback) {
           options.err.write('All OpenAPI/Swagger specs are valid.\n');
         }
 
+        // Use null to preserve current API.
+        // eslint-disable-next-line unicorn/no-null
         callback(null, hadError ? 2 : hadInvalid ? 1 : 0);
       }
     }
@@ -130,7 +132,7 @@ function validateAll(specPaths, options, callback) {
 function swaggerSpecValidatorCmd(args, options, callback) {
   if (!callback && typeof options === 'function') {
     callback = options;
-    options = null;
+    options = undefined;
   }
 
   if (!callback) {
@@ -187,7 +189,7 @@ function swaggerSpecValidatorCmd(args, options, callback) {
   // Workaround for https://github.com/yargs/yargs/issues/783
   // Necessary because mocha package.json overrides .parserConfiguration()
   require.main = module;
-  const yargs = new Yargs(null, null, require)
+  const yargs = new Yargs(undefined, undefined, require)
     .parserConfiguration({
       'parse-numbers': false,
       'duplicate-arguments-array': false,
@@ -232,6 +234,8 @@ function swaggerSpecValidatorCmd(args, options, callback) {
       } else {
         options.err.write(`${err.name}: ${err.message}\n`);
       }
+      // Use null to preserve current API.
+      // eslint-disable-next-line unicorn/no-null
       callback(null, 3);
       return;
     }
@@ -241,6 +245,8 @@ function swaggerSpecValidatorCmd(args, options, callback) {
     }
 
     if (argOpts.help || argOpts.version) {
+      // Use null to preserve current API.
+      // eslint-disable-next-line unicorn/no-null
       callback(null, 0);
       return;
     }
@@ -260,7 +266,7 @@ function swaggerSpecValidatorCmd(args, options, callback) {
 
     const validateOpts = {
       ...options,
-      request: argOpts.header ? { headers: argOpts.header } : null,
+      request: argOpts.header ? { headers: argOpts.header } : undefined,
       url: argOpts.url,
       verbosity,
     };

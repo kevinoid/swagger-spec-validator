@@ -106,7 +106,7 @@ function requestJson(url, options, callback) {
   const protocol = options.protocol || url.protocol;
   const proto = protocol === 'https:' ? https
     : protocol === 'http:' ? http
-      : null;
+      : undefined;
   if (!proto) {
     callback(
       new Error(`Unsupported protocol "${protocol}" for validator URL`),
@@ -157,6 +157,8 @@ function requestJson(url, options, callback) {
           err.body = resBodyObj !== undefined ? resBodyObj : resBody;
           callback(err);
         } else {
+          // Use null to preserve current API.
+          // eslint-disable-next-line unicorn/no-null
           callback(null, resBodyObj);
         }
       });
@@ -184,7 +186,7 @@ function guessSpecDataContentType(spec, options) {
   try {
     JSON.parse(spec);
     return JSON_CONTENT_TYPE;
-  } catch (err) {
+  } catch {
     if (options.verbosity >= 1) {
       options.err.write(
         'Unable to parse spec content as JSON.  Assuming YAML.\n',
@@ -292,12 +294,14 @@ function validate(spec, options, callback) {
       throw new TypeError('spec must be a string, Uint8Array, or Readable');
     }
 
-    if (options != null) {
+    if (options !== undefined && options !== null) {
       if (typeof options !== 'object') {
         throw new TypeError('options must be an object');
       }
 
-      if (options.err != null && typeof options.err.write !== 'function') {
+      if (options.err !== undefined
+        && options.err !== null
+        && typeof options.err.write !== 'function') {
         throw new TypeError('options.err must be a stream.Writable');
       }
     }
@@ -342,6 +346,8 @@ function validate(spec, options, callback) {
     .some((name) => name.toLowerCase() === 'content-type')) {
     contentInfoP = guessSpecContentType(spec, options);
   } else {
+    // Use null to preserve current API.
+    // eslint-disable-next-line unicorn/no-null
     contentInfoP = Promise.resolve(null);
   }
 
@@ -379,7 +385,7 @@ swaggerSpecValidator.validateFile =
 function validateFile(specPath, options, callback) {
   if (!callback && typeof options === 'function') {
     callback = options;
-    options = null;
+    options = undefined;
   }
 
   const specStream = fs.createReadStream(specPath);

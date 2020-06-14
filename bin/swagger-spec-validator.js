@@ -39,6 +39,7 @@ function parseHeaders(lines) {
 }
 
 /** Gets validation messages from a validation response object.
+ *
  * @private
  */
 function getMessages(result) {
@@ -101,26 +102,28 @@ function validateAll(specPaths, options, callback) {
 /** Options for command entry points.
  *
  * @typedef {{
- *   in: (stream.Readable|undefined),
- *   out: (stream.Writable|undefined),
- *   err: (stream.Writable|undefined)
+ *   in: (module:stream.Readable|undefined),
+ *   out: (module:stream.Writable|undefined),
+ *   err: (module:stream.Writable|undefined)
  * }} CommandOptions
- * @property {stream.Readable=} in Stream from which input is read. (default:
- * <code>process.stdin</code>)
- * @property {stream.Writable=} out Stream to which output is written.
+ * @property {module:stream.Readable=} in Stream from which input is read.
+ * (default: <code>process.stdin</code>)
+ * @property {module:stream.Writable=} out Stream to which output is written.
  * (default: <code>process.stdout</code>)
- * @property {stream.Writable=} err Stream to which errors (and non-output
- * status messages) are written. (default: <code>process.stderr</code>)
+ * @property {module:stream.Writable=} err Stream to which errors (and
+ * non-output status messages) are written.
+ * (default: <code>process.stderr</code>)
  */
 // const CommandOptions;
 
-/** Entry point for this command.
+/**
+ * Entry point for this command.
  *
  * @param {!Array<string>} args Command-line arguments.
  * @param {CommandOptions=} options Options.
- * @param {?function(Error, number=)=}
- * callback Callback for the exit code or an <code>Error</code>.
- * @return {Promise<number>|undefined} If <code>callback</code> is not given, a
+ * @param {?function(Error, number=)=} callback Callback for the exit code or
+ * an <code>Error</code>.
+ * @returns {Promise<number>|undefined} If <code>callback</code> is not given, a
  * <code>Promise</code> with the exit code or <code>Error</code>.
  * @exports swagger-spec-validator/bin/swagger-spec-validator
  */

@@ -58,69 +58,6 @@ describe('swagger-spec-validator', function() {
     });
   });
 
-  // Ensure online.swagger.io works over HTTP when requested
-  // (Since it has had multiple HTTPS certificate issues and HTTP wasn't
-  // supported previously due to bad https.Agent handling.)
-  it('can validate using http://online.swagger.io', (done) => {
-    const options = {
-      in: new stream.PassThrough(),
-      out: new stream.PassThrough({ encoding: 'utf-8' }),
-      err: new stream.PassThrough({ encoding: 'utf-8' }),
-    };
-    const allArgs = RUNTIME_ARGS.concat([
-      '-u',
-      'http://online.swagger.io/validator/debug',
-      swaggerJsonPath,
-    ]);
-    swaggerSpecValidatorCmd(allArgs, options, (err, code) => {
-      assert.ifError(err);
-      assertMatch(
-        {
-          code,
-          out: options.out.read(),
-          err: options.err.read(),
-        },
-        match({
-          code: 0,
-          out: null,
-          err: match(/\bvalid/i),
-        }),
-      );
-      done();
-    });
-  });
-
-  // Ensure online.swagger.io works over HTTPS
-  // (Which requires special https.Agent handling.)
-  it('can validate using https://online.swagger.io', (done) => {
-    const options = {
-      in: new stream.PassThrough(),
-      out: new stream.PassThrough({ encoding: 'utf-8' }),
-      err: new stream.PassThrough({ encoding: 'utf-8' }),
-    };
-    const allArgs = RUNTIME_ARGS.concat([
-      '-u',
-      'https://online.swagger.io/validator/debug',
-      swaggerJsonPath,
-    ]);
-    swaggerSpecValidatorCmd(allArgs, options, (err, code) => {
-      assert.ifError(err);
-      assertMatch(
-        {
-          code,
-          out: options.out.read(),
-          err: options.err.read(),
-        },
-        match({
-          code: 0,
-          out: null,
-          err: match(/\bvalid/i),
-        }),
-      );
-      done();
-    });
-  });
-
   it('validates from stdin', (done) => {
     const options = {
       in: fs.createReadStream(swaggerYamlPath),

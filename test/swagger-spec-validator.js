@@ -416,7 +416,7 @@ describe('swaggerSpecValidator', () => {
     });
 
     // application/yaml is the only known supported YAML type on
-    // validator.swagger.io and online.swagger.io
+    // validator.swagger.io
     // https://github.com/swagger-api/validator-badge/issues/136#issuecomment-545945678
     it('adds Content-Type: application/yaml .yaml files', () => {
       const response = {};

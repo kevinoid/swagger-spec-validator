@@ -18,14 +18,14 @@ const { isUint8Array } = util.types;
 /** @exports swagger-spec-validator */
 const swaggerSpecValidator = {};
 
-/** JSON Content-Type accepted by online.swagger.io and validator.swagger.io.
+/** JSON Content-Type accepted by validator.swagger.io.
  *
  * @constant
  * @private
  */
 const JSON_CONTENT_TYPE = 'application/json';
 
-/** YAML Content-Type accepted by online.swagger.io and validator.swagger.io.
+/** YAML Content-Type accepted by validator.swagger.io.
  * See https://github.com/swagger-api/validator-badge/issues/136
  *
  * @constant

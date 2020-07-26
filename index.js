@@ -141,10 +141,17 @@ function requestJson(url, options, callback) {
           );
         }
 
+        // Note: Could redirect using follow-redirects, axios, got, node-fetch
+        // No known use case, since user should update -u to avoid overhead.
+        // If you have a use case, feel free to open an issue.
         if (res.statusCode >= 300) {
           let errMessage = `HTTP ${res.statusCode}`;
           if (res.statusMessage) {
             errMessage += `: ${res.statusMessage}`;
+          }
+          const { location } = res.headers;
+          if (location) {
+            errMessage += `: ${location}`;
           }
           err = new Error(errMessage);
         }

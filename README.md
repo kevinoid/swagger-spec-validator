@@ -1,8 +1,7 @@
 OpenAPI/Swagger Specification Validator
 =======================================
 
-[![Build Status: Linux](https://img.shields.io/travis/kevinoid/swagger-spec-validator/master.svg?style=flat&label=build+on+linux)](https://travis-ci.org/kevinoid/swagger-spec-validator)
-[![Build Status: Windows](https://img.shields.io/appveyor/ci/kevinoid/swagger-spec-validator/master.svg?style=flat&label=build+on+windows)](https://ci.appveyor.com/project/kevinoid/swagger-spec-validator)
+[![Build Status](https://img.shields.io/github/workflow/status/kevinoid/swagger-spec-validator/Node.js%20CI/master.svg?style=flat&label=build)](https://github.com/kevinoid/swagger-spec-validator/actions?query=branch%3Amaster)
 [![Coverage](https://img.shields.io/codecov/c/github/kevinoid/swagger-spec-validator.svg?style=flat)](https://codecov.io/github/kevinoid/swagger-spec-validator?branch=master)
 [![Dependency Status](https://img.shields.io/david/kevinoid/swagger-spec-validator.svg?style=flat)](https://david-dm.org/kevinoid/swagger-spec-validator)
 [![Supported Node Version](https://img.shields.io/node/v/swagger-spec-validator.svg?style=flat)](https://www.npmjs.com/package/swagger-spec-validator)

@@ -18,7 +18,17 @@
     "type": "git",
     "url": "https://github.com/kevinoid/swagger-spec-validator.git"
   },
+  "type": "commonjs",
+  "files": [
+    "*.js",
+    "bin/",
+    "lib/",
+    "!**/.*"
+  ],
   "main": "index.js",
+  "// Next major version will declare exports": {
+    ".": "./index.js"
+  },
   "bin": {
     "swagger-spec-validator": "bin/swagger-spec-validator.js"
   },
@@ -34,32 +44,32 @@
     "lint-js": "eslint --report-unused-disable-directives . && echo ESLint passed.",
     "postpublish": "git -C doc push && git push --follow-tags origin master gh-pages && echo Remember to update GitHub Releases from CHANGELOG.md",
     "postversion": "rimraf doc && git clone -b gh-pages -l -q . doc && npm run doc && git -C doc add . && git -C doc commit -n -m \"Docs for v$npm_package_version\"",
-    "preversion": "npm run test-cov && nyc check-coverage --statements 90 && depcheck --ignore-dirs doc --ignores mocha-ur2ue && david && git-branch-is master && travis-status -b master -c -w -x && appveyor-status -b master -c -w -p kevinoid/swagger-spec-validator",
+    "preversion": "npm run test-cov && nyc check-coverage --statements 90 && depcheck --ignore-dirs doc && david && git-branch-is master && hub-ci-status -vv --wait",
     "test": "npm run lint && npm run test-unit",
     "test-cov": "npm run lint && npm run test-unit-cov",
-    "test-unit": "mocha --parallel --require mocha-ur2ue --recursive test",
-    "test-unit-cov": "nyc mocha --parallel --require mocha-ur2ue --recursive test",
+    "test-unit": "node --throw-deprecation --unhandled-rejections=strict node_modules/mocha/bin/mocha --parallel --recursive test",
+    "//": "Note: nyc incompatible with --parallel.  See https://github.com/istanbuljs/nyc/issues/1328 and https://github.com/mochajs/mocha/issues/4372",
+    "test-unit-cov": "nyc --reporter=lcov --reporter=text node --throw-deprecation --unhandled-rejections=strict node_modules/mocha/bin/mocha --recursive test",
     "upload-cov": "codecov < ./coverage/lcov.info && coveralls < ./coverage/lcov.info",
     "version": "npm run changelog && echo && echo === Please edit CHANGELOG.md as desired, then exit === && echo && $npm_config_shell && git commit -m \"Update CHANGELOG.md for $npm_package_version\" CHANGELOG.md",
-    "version-deps": "npm install conventional-changelog-cli david depcheck git-branch-is travis-status"
+    "version-deps": "npm install conventional-changelog-cli david depcheck git-branch-is hub-ci-status"
   },
   "dependencies": {
     "yargs": "^16.0.3"
   },
   "devDependencies": {
-    "@kevinoid/eslint-config": "^11.0.0",
+    "@kevinoid/eslint-config": "^14.0.0",
     "codecov": "^3.0.0",
     "coveralls": "^3.0.0",
     "eslint": "^7.3.0",
     "eslint-config-airbnb-base": "^14.2.0",
     "eslint-plugin-import": "^2.18.2",
-    "eslint-plugin-jsdoc": "^30.0.3",
+    "eslint-plugin-jsdoc": "^31.0.7",
     "eslint-plugin-node": "^11.0.0",
     "eslint-plugin-promise": "^4.2.1",
-    "eslint-plugin-unicorn": "^21.0.0",
+    "eslint-plugin-unicorn": "^27.0.0",
     "jsdoc": "^3.6.0",
     "mocha": "^8.0.1",
-    "mocha-ur2ue": "^1.0.0",
     "nock": "^13.0.0",
     "nodecat": "^2.0.0",
     "nyc": "^15.0.0",
@@ -69,7 +79,7 @@
     "sinon": "^9.0.0"
   },
   "engines": {
-    "node": ">=10.13",
+    "node": ">=10.17",
     "npm": ">=1.3.7"
   },
   "david": {

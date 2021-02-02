@@ -77,7 +77,7 @@ describe('swagger-spec-validator command', () => {
         match.object,
         match.func,
       );
-    const allArgs = RUNTIME_ARGS.concat('-');
+    const allArgs = [...RUNTIME_ARGS, '-'];
     const result =
       swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
     swaggerSpecValidatorMock.verify();
@@ -92,7 +92,7 @@ describe('swagger-spec-validator command', () => {
         match.object,
         match.func,
       );
-    const allArgs = RUNTIME_ARGS.concat('./-');
+    const allArgs = [...RUNTIME_ARGS, './-'];
     const result =
       swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
     swaggerSpecValidatorMock.verify();
@@ -113,7 +113,7 @@ describe('swagger-spec-validator command', () => {
         match.object,
         match.func,
       );
-    const allArgs = RUNTIME_ARGS.concat('file1', 'file2');
+    const allArgs = [...RUNTIME_ARGS, 'file1', 'file2'];
     const result =
       swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
     swaggerSpecValidatorMock.verify();
@@ -129,7 +129,7 @@ describe('swagger-spec-validator command', () => {
         match.object,
         match.func,
       );
-    const allArgs = RUNTIME_ARGS.concat('file1', 'file1');
+    const allArgs = [...RUNTIME_ARGS, 'file1', 'file1'];
     const result =
       swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
     swaggerSpecValidatorMock.verify();
@@ -151,7 +151,7 @@ describe('swagger-spec-validator command', () => {
         match.object,
         match.func,
       );
-    const allArgs = RUNTIME_ARGS.concat('file1', './file1');
+    const allArgs = [...RUNTIME_ARGS, 'file1', './file1'];
     const result =
       swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
     swaggerSpecValidatorMock.verify();
@@ -177,7 +177,7 @@ describe('swagger-spec-validator command', () => {
         match.object,
         match.func,
       );
-    const allArgs = RUNTIME_ARGS.concat('file1', '-', 'file2');
+    const allArgs = [...RUNTIME_ARGS, 'file1', '-', 'file2'];
     const result =
       swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
     swaggerSpecValidatorMock.verify();
@@ -193,7 +193,7 @@ describe('swagger-spec-validator command', () => {
           expectObj,
           match.func,
         );
-      const allArgs = RUNTIME_ARGS.concat(args);
+      const allArgs = [...RUNTIME_ARGS, ...args];
       swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
       swaggerSpecValidatorMock.verify();
     });
@@ -203,7 +203,7 @@ describe('swagger-spec-validator command', () => {
     it(`prints error and exits for ${args.join(' ')}`, (done) => {
       swaggerSpecValidatorMock.expects('validate').never();
       swaggerSpecValidatorMock.expects('validateFile').never();
-      const allArgs = RUNTIME_ARGS.concat(args);
+      const allArgs = [...RUNTIME_ARGS, ...args];
       swaggerSpecValidatorCmd(allArgs, options, (err, code) => {
         assert.ifError(err);
         assert.strictEqual(code, expectCode);
@@ -290,7 +290,7 @@ describe('swagger-spec-validator command', () => {
         match.func,
       );
     const allArgs =
-      RUNTIME_ARGS.concat('-H', 'Content-Type: text/plain', 'file');
+      [...RUNTIME_ARGS, '-H', 'Content-Type: text/plain', 'file'];
     const result =
       swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
     swaggerSpecValidatorMock.verify();
@@ -351,7 +351,8 @@ describe('swagger-spec-validator command', () => {
     validate.yield(null, {});
   });
 
-  ['-q', '--quiet'].forEach((arg) => {
+  for (const arg of ['-q', '--quiet']) {
+    // eslint-disable-next-line no-loop-func
     it(`${arg} exits without printing valid`, (done) => {
       swaggerSpecValidatorMock.expects('validateFile').never();
       const validate = swaggerSpecValidatorMock.expects('validate').once()
@@ -360,7 +361,7 @@ describe('swagger-spec-validator command', () => {
           match.object,
           match.func,
         );
-      const allArgs = RUNTIME_ARGS.concat(arg);
+      const allArgs = [...RUNTIME_ARGS, arg];
       swaggerSpecValidatorCmd(allArgs, options, (err, code) => {
         assert.ifError(err);
         assert.strictEqual(code, 0);
@@ -370,7 +371,7 @@ describe('swagger-spec-validator command', () => {
       });
       validate.yield(null, {});
     });
-  });
+  }
 
   it('normally prints error messages to stderr', (done) => {
     swaggerSpecValidatorMock.expects('validateFile').never();
@@ -398,7 +399,7 @@ describe('swagger-spec-validator command', () => {
         match.object,
         match.func,
       );
-    const allArgs = RUNTIME_ARGS.concat('-v');
+    const allArgs = [...RUNTIME_ARGS, '-v'];
     swaggerSpecValidatorCmd(allArgs, options, (err, code) => {
       assert.ifError(err);
       assert.strictEqual(code, 2);
@@ -453,7 +454,8 @@ describe('swagger-spec-validator command', () => {
     });
   });
 
-  ['-qq', ['--quiet', '--quiet']].forEach((arg) => {
+  for (const arg of [['-qq'], ['--quiet', '--quiet']]) {
+    // eslint-disable-next-line no-loop-func
     it(`${arg} exits without printing error`, (done) => {
       swaggerSpecValidatorMock.expects('validateFile').never();
       const validate = swaggerSpecValidatorMock.expects('validate').once()
@@ -462,7 +464,7 @@ describe('swagger-spec-validator command', () => {
           match.object,
           match.func,
         );
-      const allArgs = RUNTIME_ARGS.concat(arg);
+      const allArgs = [...RUNTIME_ARGS, ...arg];
       swaggerSpecValidatorCmd(allArgs, options, (err, code) => {
         assert.ifError(err);
         assert.strictEqual(code, 2);
@@ -473,6 +475,7 @@ describe('swagger-spec-validator command', () => {
       validate.yield(new Error('testerr'), {});
     });
 
+    // eslint-disable-next-line no-loop-func
     it(`${arg} exits without printing validation message`, (done) => {
       swaggerSpecValidatorMock.expects('validateFile').never();
       const validate = swaggerSpecValidatorMock.expects('validate').once()
@@ -481,7 +484,7 @@ describe('swagger-spec-validator command', () => {
           match.object,
           match.func,
         );
-      const allArgs = RUNTIME_ARGS.concat(arg);
+      const allArgs = [...RUNTIME_ARGS, ...arg];
       swaggerSpecValidatorCmd(allArgs, options, (err, code) => {
         assert.ifError(err);
         assert.strictEqual(code, 1);
@@ -496,7 +499,7 @@ describe('swagger-spec-validator command', () => {
         ],
       });
     });
-  });
+  }
 
   it('accepts null args', () => {
     swaggerSpecValidatorMock.expects('validateFile').never();

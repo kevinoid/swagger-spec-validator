@@ -45,12 +45,13 @@ function parseHeaders(lines) {
 function getMessages(result) {
   let messages = [];
   if (result.messages) {
-    messages = messages.concat(result.messages);
+    messages = [...messages, ...result.messages];
   }
   if (result.schemaValidationMessages) {
-    messages = messages.concat(
-      result.schemaValidationMessages.map((m) => `${m.level}: ${m.message}`),
-    );
+    messages = [
+      ...messages,
+      ...result.schemaValidationMessages.map((m) => `${m.level}: ${m.message}`),
+    ];
   }
   return messages;
 }
@@ -59,7 +60,8 @@ function validateAll(specPaths, options, callback) {
   let hadError = false;
   let hadInvalid = false;
   let numValidated = 0;
-  specPaths.forEach((specPath) => {
+  for (const specPath of specPaths) {
+    // eslint-disable-next-line no-inner-declarations, no-loop-func
     function onResult(err, result) {
       if (err) {
         hadError = true;
@@ -98,7 +100,7 @@ function validateAll(specPaths, options, callback) {
     } else {
       swaggerSpecValidator.validateFile(specPath, options, onResult);
     }
-  });
+  }
 }
 
 /** Options for command entry points.

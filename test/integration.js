@@ -39,7 +39,7 @@ describe('swagger-spec-validator', function() {
       out: new stream.PassThrough({ encoding: 'utf-8' }),
       err: new stream.PassThrough({ encoding: 'utf-8' }),
     };
-    const allArgs = RUNTIME_ARGS.concat([swaggerJsonPath, swaggerYamlPath]);
+    const allArgs = [...RUNTIME_ARGS, swaggerJsonPath, swaggerYamlPath];
     swaggerSpecValidatorCmd(allArgs, options, (err, code) => {
       assert.ifError(err);
       assertMatch(
@@ -88,7 +88,7 @@ describe('swagger-spec-validator', function() {
       out: new stream.PassThrough({ encoding: 'utf-8' }),
       err: new stream.PassThrough({ encoding: 'utf-8' }),
     };
-    const allArgs = RUNTIME_ARGS.concat([invalidYamlPath]);
+    const allArgs = [...RUNTIME_ARGS, invalidYamlPath];
     swaggerSpecValidatorCmd(allArgs, options, (err, code) => {
       assert.ifError(err);
       assertMatch(
@@ -114,7 +114,7 @@ describe('swagger-spec-validator', function() {
       err: new stream.PassThrough({ encoding: 'utf-8' }),
     };
     const nonexistentPath = 'nonexistent.yaml';
-    const allArgs = RUNTIME_ARGS.concat([nonexistentPath]);
+    const allArgs = [...RUNTIME_ARGS, nonexistentPath];
     swaggerSpecValidatorCmd(allArgs, options, (err, code) => {
       assert.ifError(err);
       assertMatch(

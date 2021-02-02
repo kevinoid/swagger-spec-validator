@@ -8,12 +8,10 @@
 const fs = require('fs');
 const http = require('http');
 const https = require('https');
-const util = require('util');
+// stream.Writable (and therefore http.ClientRequest) accept any Uint8Array
+const { types: { isUint8Array } } = require('util');
 
 const packageJson = require('./package.json');
-
-// stream.Writable (and therefore http.ClientRequest) accept any Uint8Array
-const { isUint8Array } = util.types;
 
 /** @exports swagger-spec-validator */
 const swaggerSpecValidator = {};
@@ -60,17 +58,17 @@ function combineHeaders(...args) {
   const combinedLower = {};
   const combined = {};
   args.reverse();
-  args.forEach((headers) => {
+  for (const headers of args) {
     if (headers) {
-      Object.keys(headers).forEach((name) => {
+      for (const name of Object.keys(headers)) {
         const nameLower = name.toLowerCase();
         if (!hasOwnProperty.call(combinedLower, nameLower)) {
           combinedLower[nameLower] = true;
           combined[name] = headers[name];
         }
-      });
+      }
     }
-  });
+  }
   return combined;
 }
 
@@ -90,6 +88,8 @@ function getStreamData(stream) {
         'end',
         () => resolve(
           chunks.length === 0 ? undefined
+            // https://github.com/sindresorhus/eslint-plugin-unicorn/issues/1068
+            // eslint-disable-next-line unicorn/prefer-spread
             : Buffer.isBuffer(chunks[0]) ? Buffer.concat(chunks)
               : typeof chunks[0] === 'string' ? chunks.join('')
                 : chunks,
@@ -131,6 +131,8 @@ function requestJson(url, options, callback) {
       const bodyData = [];
       res.on('data', (data) => { bodyData.push(data); });
       res.on('end', () => {
+        // https://github.com/sindresorhus/eslint-plugin-unicorn/issues/1068
+        // eslint-disable-next-line unicorn/prefer-spread
         const resBody = Buffer.concat(bodyData);
         let err, resBodyObj;
         try {

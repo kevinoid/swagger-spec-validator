@@ -352,7 +352,6 @@ describe('swagger-spec-validator command', () => {
   });
 
   for (const arg of ['-q', '--quiet']) {
-    // eslint-disable-next-line no-loop-func
     it(`${arg} exits without printing valid`, (done) => {
       swaggerSpecValidatorMock.expects('validateFile').never();
       const validate = swaggerSpecValidatorMock.expects('validate').once()
@@ -455,7 +454,6 @@ describe('swagger-spec-validator command', () => {
   });
 
   for (const arg of [['-qq'], ['--quiet', '--quiet']]) {
-    // eslint-disable-next-line no-loop-func
     it(`${arg} exits without printing error`, (done) => {
       swaggerSpecValidatorMock.expects('validateFile').never();
       const validate = swaggerSpecValidatorMock.expects('validate').once()
@@ -475,7 +473,6 @@ describe('swagger-spec-validator command', () => {
       validate.yield(new Error('testerr'), {});
     });
 
-    // eslint-disable-next-line no-loop-func
     it(`${arg} exits without printing validation message`, (done) => {
       swaggerSpecValidatorMock.expects('validateFile').never();
       const validate = swaggerSpecValidatorMock.expects('validate').once()

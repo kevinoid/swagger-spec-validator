@@ -88,8 +88,6 @@ function getStreamData(stream) {
         'end',
         () => resolve(
           chunks.length === 0 ? undefined
-            // https://github.com/sindresorhus/eslint-plugin-unicorn/issues/1068
-            // eslint-disable-next-line unicorn/prefer-spread
             : Buffer.isBuffer(chunks[0]) ? Buffer.concat(chunks)
               : typeof chunks[0] === 'string' ? chunks.join('')
                 : chunks,
@@ -131,8 +129,6 @@ function requestJson(url, options, callback) {
       const bodyData = [];
       res.on('data', (data) => { bodyData.push(data); });
       res.on('end', () => {
-        // https://github.com/sindresorhus/eslint-plugin-unicorn/issues/1068
-        // eslint-disable-next-line unicorn/prefer-spread
         const resBody = Buffer.concat(bodyData);
         let err, resBodyObj;
         try {

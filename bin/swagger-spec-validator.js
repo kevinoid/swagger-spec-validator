@@ -61,7 +61,6 @@ function validateAll(specPaths, options, callback) {
   let hadInvalid = false;
   let numValidated = 0;
   for (const specPath of specPaths) {
-    // eslint-disable-next-line no-inner-declarations, no-loop-func
     function onResult(err, result) {
       if (err) {
         hadError = true;

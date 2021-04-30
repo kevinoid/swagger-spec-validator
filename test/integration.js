@@ -12,7 +12,7 @@ const regexpEscape = require('regexp.escape');
 const sinon = require('sinon');
 const stream = require('stream');
 
-const swaggerSpecValidatorCmd = require('../bin/swagger-spec-validator.js');
+const swaggerSpecValidatorCmd = require('../cli.js');
 
 // Note: Match result to ease debugging (all properties are printed on mismatch)
 const assertMatch = sinon.assert.match;

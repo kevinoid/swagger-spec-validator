@@ -31,8 +31,8 @@ describe('swagger-spec-validator command', () => {
   // In order to test the module in isolation, we need to mock the
   // swagger-spec-validator module.
   const swaggerSpecValidatorCmd = proxyquire(
-    '../bin/swagger-spec-validator',
-    { '..': swaggerSpecValidator },
+    '../cli.js',
+    { './index.js': swaggerSpecValidator },
   );
 
   // Ensure that expectations are not carried over between tests

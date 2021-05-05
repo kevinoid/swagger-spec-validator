@@ -124,7 +124,7 @@ function modulenameCmd(args, options, callback) {
       verbosity: argOpts.verbose - argOpts.quiet,
     };
     // eslint-disable-next-line promise/catch-or-return
-    modulename.func(cmdOpts)
+    modulename(cmdOpts)
       .then(
         () => 0,
         (err) => {

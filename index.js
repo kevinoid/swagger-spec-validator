@@ -6,7 +6,7 @@
 
 'use strict';
 
-exports.func =
+module.exports =
 async function func(options) {
   if (options !== undefined && typeof options !== 'object') {
     throw new TypeError('options must be an object');

@@ -10,7 +10,7 @@ const modulename = require('..');
 describe('modulename', () => {
   it('does something', (done) => {
     // Assert something about modulename here
-    modulename.func();
+    modulename();
     done();
   });
 });

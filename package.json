@@ -70,7 +70,7 @@
     "eslint-plugin-promise": "^5.1.0",
     "eslint-plugin-unicorn": "^31.0.0",
     "jsdoc": "^3.6.0",
-    "mocha": "^8.3.0",
+    "mocha": "^9.0.0",
     "nock": "^13.0.0",
     "nodecat": "^2.0.0",
     "proxyquire": "^2.0.0",

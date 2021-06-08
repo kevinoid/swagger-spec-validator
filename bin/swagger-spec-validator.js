@@ -8,34 +8,46 @@
 
 'use strict';
 
-const Yargs = require('yargs/yargs');
+const { Command, InvalidOptionArgumentError } = require('commander');
 
 const packageJson = require('../package.json');
 const swaggerSpecValidator = require('..');
 
-function parseHeader(line) {
+/** Option parser to count the number of occurrences of the option.
+ *
+ * @private
+ * @param {boolean|string} optarg Argument passed to option (ignored).
+ * @param {number=} previous Previous value of option (counter).
+ * @returns {number} previous + 1.
+ */
+function countOption(optarg, previous) {
+  return (previous || 0) + 1;
+}
+
+/** Option parser to count the number of occurrences of the option.
+ *
+ * @private
+ * @param {string} headerLine Option argument (header line).
+ * @param {!object<string,string>=} headers Previous value of header option
+ * (object mapping header names to values) if any.
+ * @returns {!object<string,string>} Object mapping header names to values,
+ * with header argument added.
+ * @throws Error If headerLine can not be parsed.
+ */
+function headerOption(headerLine, headers = Object.create(null)) {
   // Note: curl uses the header line literally.  We can't due to Node API.
   //       Node enforces name is a valid RFC 7230 token, so remove whitespace
   //       as a convenience for users.
-  const match = /^\s*(\S+)\s*: ?(.*)$/.exec(line);
+  const match = /^\s*(\S+)\s*: ?(.*)$/.exec(headerLine);
   if (!match) {
-    throw new Error(`Unable to parse header line "${line}"`);
+    throw new InvalidOptionArgumentError(
+      `Header must start with token, then colon.  Got "${headerLine}"`,
+    );
   }
 
-  const name = match[1];
-  const value = match[2];
-  return [name, value];
-}
-
-function parseHeaders(lines) {
-  return lines
-    // yargs passes [undefined] when insufficient arguments are given
-    .filter((line) => line !== null && line !== undefined)
-    .map(parseHeader)
-    .reduce((headerObj, [headerName, headerVal]) => {
-      headerObj[headerName] = headerVal;
-      return headerObj;
-    }, {});
+  const [, name, value] = match;
+  headers[name] = value;
+  return headers;
 }
 
 /** Gets validation messages from a validation response object.
@@ -157,7 +169,7 @@ function swaggerSpecValidatorCmd(args, options, callback) {
     } else if (args.length < 2 && args.length !== 0) {
       throw new RangeError('args must have at least 2 elements');
     } else {
-      args = Array.prototype.slice.call(args, 2).map(String);
+      args = Array.prototype.slice.call(args).map(String);
     }
 
     if (options !== undefined && typeof options !== 'object') {
@@ -187,90 +199,90 @@ function swaggerSpecValidatorCmd(args, options, callback) {
     return undefined;
   }
 
-  const yargs = new Yargs()
-    .parserConfiguration({
-      'parse-numbers': false,
-      'duplicate-arguments-array': false,
-      'flatten-duplicate-arrays': false,
+  let errVersion;
+  const command = new Command()
+    .exitOverride()
+    .configureOutput({
+      writeOut: (str) => options.out.write(str),
+      writeErr: (str) => options.err.write(str),
+      getOutHelpWidth: () => options.out.columns,
+      getErrHelpWidth: () => options.err.columns,
     })
-    .usage('Usage: $0 [options] [swagger.yaml...]')
-    .option('header', {
-      alias: 'H',
-      describe: 'Additional HTTP header to send',
-      requiresArg: true,
-      array: true,
-      // Prevent array from eating non-option arguments
-      nargs: 1,
-      coerce: parseHeaders,
-    })
-    .help()
-    .alias('help', 'h')
-    .alias('help', '?')
-    .option('quiet', {
-      alias: 'q',
-      describe: 'Print less output',
-      count: true,
-    })
-    .option('url', {
-      alias: 'u',
-      describe: 'Validator URL',
-      defaultDescription: swaggerSpecValidator.DEFAULT_URL,
-      nargs: 1,
-    })
-    .option('verbose', {
-      alias: 'v',
-      describe: 'Print more output',
-      count: true,
-    })
-    .version(`${packageJson.name} ${packageJson.version}`)
-    .alias('version', 'V')
-    .strict();
-  yargs.parse(args, (err, argOpts, output) => {
-    if (err) {
-      if (output) {
-        options.err.write(`${output}\n`);
-      } else {
-        options.err.write(`${err.name}: ${err.message}\n`);
-      }
-      // Use null to preserve current API.
+    .arguments('[swagger.yaml...]')
+    .allowExcessArguments(false)
+    // Check for required/excess arguments.
+    // Workaround https://github.com/tj/commander.js/issues/1493
+    // TODO [commander@>=8]: Remove if fixed
+    .action(() => {})
+    .description('Validate OpenAPI/Swagger files.')
+    .option(
+      '-H, --header <header>',
+      'additional HTTP header to send',
+      headerOption,
+    )
+    .option('-q, --quiet', 'print less output', countOption)
+    .option(
+      '-u, --url <validator_url>',
+      'validator URL',
+      swaggerSpecValidator.DEFAULT_URL,
+    )
+    .option('-v, --verbose', 'print more output', countOption)
+    // TODO: Replace with .version(packageJson.version) loaded as JSON module
+    // https://github.com/nodejs/node/issues/37141
+    .option('-V, --version', 'output the version number')
+    // throw exception to stop option parsing early, as commander does
+    // (e.g. to avoid failing due to missing required arguments)
+    .on('option:version', () => {
+      errVersion = new Error('version');
+      throw errVersion;
+    });
+
+  try {
+    command.parse(args);
+  } catch (errParse) {
+    if (errVersion) {
+      options.out.write(`${packageJson.name} ${packageJson.version}\n`);
       // eslint-disable-next-line unicorn/no-null
-      callback(null, 3);
-      return;
+      process.nextTick(callback, null, 0);
+      return undefined;
     }
 
-    if (output) {
-      options.out.write(`${output}\n`);
+    // If a non-Commander error was thrown, treat it as unhandled.
+    // It probably represents a bug and has not been written to stdout/stderr.
+    // throw commander.{CommanderError,InvalidOptionArgumentError} to avoid.
+    if (typeof errParse.code !== 'string'
+      || !errParse.code.startsWith('commander.')) {
+      throw errParse;
     }
 
-    if (argOpts.help || argOpts.version) {
-      // Use null to preserve current API.
-      // eslint-disable-next-line unicorn/no-null
-      callback(null, 0);
-      return;
+    const exitCode = errParse.exitCode === 0 ? 0 : 3;
+    // eslint-disable-next-line unicorn/no-null
+    process.nextTick(callback, null, exitCode);
+    return undefined;
+  }
+
+  const argOpts = command.opts();
+
+  const verbosity = (argOpts.verbose || 0) - (argOpts.quiet || 0);
+
+  let specPaths = command.args;
+  if (specPaths.length === 0) {
+    // Default to validating stdin
+    specPaths.push('-');
+    if (verbosity > 1) {
+      options.out.write('Reading spec from stdin...\n');
     }
+  } else if (specPaths.length > 1) {
+    specPaths = [...new Set(specPaths)];
+  }
 
-    const verbosity = argOpts.verbose - argOpts.quiet;
-
-    let specPaths = argOpts._;
-    if (specPaths.length === 0) {
-      // Default to validating stdin
-      specPaths.push('-');
-      if (verbosity > 1) {
-        options.out.write('Reading spec from stdin...\n');
-      }
-    } else if (specPaths.length > 1) {
-      specPaths = [...new Set(specPaths)];
-    }
-
-    const validateOpts = {
-      ...options,
-      request: argOpts.header ? { headers: argOpts.header } : undefined,
-      url: argOpts.url,
-      verbosity,
-    };
-    validateAll(specPaths, validateOpts, callback);
-  });
-
+  const validateOpts = {
+    ...options,
+    request: argOpts.header ? { headers: argOpts.header } : undefined,
+    url: argOpts.url,
+    verbosity,
+  };
+  validateAll(specPaths, validateOpts, callback);
   return undefined;
 }
 

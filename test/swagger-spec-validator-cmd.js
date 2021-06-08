@@ -323,7 +323,6 @@ describe('swagger-spec-validator command', () => {
 
   expectArgsResult(['--help'], 0, /usage/i, null);
   expectArgsResult(['-h'], 0, /usage/i, null);
-  expectArgsResult(['-?'], 0, /usage/i, null);
 
   // Satisfy GNU Coding Standards --version convention:
   // https://www.gnu.org/prep/standards/html_node/_002d_002dversion.html

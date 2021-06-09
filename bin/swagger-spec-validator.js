@@ -9,4 +9,6 @@
 const main = require('../cli.js');
 
 // eslint-disable-next-line promise/catch-or-return
-main(process.argv, process).then(process.exit);
+main(process.argv, process).then((exitCode) => {
+  process.exitCode = exitCode;
+});

@@ -7,6 +7,7 @@
 'use strict';
 
 const { Command, InvalidOptionArgumentError } = require('commander');
+const { promisify } = require('util');
 
 const packageJson = require('./package.json');
 const swaggerSpecValidator = require('./index.js');
@@ -66,7 +67,8 @@ function getMessages(result) {
   return messages;
 }
 
-function validateAll(specPaths, options, callback) {
+// TODO: Replace promisify() with Promise-returning version
+const validateAll = promisify((specPaths, options, callback) => {
   let hadError = false;
   let hadInvalid = false;
   let numValidated = 0;
@@ -75,9 +77,9 @@ function validateAll(specPaths, options, callback) {
       if (err) {
         hadError = true;
         if (options.verbosity >= -1) {
-          options.err.write(`${specPath}: ${err}\n`);
+          options.stderr.write(`${specPath}: ${err}\n`);
           if (options.verbosity >= 1) {
-            options.err.write(err.stack);
+            options.stderr.write(err.stack);
           }
         }
       } else {
@@ -87,7 +89,7 @@ function validateAll(specPaths, options, callback) {
           if (options.verbosity >= 0) {
             const messagesWithPath =
               messages.map((message) => `${specPath}: ${message}`);
-            options.out.write(`${messagesWithPath.join('\n')}\n`);
+            options.stdout.write(`${messagesWithPath.join('\n')}\n`);
           }
         }
       }
@@ -95,37 +97,33 @@ function validateAll(specPaths, options, callback) {
       numValidated += 1;
       if (numValidated === specPaths.length) {
         if (!hadError && !hadInvalid && options.verbosity >= 0) {
-          options.err.write('All OpenAPI/Swagger specs are valid.\n');
+          options.stderr.write('All OpenAPI/Swagger specs are valid.\n');
         }
 
-        // Use null to preserve current API.
-        // eslint-disable-next-line unicorn/no-null
-        callback(null, hadError ? 2 : hadInvalid ? 1 : 0);
+        callback(undefined, hadError ? 2 : hadInvalid ? 1 : 0);
       }
     }
 
     if (specPath === '-') {
-      swaggerSpecValidator.validate(options.in, options, onResult);
+      swaggerSpecValidator.validate(options.stdin, options, onResult);
     } else {
       swaggerSpecValidator.validateFile(specPath, options, onResult);
     }
   }
-}
+});
 
 /** Options for command entry points.
  *
  * @typedef {{
- *   in: (module:stream.Readable|undefined),
- *   out: (module:stream.Writable|undefined),
- *   err: (module:stream.Writable|undefined)
+ *   stdin: !module:stream.Readable,
+ *   stdout: !module:stream.Writable,
+ *   stderr: !module:stream.Writable
  * }} CommandOptions
- * @property {module:stream.Readable=} in Stream from which input is read.
- * (default: <code>process.stdin</code>)
- * @property {module:stream.Writable=} out Stream to which output is written.
- * (default: <code>process.stdout</code>)
- * @property {module:stream.Writable=} err Stream to which errors (and
- * non-output status messages) are written.
- * (default: <code>process.stderr</code>)
+ * @property {!module:stream.Readable} stdin Stream from which input is read.
+ * @property {!module:stream.Writable} stdout Stream to which output is
+ * written.
+ * @property {!module:stream.Writable} stderr Stream to which errors and
+ * non-output status messages are written.
  */
 // const CommandOptions;
 
@@ -133,79 +131,38 @@ function validateAll(specPaths, options, callback) {
  * Entry point for this command.
  *
  * @param {!Array<string>} args Command-line arguments.
- * @param {CommandOptions=} options Options.
- * @param {?function(Error, number=)=} callback Callback for the exit code or
- * an <code>Error</code>.
- * @returns {Promise<number>|undefined} If <code>callback</code> is not given, a
- * <code>Promise</code> with the exit code or <code>Error</code>.
- * @exports swagger-spec-validator/bin/swagger-spec-validator
+ * @param {!CommandOptions} options Options.
+ * @returns {!Promise<number>} Promise for exit code.  Only rejected for
+ * arguments with invalid type (or args.length < 2).
  */
 module.exports =
-function swaggerSpecValidatorCmd(args, options, callback) {
-  if (!callback && typeof options === 'function') {
-    callback = options;
-    options = undefined;
+async function swaggerSpecValidatorCmd(args, options) {
+  if (!Array.isArray(args) || args.length < 2) {
+    throw new TypeError('args must be an Array with at least 2 items');
   }
 
-  if (!callback) {
-    return new Promise((resolve, reject) => {
-      swaggerSpecValidatorCmd(args, options, (err, result) => {
-        if (err) { reject(err); } else { resolve(result); }
-      });
-    });
+  if (!options || typeof options !== 'object') {
+    throw new TypeError('options must be an object');
   }
 
-  if (typeof callback !== 'function') {
-    throw new TypeError('callback must be a function');
+  if (!options.stdin || typeof options.stdin.on !== 'function') {
+    throw new TypeError('options.stdin must be a stream.Readable');
   }
-
-  try {
-    if (args === undefined || args === null) {
-      args = [];
-    } else if (typeof args !== 'object'
-               || Math.floor(args.length) !== args.length) {
-      throw new TypeError('args must be Array-like');
-    } else if (args.length < 2 && args.length !== 0) {
-      throw new RangeError('args must have at least 2 elements');
-    } else {
-      args = Array.prototype.slice.call(args).map(String);
-    }
-
-    if (options !== undefined && typeof options !== 'object') {
-      throw new TypeError('options must be an object');
-    }
-
-    options = {
-      in: process.stdin,
-      out: process.stdout,
-      err: process.stderr,
-      ...options,
-    };
-
-    if (!options.in || typeof options.in.on !== 'function') {
-      throw new TypeError('options.in must be a stream.Readable');
-    }
-    if (!options.out || typeof options.out.write !== 'function') {
-      throw new TypeError('options.out must be a stream.Writable');
-    }
-    if (!options.err || typeof options.err.write !== 'function') {
-      throw new TypeError('options.err must be a stream.Writable');
-    }
-  } catch (err) {
-    process.nextTick(() => {
-      callback(err);
-    });
-    return undefined;
+  if (!options.stdout || typeof options.stdout.write !== 'function') {
+    throw new TypeError('options.stdout must be a stream.Writable');
+  }
+  if (!options.stderr || typeof options.stderr.write !== 'function') {
+    throw new TypeError('options.stderr must be a stream.Writable');
   }
 
   let errVersion;
   const command = new Command()
     .exitOverride()
     .configureOutput({
-      writeOut: (str) => options.out.write(str),
-      writeErr: (str) => options.err.write(str),
-      getOutHelpWidth: () => options.out.columns,
-      getErrHelpWidth: () => options.err.columns,
+      writeOut: (str) => options.stdout.write(str),
+      writeErr: (str) => options.stderr.write(str),
+      getOutHelpWidth: () => options.stdout.columns,
+      getErrHelpWidth: () => options.stderr.columns,
     })
     .arguments('[swagger.yaml...]')
     .allowExcessArguments(false)
@@ -240,10 +197,8 @@ function swaggerSpecValidatorCmd(args, options, callback) {
     command.parse(args);
   } catch (errParse) {
     if (errVersion) {
-      options.out.write(`${packageJson.name} ${packageJson.version}\n`);
-      // eslint-disable-next-line unicorn/no-null
-      process.nextTick(callback, null, 0);
-      return undefined;
+      options.stdout.write(`${packageJson.name} ${packageJson.version}\n`);
+      return 0;
     }
 
     // If a non-Commander error was thrown, treat it as unhandled.
@@ -254,10 +209,7 @@ function swaggerSpecValidatorCmd(args, options, callback) {
       throw errParse;
     }
 
-    const exitCode = errParse.exitCode === 0 ? 0 : 3;
-    // eslint-disable-next-line unicorn/no-null
-    process.nextTick(callback, null, exitCode);
-    return undefined;
+    return errParse.exitCode === 0 ? 0 : 3;
   }
 
   const argOpts = command.opts();
@@ -269,7 +221,7 @@ function swaggerSpecValidatorCmd(args, options, callback) {
     // Default to validating stdin
     specPaths.push('-');
     if (verbosity > 1) {
-      options.out.write('Reading spec from stdin...\n');
+      options.stdout.write('Reading spec from stdin...\n');
     }
   } else if (specPaths.length > 1) {
     specPaths = [...new Set(specPaths)];
@@ -281,6 +233,5 @@ function swaggerSpecValidatorCmd(args, options, callback) {
     url: argOpts.url,
     verbosity,
   };
-  validateAll(specPaths, validateOpts, callback);
-  return undefined;
+  return validateAll(specPaths, validateOpts);
 };

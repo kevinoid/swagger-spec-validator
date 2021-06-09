@@ -49,9 +49,9 @@ describe('swagger-spec-validator command', () => {
   let options;
   beforeEach(() => {
     options = {
-      in: new stream.PassThrough(),
-      out: new stream.PassThrough(),
-      err: new stream.PassThrough(),
+      stdin: new stream.PassThrough(),
+      stdout: new stream.PassThrough(),
+      stderr: new stream.PassThrough(),
     };
   });
 
@@ -59,29 +59,25 @@ describe('swagger-spec-validator command', () => {
     swaggerSpecValidatorMock.expects('validateFile').never();
     swaggerSpecValidatorMock.expects('validate').once()
       .withArgs(
-        options.in,
+        options.stdin,
         match.object,
         match.func,
       );
-    const result =
-      swaggerSpecValidatorCmd(RUNTIME_ARGS, options, sinon.mock().never());
+    swaggerSpecValidatorCmd(RUNTIME_ARGS, options);
     swaggerSpecValidatorMock.verify();
-    assert.strictEqual(result, undefined);
   });
 
   it('verifies stdin with "-" argument', () => {
     swaggerSpecValidatorMock.expects('validateFile').never();
     swaggerSpecValidatorMock.expects('validate').once()
       .withArgs(
-        options.in,
+        options.stdin,
         match.object,
         match.func,
       );
     const allArgs = [...RUNTIME_ARGS, '-'];
-    const result =
-      swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
+    swaggerSpecValidatorCmd(allArgs, options);
     swaggerSpecValidatorMock.verify();
-    assert.strictEqual(result, undefined);
   });
 
   it('verifies file named "-" with "./-" argument', () => {
@@ -93,10 +89,8 @@ describe('swagger-spec-validator command', () => {
         match.func,
       );
     const allArgs = [...RUNTIME_ARGS, './-'];
-    const result =
-      swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
+    swaggerSpecValidatorCmd(allArgs, options);
     swaggerSpecValidatorMock.verify();
-    assert.strictEqual(result, undefined);
   });
 
   it('verifies multiple named files', () => {
@@ -114,10 +108,8 @@ describe('swagger-spec-validator command', () => {
         match.func,
       );
     const allArgs = [...RUNTIME_ARGS, 'file1', 'file2'];
-    const result =
-      swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
+    swaggerSpecValidatorCmd(allArgs, options);
     swaggerSpecValidatorMock.verify();
-    assert.strictEqual(result, undefined);
   });
 
   // This is especially useful for '-', which can't be read twice
@@ -130,10 +122,8 @@ describe('swagger-spec-validator command', () => {
         match.func,
       );
     const allArgs = [...RUNTIME_ARGS, 'file1', 'file1'];
-    const result =
-      swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
+    swaggerSpecValidatorCmd(allArgs, options);
     swaggerSpecValidatorMock.verify();
-    assert.strictEqual(result, undefined);
   });
 
   // This could be handy, but can be unsafe with symlinks in path
@@ -152,10 +142,8 @@ describe('swagger-spec-validator command', () => {
         match.func,
       );
     const allArgs = [...RUNTIME_ARGS, 'file1', './file1'];
-    const result =
-      swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
+    swaggerSpecValidatorCmd(allArgs, options);
     swaggerSpecValidatorMock.verify();
-    assert.strictEqual(result, undefined);
   });
 
   it('verifies mix of files and stdin', () => {
@@ -173,15 +161,13 @@ describe('swagger-spec-validator command', () => {
       );
     swaggerSpecValidatorMock.expects('validate').once()
       .withArgs(
-        options.in,
+        options.stdin,
         match.object,
         match.func,
       );
     const allArgs = [...RUNTIME_ARGS, 'file1', '-', 'file2'];
-    const result =
-      swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
+    swaggerSpecValidatorCmd(allArgs, options);
     swaggerSpecValidatorMock.verify();
-    assert.strictEqual(result, undefined);
   });
 
   function expectArgsAs(args, expectObj) {
@@ -189,40 +175,37 @@ describe('swagger-spec-validator command', () => {
       swaggerSpecValidatorMock.expects('validateFile').never();
       swaggerSpecValidatorMock.expects('validate').once()
         .withArgs(
-          options.in,
+          options.stdin,
           expectObj,
           match.func,
         );
       const allArgs = [...RUNTIME_ARGS, ...args];
-      swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
+      swaggerSpecValidatorCmd(allArgs, options);
       swaggerSpecValidatorMock.verify();
     });
   }
 
   function expectArgsResult(args, expectCode, expectOutMsg, expectErrMsg) {
-    it(`prints error and exits for ${args.join(' ')}`, (done) => {
+    it(`prints error and exits for ${args.join(' ')}`, async () => {
       swaggerSpecValidatorMock.expects('validate').never();
       swaggerSpecValidatorMock.expects('validateFile').never();
       const allArgs = [...RUNTIME_ARGS, ...args];
-      swaggerSpecValidatorCmd(allArgs, options, (err, code) => {
-        assert.ifError(err);
-        assert.strictEqual(code, expectCode);
+      const code = await swaggerSpecValidatorCmd(allArgs, options);
+      assert.strictEqual(code, expectCode);
 
-        if (expectOutMsg instanceof RegExp) {
-          assertMatch(options.out.read(), expectOutMsg);
-        } else {
-          assert.strictEqual(options.out.read(), expectOutMsg);
-        }
+      if (expectOutMsg instanceof RegExp) {
+        assertMatch(options.stdout.read(), expectOutMsg);
+      } else {
+        assert.strictEqual(options.stdout.read(), expectOutMsg);
+      }
 
-        if (expectErrMsg instanceof RegExp) {
-          assertMatch(options.err.read(), expectErrMsg);
-        } else {
-          assert.strictEqual(options.err.read(), expectErrMsg);
-        }
+      if (expectErrMsg instanceof RegExp) {
+        assertMatch(options.stderr.read(), expectErrMsg);
+      } else {
+        assert.strictEqual(options.stderr.read(), expectErrMsg);
+      }
 
-        swaggerSpecValidatorMock.verify();
-        done();
-      });
+      swaggerSpecValidatorMock.verify();
     });
   }
 
@@ -291,10 +274,8 @@ describe('swagger-spec-validator command', () => {
       );
     const allArgs =
       [...RUNTIME_ARGS, '-H', 'Content-Type: text/plain', 'file'];
-    const result =
-      swaggerSpecValidatorCmd(allArgs, options, sinon.mock().never());
+    swaggerSpecValidatorCmd(allArgs, options);
     swaggerSpecValidatorMock.verify();
-    assert.strictEqual(result, undefined);
   });
 
   expectArgsAs(['-qqq'], match({ verbosity: -3 }));
@@ -332,345 +313,242 @@ describe('swagger-spec-validator command', () => {
   expectArgsResult(['--version'], 0, versionRE, null);
   expectArgsResult(['-V'], 0, versionRE, null);
 
-  it('normally prints valid message to stderr', (done) => {
+  it('normally prints valid message to stderr', async () => {
     swaggerSpecValidatorMock.expects('validateFile').never();
     const validate = swaggerSpecValidatorMock.expects('validate').once()
       .withArgs(
-        options.in,
+        options.stdin,
         match.object,
         match.func,
       );
-    swaggerSpecValidatorCmd(RUNTIME_ARGS, options, (err, code) => {
-      assert.ifError(err);
-      assert.strictEqual(code, 0);
-      assert.strictEqual(options.out.read(), null);
-      assertMatch(options.err.read(), /valid/i);
-      done();
-    });
+    const codeP = swaggerSpecValidatorCmd(RUNTIME_ARGS, options);
     validate.yield(null, {});
+    const code = await codeP;
+    assert.strictEqual(code, 0);
+    assert.strictEqual(options.stdout.read(), null);
+    assertMatch(options.stderr.read(), /valid/i);
   });
 
   for (const arg of ['-q', '--quiet']) {
-    it(`${arg} exits without printing valid`, (done) => {
+    it(`${arg} exits without printing valid`, async () => {
       swaggerSpecValidatorMock.expects('validateFile').never();
       const validate = swaggerSpecValidatorMock.expects('validate').once()
         .withArgs(
-          options.in,
+          options.stdin,
           match.object,
           match.func,
         );
       const allArgs = [...RUNTIME_ARGS, arg];
-      swaggerSpecValidatorCmd(allArgs, options, (err, code) => {
-        assert.ifError(err);
-        assert.strictEqual(code, 0);
-        assert.strictEqual(options.out.read(), null);
-        assert.strictEqual(options.err.read(), null);
-        done();
-      });
+      const codeP = swaggerSpecValidatorCmd(allArgs, options);
       validate.yield(null, {});
+      const code = await codeP;
+      assert.strictEqual(code, 0);
+      assert.strictEqual(options.stdout.read(), null);
+      assert.strictEqual(options.stderr.read(), null);
     });
   }
 
-  it('normally prints error messages to stderr', (done) => {
+  it('normally prints error messages to stderr', async () => {
     swaggerSpecValidatorMock.expects('validateFile').never();
     const validate = swaggerSpecValidatorMock.expects('validate').once()
       .withArgs(
-        options.in,
+        options.stdin,
         match.object,
         match.func,
       );
-    swaggerSpecValidatorCmd(RUNTIME_ARGS, options, (err, code) => {
-      assert.ifError(err);
-      assert.strictEqual(code, 2);
-      assert.strictEqual(options.out.read(), null);
-      assertMatch(options.err.read(), /testerr/i);
-      done();
-    });
+    const codeP = swaggerSpecValidatorCmd(RUNTIME_ARGS, options);
     validate.yield(new Error('testerr'), {});
+    const code = await codeP;
+    assert.strictEqual(code, 2);
+    assert.strictEqual(options.stdout.read(), null);
+    assertMatch(options.stderr.read(), /testerr/i);
   });
 
-  it('-v prints error messages with stack to stderr', (done) => {
+  it('-v prints error messages with stack to stderr', async () => {
     swaggerSpecValidatorMock.expects('validateFile').never();
     const validate = swaggerSpecValidatorMock.expects('validate').once()
       .withArgs(
-        options.in,
+        options.stdin,
         match.object,
         match.func,
       );
     const allArgs = [...RUNTIME_ARGS, '-v'];
-    swaggerSpecValidatorCmd(allArgs, options, (err, code) => {
-      assert.ifError(err);
-      assert.strictEqual(code, 2);
-      assert.strictEqual(options.out.read(), null);
-      const errStr = String(options.err.read());
-      assertMatch(errStr, /testerr/i);
-      assertMatch(errStr, new RegExp(regexpEscape(__filename)));
-      done();
-    });
+    const codeP = swaggerSpecValidatorCmd(allArgs, options);
     validate.yield(new Error('testerr'), {});
+    const code = await codeP;
+    assert.strictEqual(code, 2);
+    assert.strictEqual(options.stdout.read(), null);
+    const errStr = String(options.stderr.read());
+    assertMatch(errStr, /testerr/i);
+    assertMatch(errStr, new RegExp(regexpEscape(__filename)));
   });
 
-  it('normally prints validation messages to stdout', (done) => {
+  it('normally prints validation messages to stdout', async () => {
     swaggerSpecValidatorMock.expects('validateFile').never();
     const validate = swaggerSpecValidatorMock.expects('validate').once()
       .withArgs(
-        options.in,
+        options.stdin,
         match.object,
         match.func,
       );
-    swaggerSpecValidatorCmd(RUNTIME_ARGS, options, (err, code) => {
-      assert.ifError(err);
-      assert.strictEqual(code, 1);
-      assertMatch(options.out.read(), /testmsg/i);
-      assert.strictEqual(options.err.read(), null);
-      done();
-    });
+    const codeP = swaggerSpecValidatorCmd(RUNTIME_ARGS, options);
     validate.yield(null, {
       messages: ['testmsg'],
     });
+    const code = await codeP;
+    assert.strictEqual(code, 1);
+    assertMatch(options.stdout.read(), /testmsg/i);
+    assert.strictEqual(options.stderr.read(), null);
   });
 
-  it('normally prints validation schema messages to stdout', (done) => {
+  it('normally prints validation schema messages to stdout', async () => {
     swaggerSpecValidatorMock.expects('validateFile').never();
     const validate = swaggerSpecValidatorMock.expects('validate').once()
       .withArgs(
-        options.in,
+        options.stdin,
         match.object,
         match.func,
       );
-    swaggerSpecValidatorCmd(RUNTIME_ARGS, options, (err, code) => {
-      assert.ifError(err);
-      assert.strictEqual(code, 1);
-      assertMatch(options.out.read(), /level.*testmsg/i);
-      assert.strictEqual(options.err.read(), null);
-      done();
-    });
+    const codeP = swaggerSpecValidatorCmd(RUNTIME_ARGS, options);
     validate.yield(null, {
       schemaValidationMessages: [
         { level: 'level', message: 'testmsg' },
       ],
     });
+    const code = await codeP;
+    assert.strictEqual(code, 1);
+    assertMatch(options.stdout.read(), /level.*testmsg/i);
+    assert.strictEqual(options.stderr.read(), null);
   });
 
   for (const arg of [['-qq'], ['--quiet', '--quiet']]) {
-    it(`${arg} exits without printing error`, (done) => {
+    it(`${arg} exits without printing error`, async () => {
       swaggerSpecValidatorMock.expects('validateFile').never();
       const validate = swaggerSpecValidatorMock.expects('validate').once()
         .withArgs(
-          options.in,
+          options.stdin,
           match.object,
           match.func,
         );
       const allArgs = [...RUNTIME_ARGS, ...arg];
-      swaggerSpecValidatorCmd(allArgs, options, (err, code) => {
-        assert.ifError(err);
-        assert.strictEqual(code, 2);
-        assert.strictEqual(options.out.read(), null);
-        assert.strictEqual(options.err.read(), null);
-        done();
-      });
+      const codeP = swaggerSpecValidatorCmd(allArgs, options);
       validate.yield(new Error('testerr'), {});
+      const code = await codeP;
+      assert.strictEqual(code, 2);
+      assert.strictEqual(options.stdout.read(), null);
+      assert.strictEqual(options.stderr.read(), null);
     });
 
-    it(`${arg} exits without printing validation message`, (done) => {
+    it(`${arg} exits without printing validation message`, async () => {
       swaggerSpecValidatorMock.expects('validateFile').never();
       const validate = swaggerSpecValidatorMock.expects('validate').once()
         .withArgs(
-          options.in,
+          options.stdin,
           match.object,
           match.func,
         );
       const allArgs = [...RUNTIME_ARGS, ...arg];
-      swaggerSpecValidatorCmd(allArgs, options, (err, code) => {
-        assert.ifError(err);
-        assert.strictEqual(code, 1);
-        assert.strictEqual(options.out.read(), null);
-        assert.strictEqual(options.err.read(), null);
-        done();
-      });
+      const codeP = swaggerSpecValidatorCmd(allArgs, options);
       validate.yield(null, {
         messages: ['testmsg'],
         schemaValidationMessages: [
           { level: 'level', message: 'testmsg' },
         ],
       });
+      const code = await codeP;
+      assert.strictEqual(code, 1);
+      assert.strictEqual(options.stdout.read(), null);
+      assert.strictEqual(options.stderr.read(), null);
     });
   }
 
-  it('accepts null args', () => {
-    swaggerSpecValidatorMock.expects('validateFile').never();
-    swaggerSpecValidatorMock.expects('validate').once()
-      .withArgs(
-        options.in,
-        match.object,
-        match.func,
-      );
-    const result = swaggerSpecValidatorCmd(null, options, sinon.mock().never());
-    swaggerSpecValidatorMock.verify();
-    assert.strictEqual(result, undefined);
-  });
-
-  it('accepts empty args', () => {
-    swaggerSpecValidatorMock.expects('validateFile').never();
-    swaggerSpecValidatorMock.expects('validate').once()
-      .withArgs(
-        options.in,
-        match.object,
-        match.func,
-      );
-    const result = swaggerSpecValidatorCmd([], options, sinon.mock().never());
-    swaggerSpecValidatorMock.verify();
-    assert.strictEqual(result, undefined);
-  });
-
-  it('throws for non-function callback', () => {
+  it('rejects null args with TypeError', async () => {
     swaggerSpecValidatorMock.expects('validate').never();
     swaggerSpecValidatorMock.expects('validateFile').never();
-    assert.throws(
-      () => { swaggerSpecValidatorCmd(RUNTIME_ARGS, {}, true); },
+    await assert.rejects(
+      swaggerSpecValidatorCmd(null, options),
       TypeError,
-      /\bcallback\b/,
     );
     swaggerSpecValidatorMock.verify();
   });
 
-  it('returns Error for non-Array args', (done) => {
+  it('rejects empty args with TypeError', async () => {
     swaggerSpecValidatorMock.expects('validate').never();
     swaggerSpecValidatorMock.expects('validateFile').never();
-    swaggerSpecValidatorCmd(true, {}, (err) => {
-      assert.ok(err instanceof TypeError);
-      assertMatch(err.message, /\bargs\b/);
-      swaggerSpecValidatorMock.verify();
-      done();
-    });
-  });
-
-  it('yields RangeError for args.length < 2', (done) => {
-    swaggerSpecValidatorMock.expects('validate').never();
-    swaggerSpecValidatorMock.expects('validateFile').never();
-    swaggerSpecValidatorCmd(['ha'], {}, (err) => {
-      assert.ok(err instanceof RangeError);
-      assertMatch(err.message, /\bargs\b/);
-      swaggerSpecValidatorMock.verify();
-      done();
-    });
-  });
-
-  it('can be called without options', () => {
-    swaggerSpecValidatorMock.expects('validateFile').never();
-    swaggerSpecValidatorMock.expects('validate').once()
-      .withArgs(
-        process.stdin,
-        match.object,
-        match.func,
-      );
-    const result = swaggerSpecValidatorCmd(RUNTIME_ARGS, sinon.mock().never());
-    swaggerSpecValidatorMock.verify();
-    assert.strictEqual(result, undefined);
-  });
-
-  it('returns Error for non-object options', (done) => {
-    swaggerSpecValidatorMock.expects('validate').never();
-    swaggerSpecValidatorMock.expects('validateFile').never();
-    swaggerSpecValidatorCmd(RUNTIME_ARGS, true, (err) => {
-      assert.ok(err instanceof TypeError);
-      assertMatch(err.message, /\boptions\b/);
-      swaggerSpecValidatorMock.verify();
-      done();
-    });
-  });
-
-  it('returns Error for non-Readable in', (done) => {
-    swaggerSpecValidatorMock.expects('validate').never();
-    swaggerSpecValidatorMock.expects('validateFile').never();
-    swaggerSpecValidatorCmd(RUNTIME_ARGS, { in: {} }, (err) => {
-      assert.ok(err instanceof TypeError);
-      assertMatch(err.message, /\boptions.in\b/);
-      swaggerSpecValidatorMock.verify();
-      done();
-    });
-  });
-
-  it('returns Error for non-Writable out', (done) => {
-    swaggerSpecValidatorMock.expects('validate').never();
-    swaggerSpecValidatorMock.expects('validateFile').never();
-    options.out = new stream.Readable();
-    swaggerSpecValidatorCmd(RUNTIME_ARGS, options, (err) => {
-      assert.ok(err instanceof TypeError);
-      assertMatch(err.message, /\boptions.out\b/);
-      swaggerSpecValidatorMock.verify();
-      done();
-    });
-  });
-
-  it('returns Error for non-Writable err', (done) => {
-    swaggerSpecValidatorMock.expects('validate').never();
-    swaggerSpecValidatorMock.expects('validateFile').never();
-    options.err = new stream.Readable();
-    swaggerSpecValidatorCmd(RUNTIME_ARGS, options, (err) => {
-      assert.ok(err instanceof TypeError);
-      assertMatch(err.message, /\boptions.err\b/);
-      swaggerSpecValidatorMock.verify();
-      done();
-    });
-  });
-
-  it('returns a Promise when called without a function', () => {
-    swaggerSpecValidatorMock.expects('validateFile').never();
-    swaggerSpecValidatorMock.expects('validate').once()
-      .withArgs(
-        options.in,
-        match.object,
-        match.func,
-      );
-    const result = swaggerSpecValidatorCmd(RUNTIME_ARGS, options);
-    assert(result instanceof Promise);
+    await assert.rejects(
+      swaggerSpecValidatorCmd([], options),
+      TypeError,
+    );
     swaggerSpecValidatorMock.verify();
   });
 
-  it('returned Promise is resolved with success exit code', () => {
-    swaggerSpecValidatorMock.expects('validateFile').never();
-    const validate = swaggerSpecValidatorMock.expects('validate').once()
-      .withArgs(
-        options.in,
-        match.object,
-        match.func,
-      );
-    const result = swaggerSpecValidatorCmd(RUNTIME_ARGS, options);
-    validate.yield(null, {});
-    return result.then((code) => {
-      assert.strictEqual(code, 0);
-      swaggerSpecValidatorMock.verify();
-    });
-  });
-
-  it('returned Promise is resolved with failure exit code', () => {
-    swaggerSpecValidatorMock.expects('validateFile').never();
-    const validate = swaggerSpecValidatorMock.expects('validate').once()
-      .withArgs(
-        options.in,
-        match.object,
-        match.func,
-      );
-    const result = swaggerSpecValidatorCmd(RUNTIME_ARGS, options);
-    const testErr = new Error('test');
-    validate.yield(testErr);
-    return result.then((code) => {
-      assert.strictEqual(code, 2);
-      swaggerSpecValidatorMock.verify();
-    });
-  });
-
-  it('returned Promise is rejected with caller Error', () => {
+  it('rejects non-Array args with TypeError', async () => {
     swaggerSpecValidatorMock.expects('validate').never();
     swaggerSpecValidatorMock.expects('validateFile').never();
-    return swaggerSpecValidatorCmd(true, options)
-      .then(
-        sinon.mock().never(),
-        (err) => {
-          assert.ok(err instanceof Error);
-          swaggerSpecValidatorMock.verify();
-        },
-      );
+    await assert.rejects(
+      swaggerSpecValidatorCmd(true, options),
+      TypeError,
+    );
+    swaggerSpecValidatorMock.verify();
+  });
+
+  it('rejects with TypeError for args.length < 2', async () => {
+    swaggerSpecValidatorMock.expects('validate').never();
+    swaggerSpecValidatorMock.expects('validateFile').never();
+    await assert.rejects(
+      swaggerSpecValidatorCmd(['ha'], options),
+      TypeError,
+    );
+    swaggerSpecValidatorMock.verify();
+  });
+
+  it('rejects with TypeError without options', async () => {
+    swaggerSpecValidatorMock.expects('validate').never();
+    swaggerSpecValidatorMock.expects('validateFile').never();
+    await assert.rejects(
+      swaggerSpecValidatorCmd(RUNTIME_ARGS),
+      TypeError,
+    );
+    swaggerSpecValidatorMock.verify();
+  });
+
+  it('rejects with TypeError for non-object options', async () => {
+    swaggerSpecValidatorMock.expects('validate').never();
+    swaggerSpecValidatorMock.expects('validateFile').never();
+    await assert.rejects(
+      swaggerSpecValidatorCmd(RUNTIME_ARGS, true),
+      TypeError,
+    );
+    swaggerSpecValidatorMock.verify();
+  });
+
+  it('returns Error for non-Readable stdin', async () => {
+    swaggerSpecValidatorMock.expects('validate').never();
+    swaggerSpecValidatorMock.expects('validateFile').never();
+    await assert.rejects(
+      swaggerSpecValidatorCmd(RUNTIME_ARGS, { ...options, stdin: {} }),
+      TypeError,
+    );
+    swaggerSpecValidatorMock.verify();
+  });
+
+  it('returns Error for non-Writable stdout', async () => {
+    swaggerSpecValidatorMock.expects('validate').never();
+    swaggerSpecValidatorMock.expects('validateFile').never();
+    await assert.rejects(
+      swaggerSpecValidatorCmd(RUNTIME_ARGS, { ...options, stdout: {} }),
+      TypeError,
+    );
+    swaggerSpecValidatorMock.verify();
+  });
+
+  it('returns Error for non-Writable stderr', async () => {
+    swaggerSpecValidatorMock.expects('validate').never();
+    swaggerSpecValidatorMock.expects('validateFile').never();
+    await assert.rejects(
+      swaggerSpecValidatorCmd(RUNTIME_ARGS, { ...options, stderr: {} }),
+      TypeError,
+    );
+    swaggerSpecValidatorMock.verify();
   });
 });

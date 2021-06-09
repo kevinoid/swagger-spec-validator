@@ -5,7 +5,6 @@
 
 'use strict';
 
-const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
 const regexpEscape = require('regexp.escape');
@@ -33,105 +32,93 @@ describe('swagger-spec-validator', function() {
   // Increase timeout to something more reasonable for external APIs.
   this.timeout(10000);
 
-  it('validates JSON and YAML files', (done) => {
+  it('validates JSON and YAML files', async () => {
     const options = {
-      in: new stream.PassThrough(),
-      out: new stream.PassThrough({ encoding: 'utf-8' }),
-      err: new stream.PassThrough({ encoding: 'utf-8' }),
+      stdin: new stream.PassThrough(),
+      stdout: new stream.PassThrough({ encoding: 'utf-8' }),
+      stderr: new stream.PassThrough({ encoding: 'utf-8' }),
     };
     const allArgs = [...RUNTIME_ARGS, swaggerJsonPath, swaggerYamlPath];
-    swaggerSpecValidatorCmd(allArgs, options, (err, code) => {
-      assert.ifError(err);
-      assertMatch(
-        {
-          code,
-          out: options.out.read(),
-          err: options.err.read(),
-        },
-        match({
-          code: 0,
-          out: null,
-          err: match(/\bvalid/i),
-        }),
-      );
-      done();
-    });
+    const code = await swaggerSpecValidatorCmd(allArgs, options);
+    assertMatch(
+      {
+        code,
+        stdout: options.stdout.read(),
+        stderr: options.stderr.read(),
+      },
+      match({
+        code: 0,
+        stdout: null,
+        stderr: match(/\bvalid/i),
+      }),
+    );
   });
 
-  it('validates from stdin', (done) => {
+  it('validates from stdin', async () => {
     const options = {
-      in: fs.createReadStream(swaggerYamlPath),
-      out: new stream.PassThrough({ encoding: 'utf-8' }),
-      err: new stream.PassThrough({ encoding: 'utf-8' }),
+      stdin: fs.createReadStream(swaggerYamlPath),
+      stdout: new stream.PassThrough({ encoding: 'utf-8' }),
+      stderr: new stream.PassThrough({ encoding: 'utf-8' }),
     };
-    swaggerSpecValidatorCmd(RUNTIME_ARGS, options, (err, code) => {
-      assert.ifError(err);
-      assertMatch(
-        {
-          code,
-          out: options.out.read(),
-          err: options.err.read(),
-        },
-        match({
-          code: 0,
-          out: null,
-          err: match(/\bvalid/i),
-        }),
-      );
-      done();
-    });
+    const code = await swaggerSpecValidatorCmd(RUNTIME_ARGS, options);
+    assertMatch(
+      {
+        code,
+        stdout: options.stdout.read(),
+        stderr: options.stderr.read(),
+      },
+      match({
+        code: 0,
+        stdout: null,
+        stderr: match(/\bvalid/i),
+      }),
+    );
   });
 
-  it('handles validation failures', (done) => {
+  it('handles validation failures', async () => {
     const options = {
-      in: new stream.PassThrough(),
-      out: new stream.PassThrough({ encoding: 'utf-8' }),
-      err: new stream.PassThrough({ encoding: 'utf-8' }),
+      stdin: new stream.PassThrough(),
+      stdout: new stream.PassThrough({ encoding: 'utf-8' }),
+      stderr: new stream.PassThrough({ encoding: 'utf-8' }),
     };
     const allArgs = [...RUNTIME_ARGS, invalidYamlPath];
-    swaggerSpecValidatorCmd(allArgs, options, (err, code) => {
-      assert.ifError(err);
-      assertMatch(
-        {
-          code,
-          out: options.out.read(),
-          err: options.err.read(),
-        },
-        match({
-          code: 1,
-          out: match(new RegExp(`^${regexpEscape(invalidYamlPath)}:`)),
-          err: null,
-        }),
-      );
-      done();
-    });
+    const code = await swaggerSpecValidatorCmd(allArgs, options);
+    assertMatch(
+      {
+        code,
+        stdout: options.stdout.read(),
+        stderr: options.stderr.read(),
+      },
+      match({
+        code: 1,
+        stdout: match(new RegExp(`^${regexpEscape(invalidYamlPath)}:`)),
+        stderr: null,
+      }),
+    );
   });
 
-  it('handles unreadable file errors', (done) => {
+  it('handles unreadable file errors', async () => {
     const options = {
-      in: new stream.PassThrough(),
-      out: new stream.PassThrough({ encoding: 'utf-8' }),
-      err: new stream.PassThrough({ encoding: 'utf-8' }),
+      stdin: new stream.PassThrough(),
+      stdout: new stream.PassThrough({ encoding: 'utf-8' }),
+      stderr: new stream.PassThrough({ encoding: 'utf-8' }),
     };
     const nonexistentPath = 'nonexistent.yaml';
     const allArgs = [...RUNTIME_ARGS, nonexistentPath];
-    swaggerSpecValidatorCmd(allArgs, options, (err, code) => {
-      assert.ifError(err);
-      assertMatch(
-        {
-          code,
-          out: options.out.read(),
-          err: options.err.read(),
-        },
-        match({
-          code: 2,
-          out: null,
-          err: match(new RegExp(
-            `^${regexpEscape(nonexistentPath)}:.*\\bENOENT\\b`,
-          )),
-        }),
-      );
-      done();
-    });
+    const code = await swaggerSpecValidatorCmd(allArgs, options);
+    assertMatch(
+      {
+        code,
+        stdout: options.stdout.read(),
+        stderr: options.stderr.read(),
+      },
+      match({
+        code: 2,
+        stdout: null,
+        stderr: match(new RegExp(
+          `^${regexpEscape(nonexistentPath)}:.*\\bENOENT\\b`,
+        )),
+      }),
+    );
   });
 });

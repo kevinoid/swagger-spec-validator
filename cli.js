@@ -166,10 +166,6 @@ async function swaggerSpecValidatorCmd(args, options) {
     })
     .arguments('[swagger.yaml...]')
     .allowExcessArguments(false)
-    // Check for required/excess arguments.
-    // Workaround https://github.com/tj/commander.js/issues/1493
-    // TODO [commander@>=8]: Remove if fixed
-    .action(() => {})
     .description('Validate OpenAPI/Swagger files.')
     .option(
       '-H, --header <header>',

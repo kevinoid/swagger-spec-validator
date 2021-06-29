@@ -312,9 +312,7 @@ function validate(spec, options, callback) {
       }
     }
   } catch (err) {
-    process.nextTick(() => {
-      callback(err);
-    });
+    queueMicrotask(() => callback(err));
     return undefined;
   }
 

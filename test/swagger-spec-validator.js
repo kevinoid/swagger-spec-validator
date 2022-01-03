@@ -353,15 +353,16 @@ describe('swaggerSpecValidator', () => {
         });
     });
 
-    it('Error for non-string, non-Buffer, non-Readable spec',
-      () => swaggerSpecValidator.validate(true)
+    it('Error for non-string, non-Buffer, non-Readable spec', () => {
+      return swaggerSpecValidator.validate(true)
         .then(
           neverCalled,
           (err) => {
             assert.ok(err instanceof TypeError);
             assert.ok(/\bspec\b/.test(err.message));
           },
-        ));
+        );
+    });
 
     it('Error for non-object options', () => {
       const testBody = 'swagger';

@@ -6,7 +6,7 @@
 
 'use strict';
 
-const { Command, InvalidOptionArgumentError } = require('commander');
+const { Command, InvalidArgumentError } = require('commander');
 const { promisify } = require('util');
 
 const packageJson = require('./package.json');
@@ -39,7 +39,7 @@ function headerOption(headerLine, headers = Object.create(null)) {
   //       as a convenience for users.
   const match = /^\s*(\S+)\s*: ?(.*)$/.exec(headerLine);
   if (!match) {
-    throw new InvalidOptionArgumentError(
+    throw new InvalidArgumentError(
       `Header must start with token, then colon.  Got "${headerLine}"`,
     );
   }
@@ -199,7 +199,7 @@ async function swaggerSpecValidatorCmd(args, options) {
 
     // If a non-Commander error was thrown, treat it as unhandled.
     // It probably represents a bug and has not been written to stdout/stderr.
-    // throw commander.{CommanderError,InvalidOptionArgumentError} to avoid.
+    // throw commander.{CommanderError,InvalidArgumentError} to avoid.
     if (typeof errParse.code !== 'string'
       || !errParse.code.startsWith('commander.')) {
       throw errParse;

@@ -27,9 +27,9 @@ function countOption(optarg, previous) {
  *
  * @private
  * @param {string} headerLine Option argument (header line).
- * @param {!object<string,string>=} headers Previous value of header option
+ * @param {!Object<string,string>=} headers Previous value of header option
  * (object mapping header names to values) if any.
- * @returns {!object<string,string>} Object mapping header names to values,
+ * @returns {!Object<string,string>} Object mapping header names to values,
  * with header argument added.
  * @throws Error If headerLine can not be parsed.
  */

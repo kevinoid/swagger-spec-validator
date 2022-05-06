@@ -35,8 +35,8 @@ describe('swagger-spec-validator', function() {
   it('validates JSON and YAML files', async () => {
     const options = {
       stdin: new stream.PassThrough(),
-      stdout: new stream.PassThrough({ encoding: 'utf-8' }),
-      stderr: new stream.PassThrough({ encoding: 'utf-8' }),
+      stdout: new stream.PassThrough({ encoding: 'utf8' }),
+      stderr: new stream.PassThrough({ encoding: 'utf8' }),
     };
     const allArgs = [...RUNTIME_ARGS, swaggerJsonPath, swaggerYamlPath];
     const code = await swaggerSpecValidatorCmd(allArgs, options);
@@ -57,8 +57,8 @@ describe('swagger-spec-validator', function() {
   it('validates from stdin', async () => {
     const options = {
       stdin: fs.createReadStream(swaggerYamlPath),
-      stdout: new stream.PassThrough({ encoding: 'utf-8' }),
-      stderr: new stream.PassThrough({ encoding: 'utf-8' }),
+      stdout: new stream.PassThrough({ encoding: 'utf8' }),
+      stderr: new stream.PassThrough({ encoding: 'utf8' }),
     };
     const code = await swaggerSpecValidatorCmd(RUNTIME_ARGS, options);
     assertMatch(
@@ -78,8 +78,8 @@ describe('swagger-spec-validator', function() {
   it('handles validation failures', async () => {
     const options = {
       stdin: new stream.PassThrough(),
-      stdout: new stream.PassThrough({ encoding: 'utf-8' }),
-      stderr: new stream.PassThrough({ encoding: 'utf-8' }),
+      stdout: new stream.PassThrough({ encoding: 'utf8' }),
+      stderr: new stream.PassThrough({ encoding: 'utf8' }),
     };
     const allArgs = [...RUNTIME_ARGS, invalidYamlPath];
     const code = await swaggerSpecValidatorCmd(allArgs, options);
@@ -100,8 +100,8 @@ describe('swagger-spec-validator', function() {
   it('handles unreadable file errors', async () => {
     const options = {
       stdin: new stream.PassThrough(),
-      stdout: new stream.PassThrough({ encoding: 'utf-8' }),
-      stderr: new stream.PassThrough({ encoding: 'utf-8' }),
+      stdout: new stream.PassThrough({ encoding: 'utf8' }),
+      stderr: new stream.PassThrough({ encoding: 'utf8' }),
     };
     const nonexistentPath = 'nonexistent.yaml';
     const allArgs = [...RUNTIME_ARGS, nonexistentPath];

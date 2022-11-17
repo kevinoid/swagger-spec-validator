@@ -29,6 +29,7 @@
             <pre class="prettyprint source linenums"><code>/**
  * @copyright Copyright 2017-2019 Kevin Locke &lt;kevin@kevinlocke.name>
  * @license MIT
+ * @module modulename
  */
 
 'use strict';
@@ -36,44 +37,39 @@
 const fs = require('fs');
 const http = require('http');
 const https = require('https');
-// TODO [engine:node@>=10]: Use URL defined globally
-const { URL } = require('url'); // eslint-disable-line no-shadow
-const util = require('util');
+// stream.Writable (and therefore http.ClientRequest) accept any Uint8Array
+const { types: { isUint8Array } } = require('util');
 
 const packageJson = require('./package.json');
-
-// stream.Writable (and therefore http.ClientRequest) accept any Uint8Array
-// TODO [engine:node@>=10]: Use util.types unconditionally
-// eslint-disable-next-line node/no-unsupported-features/node-builtins
-const isUint8Array = util.types ? util.types.isUint8Array
-  : function isUint8Array(obj) {
-    return Object.prototype.toString.call(obj) === '[object Uint8Array]';
-  };
 
 /** @exports swagger-spec-validator */
 const swaggerSpecValidator = {};
 
-/** JSON Content-Type accepted by online.swagger.io and validator.swagger.io.
- * @const
+/** JSON Content-Type accepted by validator.swagger.io.
+ *
+ * @constant
  * @private
  */
 const JSON_CONTENT_TYPE = 'application/json';
 
-/** YAML Content-Type accepted by online.swagger.io and validator.swagger.io.
+/** YAML Content-Type accepted by validator.swagger.io.
  * See https://github.com/swagger-api/validator-badge/issues/136
- * @const
+ *
+ * @constant
  * @private
  */
 const YAML_CONTENT_TYPE = 'application/yaml';
 
 /** Default URL to which validation requests are sent.
- * @const
+ *
+ * @constant
  */
 const DEFAULT_URL = 'https://validator.swagger.io/validator/debug';
 swaggerSpecValidator.DEFAULT_URL = DEFAULT_URL;
 
 /** Default headers sent with API requests.
- * @const
+ *
+ * @constant
  */
 const DEFAULT_HEADERS = Object.freeze({
   Accept: JSON_CONTENT_TYPE,
@@ -82,34 +78,34 @@ const DEFAULT_HEADERS = Object.freeze({
 });
 swaggerSpecValidator.DEFAULT_HEADERS = DEFAULT_HEADERS;
 
-
 /** Combines HTTP headers objects.
  * With the capitalization and value of the last occurrence.
+ *
  * @private
  */
 function combineHeaders(...args) {
   const combinedLower = {};
   const combined = {};
   args.reverse();
-  args.forEach((headers) => {
+  for (const headers of args) {
     if (headers) {
-      Object.keys(headers).forEach((name) => {
+      for (const name of Object.keys(headers)) {
         const nameLower = name.toLowerCase();
         if (!hasOwnProperty.call(combinedLower, nameLower)) {
           combinedLower[nameLower] = true;
           combined[name] = headers[name];
         }
-      });
+      }
     }
-  });
+  }
   return combined;
 }
 
-
 /** Reads all data from a stream.Readable.
+ *
  * @private
- * @param {!stream.Readable} stream Stream from which to read all data.
- * @return {string|Buffer} Data from stream, if any.
+ * @param {!module:stream.Readable} stream Stream from which to read all data.
+ * @returns {string|Buffer} Data from stream, if any.
  */
 function getStreamData(stream) {
   return new Promise((resolve, reject) => {
@@ -129,15 +125,15 @@ function getStreamData(stream) {
   });
 }
 
-
 /** Makes an HTTP(S) request and parses the JSON response.
+ *
  * @private
  */
 function requestJson(url, options, callback) {
   const protocol = options.protocol || url.protocol;
   const proto = protocol === 'https:' ? https
     : protocol === 'http:' ? http
-      : null;
+      : undefined;
   if (!proto) {
     callback(
       new Error(`Unsupported protocol "${protocol}" for validator URL`),
@@ -172,10 +168,17 @@ function requestJson(url, options, callback) {
           );
         }
 
+        // Note: Could redirect using follow-redirects, axios, got, node-fetch
+        // No known use case, since user should update -u to avoid overhead.
+        // If you have a use case, feel free to open an issue.
         if (res.statusCode >= 300) {
           let errMessage = `HTTP ${res.statusCode}`;
           if (res.statusMessage) {
             errMessage += `: ${res.statusMessage}`;
+          }
+          const { location } = res.headers;
+          if (location) {
+            errMessage += `: ${location}`;
           }
           err = new Error(errMessage);
         }
@@ -188,6 +191,8 @@ function requestJson(url, options, callback) {
           err.body = resBodyObj !== undefined ? resBodyObj : resBody;
           callback(err);
         } else {
+          // Use null to preserve current API.
+          // eslint-disable-next-line unicorn/no-null
           callback(null, resBodyObj);
         }
       });
@@ -205,18 +210,17 @@ function requestJson(url, options, callback) {
   }
 }
 
-
 /** Guesses Content-Type of OpenAPI/Swagger spec data.
  *
  * @private
  * @param {string|!Uint8Array} spec OpenAPI/Swagger API specification content.
- * @return {string} Content type of spec.
+ * @returns {string} Content type of spec.
  */
 function guessSpecDataContentType(spec, options) {
   try {
     JSON.parse(spec);
     return JSON_CONTENT_TYPE;
-  } catch (err) {
+  } catch {
     if (options.verbosity >= 1) {
       options.err.write(
         'Unable to parse spec content as JSON.  Assuming YAML.\n',
@@ -227,7 +231,6 @@ function guessSpecDataContentType(spec, options) {
   }
 }
 
-
 /** Guesses Content-Type of OpenAPI/Swagger spec data or stream.
  *
  * Note: All current versions of the OpenAPI Specification require OpenAPI
@@ -235,7 +238,7 @@ function guessSpecDataContentType(spec, options) {
  * between only those two types.
  *
  * @private
- * @param {string|!Uint8Array|!stream.Readable} spec OpenAPI/Swagger API
+ * @param {string|!Uint8Array|!module:stream.Readable} spec OpenAPI/Swagger API
  * specification content.
  */
 function guessSpecContentType(spec, options) {
@@ -269,19 +272,19 @@ function guessSpecContentType(spec, options) {
     }));
 }
 
-
 /** Validation options
  *
  * @typedef {{
- *   err: (stream.Writable|undefined),
- *   request: (Object|undefined),
- *   url: (URL|Object|string|undefined),
+ *   err: (module:stream.Writable|undefined),
+ *   request: (object|undefined),
+ *   url: (URL|object|string|undefined),
  *   verbosity: (number|undefined)
  * }} ValidateOptions
- * @property {stream.Writable=} err Stream to which errors (and non-output
- * status messages) are written. (default: &lt;code>process.stderr&lt;/code>)
- * @property {Object=} request Options passed to &lt;code>http.request()&lt;/code>.
- * @property {URL|Object|string=} url URL passed to &lt;code>http.request()&lt;/code>.
+ * @property {module:stream.Writable=} err Stream to which errors (and
+ * non-output status messages) are written.
+ * (default: &lt;code>process.stderr&lt;/code>)
+ * @property {object=} request Options passed to &lt;code>http.request()&lt;/code>.
+ * @property {URL|object|string=} url URL passed to &lt;code>http.request()&lt;/code>.
  * @property {number=} verbosity Amount of output to produce.  Larger numbers
  * produce more output.
  */
@@ -289,19 +292,19 @@ function guessSpecContentType(spec, options) {
 
 /** Validates an OpenAPI/Swagger API specification.
  *
- * @param {string|!Uint8Array|!stream.Readable} spec OpenAPI/Swagger API
+ * @param {string|!Uint8Array|!module:stream.Readable} spec OpenAPI/Swagger API
  * specification content.
  * @param {ValidateOptions=} options Validation options.
- * @param {?function(Error, Object=)=} callback Callback for the validation
+ * @param {?function(Error, object=)=} callback Callback for the validation
  * results object.
- * @return {Promise&lt;Object>|undefined} If &lt;code>callback&lt;/code> is not given,
+ * @returns {Promise&lt;object>|undefined} If &lt;code>callback&lt;/code> is not given,
  * a &lt;code>Promise&lt;/code> with the validation results or &lt;code>Error&lt;/code>.
  */
 swaggerSpecValidator.validate =
 function validate(spec, options, callback) {
   if (!callback &amp;&amp; typeof options === 'function') {
     callback = options;
-    options = null;
+    options = undefined;
   }
 
   if (!callback) {
@@ -325,19 +328,19 @@ function validate(spec, options, callback) {
       throw new TypeError('spec must be a string, Uint8Array, or Readable');
     }
 
-    if (options != null) {
+    if (options !== undefined &amp;&amp; options !== null) {
       if (typeof options !== 'object') {
         throw new TypeError('options must be an object');
       }
 
-      if (options.err != null &amp;&amp; typeof options.err.write !== 'function') {
+      if (options.err !== undefined
+        &amp;&amp; options.err !== null
+        &amp;&amp; typeof options.err.write !== 'function') {
         throw new TypeError('options.err must be a stream.Writable');
       }
     }
   } catch (err) {
-    process.nextTick(() => {
-      callback(err);
-    });
+    queueMicrotask(() => callback(err));
     return undefined;
   }
 
@@ -375,6 +378,8 @@ function validate(spec, options, callback) {
     .some((name) => name.toLowerCase() === 'content-type')) {
     contentInfoP = guessSpecContentType(spec, options);
   } else {
+    // Use null to preserve current API.
+    // eslint-disable-next-line unicorn/no-null
     contentInfoP = Promise.resolve(null);
   }
 
@@ -403,16 +408,16 @@ function validate(spec, options, callback) {
  *
  * @param {string} specPath Path of OpenAPI/Swagger API specification file.
  * @param {ValidateOptions=} options Validation options.
- * @param {?function(Error, Object=)=} callback Callback for the validation
+ * @param {?function(Error, object=)=} callback Callback for the validation
  * results object.
- * @return {Promise&lt;Object>|undefined} If &lt;code>callback&lt;/code> is not given,
+ * @returns {Promise&lt;object>|undefined} If &lt;code>callback&lt;/code> is not given,
  * a &lt;code>Promise&lt;/code> with the validation results or &lt;code>Error&lt;/code>.
  */
 swaggerSpecValidator.validateFile =
 function validateFile(specPath, options, callback) {
   if (!callback &amp;&amp; typeof options === 'function') {
     callback = options;
-    options = null;
+    options = undefined;
   }
 
   const specStream = fs.createReadStream(specPath);
@@ -430,13 +435,13 @@ module.exports = swaggerSpecValidator;
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-swagger-spec-validator.html">swagger-spec-validator</a></li><li><a href="module-swagger-spec-validator_bin_swagger-spec-validator.html">swagger-spec-validator/bin/swagger-spec-validator</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-modulename.html">modulename</a></li><li><a href="module-swagger-spec-validator.html">swagger-spec-validator</a></li><li><a href="swagger-spec-validator_cli.html#.module:js">js</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.3</a> on Sat Nov 16 2019 17:59:29 GMT-0700 (Mountain Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.0</a> on Wed Nov 16 2022 20:23:22 GMT-0700 (Mountain Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>

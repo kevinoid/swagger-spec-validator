@@ -1,4 +1,30 @@
-# Change Log
+# [5.0.0](https://github.com/kevinoid/swagger-spec-validator/compare/v4.0.1...v5.0.0) (2022-11-17)
+
+### BREAKING CHANGES
+
+* Drop support for Node.js 15 and 14.17 and below.
+* The `?` CLI option was dropped in favor of `-h` or `--help`.
+* Only `index.js`, `cli.js`, and `package.json` are exported from this package.
+* `require('swagger-spec-validator/bin/swagger-spec-validator.js')` has been
+  renamed to `require('swagger-spec-validator/cli.js')`.
+* The `in`, `out`, and `err` properties of the `options` argument of
+  `swagger-spec-validator/cli.js` are now `stdin`, `stdout`, and `stderr` to
+  match `process` for easier calling.
+- Default values for the `args` and `options` arguments of
+  `swagger-spec-validator/cli.js` are no longer provided, due to lack of
+  compelling use-case, to avoid ambiguity, and to reduce code.
+- `swagger-spec-validator/cli.js` no longer accepts a callback argument.  It
+  returns a `Promise` with exit code.
+
+### Features
+
+* Use `commander` instead of `yargs` for command-line parsing
+  ([2a7c9c8](https://github.com/kevinoid/swagger-spec-validator/commit/2a7c9c867cdcc4e0316729d3a01793a58247a683))
+* Switch from `nyc` to `c8` for native V8 coverage collection
+  ([d72a313](https://github.com/kevinoid/swagger-spec-validator/commit/d72a3136254166eda40fb56c550283758c25ac1f))
+* Set `process.exitCode` instead of calling `process.exit()` in `cli.js`
+  ([247de91](https://github.com/kevinoid/swagger-spec-validator/commit/247de91e0e033f531ec604e6e7953b47dd7a10ad))
+
 
 ## [v4.0.1](https://github.com/kevinoid/swagger-spec-validator/tree/v4.0.1) (2019-11-16)
 [Full Changelog](https://github.com/kevinoid/swagger-spec-validator/compare/v4.0.0...v4.0.1)

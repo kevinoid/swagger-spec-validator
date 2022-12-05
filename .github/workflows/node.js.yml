@@ -42,7 +42,7 @@ jobs:
         #
         # Support for "current"/"latest"/"node" was added in v3.2.0
         # https://github.com/actions/setup-node/pull/483
-        node-version: '19.0'
+        node-version: latest
         architecture: x64
         check-latest: true
     - name: Display Node.js version
@@ -89,12 +89,12 @@ jobs:
         - windows-latest
         node:
         - '14.18'
-        - '19.0'
+        - latest
         exclude:
         # Exclude os/version already run in test-primary
         - arch: x64
           os: ubuntu-latest
-          node: '19.0'
+          node: latest
     steps:
     - uses: actions/checkout@v3
     - name: Set up Node.js ${{ matrix.node }}

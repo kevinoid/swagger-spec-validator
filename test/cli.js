@@ -5,11 +5,11 @@
 
 'use strict';
 
-const assert = require('assert');
+const assert = require('node:assert');
 const proxyquire = require('proxyquire');
 const regexpEscape = require('regexp.escape');
 const sinon = require('sinon');
-const stream = require('stream');
+const stream = require('node:stream');
 
 let swaggerSpecValidator = require('..');
 const packageJson = require('../package.json');

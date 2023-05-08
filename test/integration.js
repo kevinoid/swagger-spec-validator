@@ -5,11 +5,11 @@
 
 'use strict';
 
-const fs = require('fs');
-const path = require('path');
+const fs = require('node:fs');
+const path = require('node:path');
 const regexpEscape = require('regexp.escape');
 const sinon = require('sinon');
-const stream = require('stream');
+const stream = require('node:stream');
 
 const swaggerSpecValidatorCmd = require('../cli.js');
 

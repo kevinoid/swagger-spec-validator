@@ -7,7 +7,7 @@
 'use strict';
 
 const { Command, InvalidArgumentError } = require('commander');
-const { promisify } = require('util');
+const { promisify } = require('node:util');
 
 const packageJson = require('./package.json');
 const swaggerSpecValidator = require('./index.js');

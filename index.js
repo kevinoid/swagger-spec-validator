@@ -6,11 +6,11 @@
 
 'use strict';
 
-const fs = require('fs');
-const http = require('http');
-const https = require('https');
+const fs = require('node:fs');
+const http = require('node:http');
+const https = require('node:https');
 // stream.Writable (and therefore http.ClientRequest) accept any Uint8Array
-const { types: { isUint8Array } } = require('util');
+const { types: { isUint8Array } } = require('node:util');
 
 const packageJson = require('./package.json');
 
@@ -317,9 +317,7 @@ function validate(spec, options, callback) {
   }
 
   options = { ...options };
-  if (!options.err) {
-    options.err = process.stderr;
-  }
+  options.err ||= process.stderr;
 
   // Note: Options on URL object are ignored by https.request()
   // Don't combine into single options object without conversion to generic obj.

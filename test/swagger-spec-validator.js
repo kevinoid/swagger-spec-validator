@@ -5,12 +5,12 @@
 
 'use strict';
 
-const assert = require('assert');
+const assert = require('node:assert');
 const nock = require('nock');
-const path = require('path');
+const path = require('node:path');
 const regexpEscape = require('regexp.escape');
-const stream = require('stream');
-const url = require('url');
+const stream = require('node:stream');
+const url = require('node:url');
 
 const packageJson = require('../package.json');
 const swaggerSpecValidator = require('..');

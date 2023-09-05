@@ -11,6 +11,8 @@ const regexpEscape = require('regexp.escape');
 const sinon = require('sinon');
 const stream = require('node:stream');
 
+// https://github.com/import-js/eslint-plugin-import/issues/2844
+// eslint-disable-next-line import/extensions
 let swaggerSpecValidator = require('..');
 const packageJson = require('../package.json');
 

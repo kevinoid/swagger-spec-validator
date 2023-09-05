@@ -13,6 +13,8 @@ const stream = require('node:stream');
 const url = require('node:url');
 
 const packageJson = require('../package.json');
+// https://github.com/import-js/eslint-plugin-import/issues/2844
+// eslint-disable-next-line import/extensions
 const swaggerSpecValidator = require('..');
 
 const defaultUrl = new URL(swaggerSpecValidator.DEFAULT_URL);

@@ -97,6 +97,7 @@ describe('swaggerSpecValidator', () => {
       const ne = nock(testProtoHost)
         .post(testPath)
         .reply(200, response);
+      // eslint-disable-next-line n/no-deprecated-api
       const options = { url: url.parse(testProtoHost + testPath) };
       return swaggerSpecValidator.validate('swagger', options)
         .then((result) => {
@@ -112,6 +113,7 @@ describe('swaggerSpecValidator', () => {
       const ne = nock(testProtoHost)
         .post(testPath)
         .reply(200, response);
+      // eslint-disable-next-line n/no-deprecated-api
       const options = { request: url.parse(testProtoHost + testPath) };
       return swaggerSpecValidator.validate('swagger', options)
         .then((result) => {
@@ -277,6 +279,7 @@ describe('swaggerSpecValidator', () => {
     });
 
     it('returns Error for unsupported protocol in request options', () => {
+      // eslint-disable-next-line n/no-deprecated-api
       const options = { request: url.parse('ftp://example.com') };
       return swaggerSpecValidator.validateFile(swaggerJsonPath, options)
         .then(

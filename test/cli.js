@@ -294,8 +294,8 @@ describe('swagger-spec-validator command', () => {
   // Check argument errors are handled correctly
   expectArgsResult(['-H'], 3, null, /missing|not enough/i);
   expectArgsResult(['--header'], 3, null, /missing|not enough/i);
-  expectArgsResult(['-H', ':badarg'], 3, null, /header.*\bbadarg\b/i);
-  expectArgsResult(['-H', 'badarg'], 3, null, /header.*\bbadarg\b/i);
+  expectArgsResult(['-H', ':badarg'], 3, null, /header.+\bbadarg\b/i);
+  expectArgsResult(['-H', 'badarg'], 3, null, /header.+\bbadarg\b/i);
   expectArgsResult(['-u'], 3, null, /missing|not enough/i);
   expectArgsResult(['--url'], 3, null, /missing|not enough/i);
   expectArgsResult(

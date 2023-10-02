@@ -38,7 +38,7 @@ function headerOption(headerLine, headers = Object.create(null)) {
   // Note: curl uses the header line literally.  We can't due to Node API.
   //       Node enforces name is a valid RFC 7230 token, so remove whitespace
   //       as a convenience for users.
-  const match = /^\s*(\S+)\s*: ?(.*)$/.exec(headerLine);
+  const match = /^\s*([^\s:]+)\s*: ?(.*)$/.exec(headerLine);
   if (!match) {
     throw new InvalidArgumentError(
       `Header must start with token, then colon.  Got "${headerLine}"`,

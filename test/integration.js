@@ -7,9 +7,10 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
+const stream = require('node:stream');
+
 const regexpEscape = require('regexp.escape');
 const sinon = require('sinon');
-const stream = require('node:stream');
 
 const swaggerSpecValidatorCmd = require('../cli.js');
 

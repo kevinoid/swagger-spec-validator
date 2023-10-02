@@ -6,16 +6,17 @@
 'use strict';
 
 const assert = require('node:assert');
-const nock = require('nock');
 const path = require('node:path');
-const regexpEscape = require('regexp.escape');
 const stream = require('node:stream');
 const url = require('node:url');
 
-const packageJson = require('../package.json');
+const nock = require('nock');
+const regexpEscape = require('regexp.escape');
+
 // https://github.com/import-js/eslint-plugin-import/issues/2844
 // eslint-disable-next-line import/extensions
 const swaggerSpecValidator = require('..');
+const packageJson = require('../package.json');
 
 const defaultUrl = new URL(swaggerSpecValidator.DEFAULT_URL);
 const defaultProtoHost = `${defaultUrl.protocol}//${defaultUrl.host}`;

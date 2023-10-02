@@ -6,10 +6,11 @@
 'use strict';
 
 const assert = require('node:assert');
+const stream = require('node:stream');
+
 const proxyquire = require('proxyquire');
 const regexpEscape = require('regexp.escape');
 const sinon = require('sinon');
-const stream = require('node:stream');
 
 // https://github.com/import-js/eslint-plugin-import/issues/2844
 // eslint-disable-next-line import/extensions

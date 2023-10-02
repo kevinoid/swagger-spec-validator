@@ -6,11 +6,12 @@
 
 'use strict';
 
-const { Command, InvalidArgumentError } = require('commander');
 const { promisify } = require('node:util');
 
-const packageJson = require('./package.json');
+const { Command, InvalidArgumentError } = require('commander');
+
 const swaggerSpecValidator = require('./index.js');
+const packageJson = require('./package.json');
 
 /** Option parser to count the number of occurrences of the option.
  *

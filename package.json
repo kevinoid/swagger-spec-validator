@@ -73,7 +73,7 @@
     "nock": "^13.0.0",
     "nodecat": "^2.0.0",
     "proxyquire": "^2.0.0",
-    "regexp.escape": "^1.0.2",
+    "regexp.escape": "^2.0.1",
     "rimraf": "^5.0.0",
     "sinon": "^18.0.0"
   },

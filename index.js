@@ -63,7 +63,7 @@ function combineHeaders(...args) {
     if (headers) {
       for (const name of Object.keys(headers)) {
         const nameLower = name.toLowerCase();
-        if (!hasOwnProperty.call(combinedLower, nameLower)) {
+        if (!Object.hasOwn(combinedLower, nameLower)) {
           combinedLower[nameLower] = true;
           combined[name] = headers[name];
         }

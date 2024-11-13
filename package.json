@@ -49,7 +49,7 @@
     "preversion": "npm run test-cov && c8 check-coverage --statements 90 && depcheck --ignore-dirs doc --ignores=\"eslint-*,rimraf\" && david && git-branch-is main && hub-ci-status -vv --wait",
     "test": "npm run lint && npm run test-unit",
     "test-cov": "npm run lint && npm run test-unit-cov",
-    "test-unit": "node --throw-deprecation --unhandled-rejections=strict node_modules/mocha/bin/mocha --parallel --recursive test",
+    "test-unit": "node --disable-proto=throw --throw-deprecation --unhandled-rejections=strict node_modules/mocha/bin/mocha.js --parallel --recursive test",
     "test-unit-cov": "c8 --reporter=lcov --reporter=text npm run test-unit",
     "version": "npm run changelog && echo && echo === Please edit CHANGELOG.md as desired, then exit === && echo && \"${npm_config_shell:-${SHELL:-bash}}\" && git commit -m \"Update CHANGELOG.md for $npm_package_version\" CHANGELOG.md",
     "version-deps": "npm install conventional-changelog-cli david depcheck git-branch-is hub-ci-status"

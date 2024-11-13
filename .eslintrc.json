@@ -28,7 +28,7 @@
       ],
       "rules": {
         // Executable scripts should have a shebang
-        "n/shebang": "off"
+        "n/hashbang": "off"
       }
     }
   ]

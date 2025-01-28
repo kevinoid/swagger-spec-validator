@@ -70,7 +70,7 @@
     "eslint-plugin-unicorn": "^56.0.0",
     "jsdoc": "^4.0.0",
     "mocha": "^11.0.1",
-    "nock": "^13.0.0",
+    "nock": "^14.0.0",
     "nodecat": "^2.0.0",
     "proxyquire": "^2.0.0",
     "regexp.escape": "^2.0.1",

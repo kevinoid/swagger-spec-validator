@@ -86,7 +86,9 @@ jobs:
         - ubuntu-latest
         - windows-latest
         node:
-        - '18.0'
+        # Note: Although this project supports 18.0, some test dependencies
+        # only support 18.6 and later (nock declares >=18.20, but works)
+        - '18.6'
         - latest
         exclude:
         # Exclude os/version already run in test-primary

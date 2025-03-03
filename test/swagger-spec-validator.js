@@ -11,6 +11,7 @@ const stream = require('node:stream');
 const url = require('node:url');
 
 const nock = require('nock');
+// eslint-disable-next-line unicorn/no-unnecessary-polyfills
 const regexpEscape = require('regexp.escape');
 
 // https://github.com/import-js/eslint-plugin-import/issues/2844

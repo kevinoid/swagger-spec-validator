@@ -9,6 +9,7 @@ const assert = require('node:assert');
 const stream = require('node:stream');
 
 const proxyquire = require('proxyquire');
+// eslint-disable-next-line unicorn/no-unnecessary-polyfills
 const regexpEscape = require('regexp.escape');
 const sinon = require('sinon');
 

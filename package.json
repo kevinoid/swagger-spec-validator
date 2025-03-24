@@ -75,7 +75,7 @@
     "proxyquire": "^2.0.0",
     "regexp.escape": "^2.0.1",
     "rimraf": "^5.0.0",
-    "sinon": "^19.0.2"
+    "sinon": "^20.0.0"
   },
   "engines": {
     "node": ">=18",

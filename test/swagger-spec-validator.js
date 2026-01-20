@@ -34,6 +34,46 @@ function neverCalled() {
   throw new Error('should not be called');
 }
 
+/** Runs a function with DeprecationWarnings suppressed.
+ *
+ * @private
+ * @param {!Function} func Function to run.
+ * @param {Array} args Arguments to pass to {@link func}.
+ * @returns {*} Return value of {@link func}.
+ */
+function withoutDeprecationWarning(func, ...args) {
+  // TODO: Could suppress more selectively by overriding process.emit as in
+  // https://github.com/yarnpkg/berry/blob/031b5da1dc8e459e844efda137b2f00d7cdc9dda/packages/yarnpkg-pnp/sources/loader/applyPatch.ts#L304-L325
+
+  if (process.noDeprecation) {
+    // Fast path.  No additional suppression required.
+    return func(...args);
+  }
+
+  // Slow path.  Must change, then restore noDeprecation.
+  //
+  // Note: noDeprecation is currently (Node.js 25) a read-only property which
+  // is only defined when the --no-deprecation option is passed to node.  This
+  // code is intended to be future-proof against unconditional definition.
+  const noDeprecationProp =
+    Object.getOwnPropertyDescriptor(process, 'noDeprecation');
+  try {
+    Object.defineProperty(process, 'noDeprecation', {
+      value: true,
+      configurable: true, // so it can be restored
+      enumerable: noDeprecationProp?.enumerable,
+    });
+
+    return func(...args);
+  } finally {
+    if (noDeprecationProp) {
+      Object.defineProperty(process, 'noDeprecation', noDeprecationProp);
+    } else {
+      delete process.noDeprecation;
+    }
+  }
+}
+
 describe('swaggerSpecValidator', () => {
   afterEach(() => {
     nock.cleanAll();
@@ -98,8 +138,10 @@ describe('swaggerSpecValidator', () => {
       const ne = nock(testProtoHost)
         .post(testPath)
         .reply(200, response);
-      // eslint-disable-next-line n/no-deprecated-api
-      const options = { url: url.parse(testProtoHost + testPath) };
+      const options = {
+        // eslint-disable-next-line n/no-deprecated-api
+        url: withoutDeprecationWarning(url.parse, testProtoHost + testPath),
+      };
       return swaggerSpecValidator.validate('swagger', options)
         .then((result) => {
           assert.deepStrictEqual(result, response);

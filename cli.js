@@ -32,7 +32,7 @@ function countOption(optarg, previous) {
  * (object mapping header names to values) if any.
  * @returns {!Object<string,string>} Object mapping header names to values,
  * with header argument added.
- * @throws Error If headerLine can not be parsed.
+ * @throws {Error} If headerLine can not be parsed.
  */
 function headerOption(headerLine, headers = Object.create(null)) {
   // Note: curl uses the header line literally.  We can't due to Node API.

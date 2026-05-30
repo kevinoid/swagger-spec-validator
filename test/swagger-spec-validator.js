@@ -36,7 +36,7 @@ function neverCalled() {
 /** Runs a function with DeprecationWarnings suppressed.
  *
  * @private
- * @param {!Function} func Function to run.
+ * @param {!function(*): *} func Function to run.
  * @param {Array} args Arguments to pass to {@link func}.
  * @returns {*} Return value of {@link func}.
  */

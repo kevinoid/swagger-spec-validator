@@ -656,7 +656,7 @@ swaggerSpecValidatorMock.verify();</code></pre></dd>
     const code = await codeP;
     assert.strictEqual(code, 2);
     assert.strictEqual(options.stdout.read(), null);
-    const errStr = String(options.stderr.read());
+    const errStr = String(options.stderr.read(options.stderr.readableLength));
     assertMatch(errStr, /testerr/i);
     assertMatch(errStr, new RegExp(regexpEscape(__filename)));
   }</code></pre></dd>
@@ -1036,8 +1036,10 @@ const response = {};
 const ne = nock(testProtoHost)
   .post(testPath)
   .reply(200, response);
-// eslint-disable-next-line n/no-deprecated-api
-const options = { url: url.parse(testProtoHost + testPath) };
+const options = {
+  // eslint-disable-next-line n/no-deprecated-api
+  url: withoutDeprecationWarning(url.parse, testProtoHost + testPath),
+};
 return swaggerSpecValidator.validate(&#x27;swagger&#x27;, options)
   .then((result) =&#x3E; {
     assert.deepStrictEqual(result, response);

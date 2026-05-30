@@ -293,10 +293,10 @@ function validate(spec, options, callback) {
 
   try {
     if (spec === undefined
-        || spec === null
-        || (typeof spec !== 'string'
-         && !isUint8Array(spec)
-         && typeof spec.pipe !== 'function')) {
+      || spec === null
+      || (typeof spec !== 'string'
+        && !isUint8Array(spec)
+        && typeof spec.pipe !== 'function')) {
       throw new TypeError('spec must be a string, Uint8Array, or Readable');
     }
 

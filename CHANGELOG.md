@@ -1,3 +1,20 @@
+# [6.0.0](https://github.com/kevinoid/swagger-spec-validator/compare/v5.0.0...v6.0.0) (2026-05-30)
+
+### BREAKING CHANGES
+
+* **deps:** Require Node.js ^20.19 || >=22.12 ([6bc3df0](https://github.com/kevinoid/swagger-spec-validator/commit/6bc3df0e597c8a7b44a199a4e2d12395d12980bb))
+
+### Bug Fixes
+
+* don't match : in header name ([e4e7a6c](https://github.com/kevinoid/swagger-spec-validator/commit/e4e7a6ce3129318a8ecf04f1cfb4da3582c86ef8))
+
+### Features
+
+* implement trusted publishing from GitHub ([2b1bdc8](https://github.com/kevinoid/swagger-spec-validator/commit/2b1bdc8e7d24ea8b33aa41dd41818e088b33091f))
+* **package:** use git+https for repository.url ([a974e85](https://github.com/kevinoid/swagger-spec-validator/commit/a974e856ca8ed6f704c94268bcff426f382d18eb))
+* **deps:** bump commander from 9.0.0 to 15.0.0 ([6bc3df0](https://github.com/kevinoid/swagger-spec-validator/commit/6bc3df0e597c8a7b44a199a4e2d12395d12980bb))
+
+
 # [5.0.0](https://github.com/kevinoid/swagger-spec-validator/compare/v4.0.1...v5.0.0) (2022-11-17)
 
 ### BREAKING CHANGES

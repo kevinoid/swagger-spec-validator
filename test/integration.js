@@ -9,7 +9,6 @@ const fs = require('node:fs');
 const path = require('node:path');
 const stream = require('node:stream');
 
-// eslint-disable-next-line unicorn/no-unnecessary-polyfills
 const regexpEscape = require('regexp.escape');
 const sinon = require('sinon');
 

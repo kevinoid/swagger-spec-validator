@@ -381,7 +381,7 @@ describe('swagger-spec-validator command', () => {
     const code = await codeP;
     assert.strictEqual(code, 2);
     assert.strictEqual(options.stdout.read(), null);
-    const errStr = String(options.stderr.read());
+    const errStr = String(options.stderr.read(options.stderr.readableLength));
     assertMatch(errStr, /testerr/i);
     assertMatch(errStr, new RegExp(regexpEscape(__filename)));
   });

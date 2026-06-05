@@ -68,6 +68,53 @@ function getMessages(result) {
   return messages;
 }
 
+/** Format a headers object to a string for printing.
+ *
+ * @private
+ * @param {!Object<string,string>} headers Headers to format.
+ * @returns {string} Formatted string of headers.
+ */
+function formatHeaders(headers) {
+  return Object.entries(headers)
+    .flatMap(([key, value]) => [key, ': ', value, '\n'])
+    .join('');
+}
+
+/** Write an error message to a given stream for a given file and error.
+ *
+ * @private
+ * @param {string} specPath Path of OpenAPI/Swagger API specification file
+ * which encountered the error.
+ * @param {!Error} err Error to write.
+ * @param {!CommandOptions} options Options.
+ */
+function writeError(specPath, err, options) {
+  if (options.verbosity < 0) {
+    return;
+  }
+
+  options.stderr.write(`${specPath}: ${err}\n`);
+
+  if (options.verbosity >= 1) {
+    if (err.headers) {
+      options.stderr.write(formatHeaders(err.headers));
+    }
+
+    if (err.body) {
+      options.stderr.write('\n');
+      options.stderr.write(
+        err.body instanceof Uint8Array ? err.body
+          : JSON.stringify(err.body, undefined, 2),
+      );
+      options.stderr.write('\n');
+    }
+
+    if (options.verbosity >= 2) {
+      options.stderr.write(err.stack);
+    }
+  }
+}
+
 // TODO: Replace promisify() with Promise-returning version
 const validateAll = promisify((specPaths, options, callback) => {
   let hadError = false;
@@ -77,12 +124,7 @@ const validateAll = promisify((specPaths, options, callback) => {
     function onResult(err, result) {
       if (err) {
         hadError = true;
-        if (options.verbosity >= -1) {
-          options.stderr.write(`${specPath}: ${err}\n`);
-          if (options.verbosity >= 1) {
-            options.stderr.write(err.stack);
-          }
-        }
+        writeError(specPath, err, options);
       } else {
         const messages = getMessages(result);
         if (messages.length > 0) {

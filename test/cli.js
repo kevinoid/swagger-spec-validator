@@ -367,7 +367,35 @@ describe('swagger-spec-validator command', () => {
     assertMatch(options.stderr.read(), /testerr/i);
   });
 
-  it('-v prints error messages with stack to stderr', async () => {
+  it('-v prints error headers and body to stderr', async () => {
+    swaggerSpecValidatorMock.expects('validateFile').never();
+    const validate = swaggerSpecValidatorMock.expects('validate').once()
+      .withArgs(
+        options.stdin,
+        match.object,
+        match.func,
+      );
+    const allArgs = [...RUNTIME_ARGS, '-v'];
+    const codeP = swaggerSpecValidatorCmd(allArgs, options);
+    const err = new Error('testerr');
+    err.headers = {
+      header1: 'Some header value',
+      header2: 'Another header value',
+    };
+    err.body = Buffer.from('Response body');
+    validate.yield(err, {});
+    const code = await codeP;
+    assert.strictEqual(code, 2);
+    assert.strictEqual(options.stdout.read(), null);
+    const errStr = String(options.stderr.read(options.stderr.readableLength));
+    assertMatch(errStr, /testerr/i);
+    assertMatch(errStr, new RegExp(regexpEscape(`header1: Some header value
+header2: Another header value
+
+Response body`)));
+  });
+
+  it('-v prints normally if no error headers/body', async () => {
     swaggerSpecValidatorMock.expects('validateFile').never();
     const validate = swaggerSpecValidatorMock.expects('validate').once()
       .withArgs(
@@ -381,6 +409,22 @@ describe('swagger-spec-validator command', () => {
     const code = await codeP;
     assert.strictEqual(code, 2);
     assert.strictEqual(options.stdout.read(), null);
+    assertMatch(options.stderr.read(), /testerr/i);
+  });
+
+  it('-vv prints error messages with stack to stderr', async () => {
+    swaggerSpecValidatorMock.expects('validateFile').never();
+    const validate = swaggerSpecValidatorMock.expects('validate').once()
+      .withArgs(
+        options.stdin,
+        match.object,
+        match.func,
+      );
+    const allArgs = [...RUNTIME_ARGS, '-vv'];
+    const codeP = swaggerSpecValidatorCmd(allArgs, options);
+    validate.yield(new Error('testerr'), {});
+    const code = await codeP;
+    assert.strictEqual(code, 2);
     const errStr = String(options.stderr.read(options.stderr.readableLength));
     assertMatch(errStr, /testerr/i);
     assertMatch(errStr, new RegExp(regexpEscape(__filename)));

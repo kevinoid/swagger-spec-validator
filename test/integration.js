@@ -19,7 +19,7 @@ const assertMatch = sinon.assert.match;
 const { match } = sinon;
 
 // Simulate arguments passed by the node runtime
-const RUNTIME_ARGS = ['node', 'swagger-spec-validator'];
+const RUNTIME_ARGS = ['node', 'swagger-spec-validator', '-v'];
 
 const swaggerJsonPath =
   path.join(__dirname, '..', 'test-data', 'petstore-minimal.json');

@@ -60,7 +60,7 @@
     "commander": "^15.0.0"
   },
   "devDependencies": {
-    "@kevinoid/eslint-config": "^34.0.0",
+    "@kevinoid/eslint-config": "^35.3.0",
     "c8": "^12.0.0",
     "eslint": "^9.35.0",
     "globals": "^17.0.0",

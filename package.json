@@ -48,7 +48,7 @@
     "lint-js": "eslint --report-unused-disable-directives . && echo ESLint passed.",
     "release": "git -C doc push && git push --follow-tags origin main gh-pages && echo \"Create a GitHub Release (from CHANGELOG.md) to run publish workflow.\"",
     "postversion": "rimraf doc && git clone -b gh-pages -l -q . doc && npm run doc && git -C doc add . && git -C doc commit -n -m \"Docs for v$npm_package_version\"",
-    "preversion": "npm run test-cov && c8 check-coverage --statements 90 && depcheck --ignore-dirs doc --ignores=\"eslint-*,rimraf\" && david && git-branch-is main && hub-ci-status -vv --wait",
+    "preversion": "npm run test-cov && c8 check-coverage --statements 90 && npm run check-deps && depcheck --ignore-dirs doc --ignores=\"eslint-*,rimraf\" && david && git-branch-is main && hub-ci-status -vv --wait",
     "test": "npm run lint && npm run test-unit && knip",
     "test-cov": "npm run lint && npm run test-unit-cov && knip",
     "test-unit": "node --disable-proto=throw --throw-deprecation --unhandled-rejections=strict node_modules/mocha/bin/mocha.js --parallel --recursive test",

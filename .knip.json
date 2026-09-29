@@ -1,0 +1,12 @@
+{
+  "ignoreBinaries": [
+    // Ignore version binaries.  Install by running version-deps script.
+    "conventional-changelog",
+    "depcheck",
+    "david",
+    "git-branch-is",
+    "hub-ci-status"
+  ],
+  "treatConfigHintsAsErrors": true,
+  "treatTagHintsAsErrors": true
+}

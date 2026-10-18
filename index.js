@@ -344,8 +344,8 @@ function validate(spec, options, callback) {
   }
 
   let contentInfoP;
-  if (!Object.keys(reqOpts.headers)
-    .some((name) => name.toLowerCase() === 'content-type')) {
+  if (Object.keys(reqOpts.headers)
+    .every((name) => name.toLowerCase() !== 'content-type')) {
     contentInfoP = guessSpecContentType(spec, options);
   } else {
     // Use null to preserve current API.

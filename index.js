@@ -213,7 +213,7 @@ function guessSpecDataContentType(spec, options) {
  * @param {string|!Uint8Array|!module:stream.Readable} spec OpenAPI/Swagger API
  * specification content.
  */
-function guessSpecContentType(spec, options) {
+async function guessSpecContentType(spec, options) {
   let contentType;
   if (typeof spec === 'string' || isUint8Array(spec)) {
     contentType = guessSpecDataContentType(spec, options);
@@ -227,7 +227,7 @@ function guessSpecContentType(spec, options) {
   }
 
   if (contentType) {
-    return Promise.resolve({ contentType });
+    return { contentType };
   }
 
   if (options.verbosity >= 1) {
@@ -237,11 +237,11 @@ function guessSpecContentType(spec, options) {
     );
   }
 
-  return getStreamData(spec)
-    .then((specContent) => ({
-      contentType: guessSpecDataContentType(specContent, options),
-      specContent,
-    }));
+  const specContent = await getStreamData(spec);
+  return {
+    contentType: guessSpecDataContentType(specContent, options),
+    specContent,
+  };
 }
 
 /** Validation options

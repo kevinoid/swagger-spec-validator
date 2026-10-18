@@ -117,18 +117,18 @@ function writeError(specPath, err, options) {
 
 // TODO: Replace promisify() with Promise-returning version
 const validateAll = promisify((specPaths, options, callback) => {
-  let hadError = false;
-  let hadInvalid = false;
+  let haveError = false;
+  let haveInvalid = false;
   let numValidated = 0;
   for (const specPath of specPaths) {
     function onResult(err, result) {
       if (err) {
-        hadError = true;
+        haveError = true;
         writeError(specPath, err, options);
       } else {
         const messages = getMessages(result);
         if (messages.length > 0) {
-          hadInvalid = true;
+          haveInvalid = true;
           if (options.verbosity >= 0) {
             const messagesWithPath =
               messages.map((message) => `${specPath}: ${message}`);
@@ -139,11 +139,11 @@ const validateAll = promisify((specPaths, options, callback) => {
 
       numValidated += 1;
       if (numValidated === specPaths.length) {
-        if (!hadError && !hadInvalid && options.verbosity >= 0) {
+        if (!haveError && !haveInvalid && options.verbosity >= 0) {
           options.stderr.write('All OpenAPI/Swagger specs are valid.\n');
         }
 
-        callback(undefined, hadError ? 2 : hadInvalid ? 1 : 0);
+        callback(undefined, haveError ? 2 : haveInvalid ? 1 : 0);
       }
     }
 

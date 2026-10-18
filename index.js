@@ -335,10 +335,10 @@ function validate(spec, options, callback) {
       ? combineHeaders(DEFAULT_HEADERS, reqOpts.headers || reqUrl.headers)
       : { ...DEFAULT_HEADERS };
 
-  let calledBack = false;
+  let wasCalled = false;
   function callbackOnce(...args) {
-    if (!calledBack) {
-      calledBack = true;
+    if (!wasCalled) {
+      wasCalled = true;
       callback.apply(this, args);
     }
   }

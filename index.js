@@ -339,6 +339,7 @@ function validate(spec, options, callback) {
   function callbackOnce(...args) {
     if (!wasCalled) {
       wasCalled = true;
+      // eslint-disable-next-line unicorn/no-this-outside-of-class
       callback.apply(this, args);
     }
   }
@@ -354,6 +355,7 @@ function validate(spec, options, callback) {
   }
 
   contentInfoP
+    // eslint-disable-next-line unicorn/prefer-await
     .then((contentInfo) => {
       if (contentInfo) {
         const { contentType, specContent } = contentInfo;
@@ -366,6 +368,7 @@ function validate(spec, options, callback) {
 
       requestJson(reqUrl, reqOpts, callbackOnce);
     })
+    // eslint-disable-next-line unicorn/prefer-await
     .catch(callbackOnce);
 
   return undefined;

@@ -61,11 +61,11 @@ function combineHeaders(...args) {
   args.reverse();
   for (const headers of args) {
     if (headers) {
-      for (const name of Object.keys(headers)) {
+      for (const [name, value] of Object.entries(headers)) {
         const nameLower = name.toLowerCase();
         if (!Object.hasOwn(combinedLower, nameLower)) {
           combinedLower[nameLower] = true;
-          combined[name] = headers[name];
+          combined[name] = value;
         }
       }
     }

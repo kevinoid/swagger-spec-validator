@@ -101,7 +101,7 @@ describe('swaggerSpecValidator', () => {
     });
 
     it('POSTs to string in options.url', () => {
-      const testProtoHost = 'http://example.com';
+      const testProtoHost = 'https://example.com';
       const testPath = '/foo/bar?baz=quux';
       const response = {};
       const ne = nock(testProtoHost)
@@ -116,7 +116,7 @@ describe('swaggerSpecValidator', () => {
     });
 
     it('POSTs to URL in options.url', () => {
-      const testProtoHost = 'http://example.com';
+      const testProtoHost = 'https://example.com';
       const testPath = '/foo/bar?baz=quux';
       const response = {};
       const ne = nock(testProtoHost)
@@ -131,7 +131,7 @@ describe('swaggerSpecValidator', () => {
     });
 
     it('POSTs to url.parse in options.url', () => {
-      const testProtoHost = 'http://example.com';
+      const testProtoHost = 'https://example.com';
       const testPath = '/foo/bar?baz=quux';
       const response = {};
       const ne = nock(testProtoHost)
@@ -149,7 +149,7 @@ describe('swaggerSpecValidator', () => {
     });
 
     it('POSTs to url.parse in request options', () => {
-      const testProtoHost = 'http://example.com';
+      const testProtoHost = 'https://example.com';
       const testPath = '/foo/bar?baz=quux';
       const response = {};
       const ne = nock(testProtoHost)
@@ -166,7 +166,7 @@ describe('swaggerSpecValidator', () => {
 
     // Note: options overrides url, as in http.request(url, options)
     it('path in request options overrides path in options.url', () => {
-      const testProtoHost = 'http://example.com';
+      const testProtoHost = 'https://example.com';
       const testPath1 = '/foo/bar?baz=quux';
       const testPath2 = '/foo2/bar2?baz2=quux2';
       const response = {};

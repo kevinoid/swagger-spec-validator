@@ -223,8 +223,8 @@ describe('swagger-spec-validator command', () => {
   );
   expectArgsAs(['--quiet'], match({ verbosity: -1 }));
   expectArgsAs(
-    ['--url', 'http://example.com'],
-    match({ url: 'http://example.com' }),
+    ['--url', 'https://example.com'],
+    match({ url: 'https://example.com' }),
   );
   expectArgsAs(['--verbose'], match({ verbosity: 1 }));
   expectArgsAs(

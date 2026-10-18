@@ -83,7 +83,7 @@ function getStreamData(stream) {
   return new Promise((resolve, reject) => {
     const chunks = [];
     stream
-      .on('data', (chunk) => chunks.push(chunk))
+      .on('data', (chunk) => { chunks.push(chunk); })
       .once('error', reject)
       .once(
         'end',

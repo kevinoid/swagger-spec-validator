@@ -10,7 +10,7 @@ const path = require('node:path');
 const stream = require('node:stream');
 const url = require('node:url');
 
-const nock = require('nock');
+const { default: nock } = require('nock');
 const regexpEscape = require('regexp.escape');
 
 // https://github.com/import-js/eslint-plugin-import/issues/2844
